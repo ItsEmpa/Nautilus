@@ -1,5 +1,3 @@
-Some notes on the template:
+Nautilus is a Forge mod for 1.8.9 made to help with fishing in Hypixel Skyblock.
 
-- Currently, when adding configs you dont need to annotate with @Expose, and you have to annotate stuff with @Transient if you dont want it saved in the file.
-- Objects annotated with @Module will get automatically registered.
-- Feel free to ask Empa for help (`empa_` on Discord)
+WIP
