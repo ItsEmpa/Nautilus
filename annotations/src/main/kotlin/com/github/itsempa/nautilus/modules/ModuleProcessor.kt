@@ -1,4 +1,4 @@
-package com.example.modules
+package com.github.itsempa.nautilus.modules
 
 import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.getAnnotationsByType
@@ -42,12 +42,12 @@ class ModuleProcessor(
 
         logger.warn("--- $moduleName Processor ---")
         logger.warn("Found ${validSymbols.size} modules")
-        logger.warn("Generating ExampleModules.kt")
+        logger.warn("Generating NautilusModules.kt")
 
-        val file = FileSpec.builder("com.example.modules", "ExampleModules")
+        val file = FileSpec.builder("com.github.itsempa.nautilus.modules", "NautilusModules")
             .indent("    ")
             .addType(
-                TypeSpec.objectBuilder("ExampleModules").apply {
+                TypeSpec.objectBuilder("NautilusModules").apply {
                     this.addProperty(
                         PropertySpec.builder("isDev", Boolean::class).apply {
                             this.addModifiers(KModifier.PRIVATE)
@@ -88,7 +88,7 @@ class ModuleProcessor(
             Dependencies(true, *validSymbols.mapNotNull(KSClassDeclaration::containingFile).toTypedArray()),
         )
 
-        logger.warn("Generated ExampleModules.kt")
+        logger.warn("Generated NautilusModules.kt")
 
         return emptyList()
     }

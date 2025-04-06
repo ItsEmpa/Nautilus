@@ -1,4 +1,4 @@
-package com.example.modules
+package com.github.itsempa.nautilus.modules
 
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment

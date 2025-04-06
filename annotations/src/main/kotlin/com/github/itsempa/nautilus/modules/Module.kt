@@ -1,4 +1,4 @@
-package com.example.modules
+package com.github.itsempa.nautilus.modules
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)

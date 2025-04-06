@@ -25,4 +25,4 @@ plugins {
 
 include("annotations")
 
-rootProject.name = "ExampleMod"
+rootProject.name = "Nautilus"
