@@ -1,6 +1,6 @@
 {
-  "package": "com.example.mixins.transformers",
-  "plugin": "com.example.mixins.init.AutoDiscoveryMixinPlugin",
+  "package": "com.github.itsempa.nautilus.mixins.transformers",
+  "plugin": "com.github.itsempa.nautilus.mixins.init.AutoDiscoveryMixinPlugin",
   "refmap": "mixins.${modid}.refmap.json",
   "minVersion": "0.7",
   "compatibilityLevel": "JAVA_8",

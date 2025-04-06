@@ -1,6 +1,6 @@
-package com.example.mixins.transformers;
+package com.github.itsempa.nautilus.mixins.transformers;
 
-import com.example.ExampleMod;
+import com.github.itsempa.nautilus.Nautilus;
 import net.minecraft.client.gui.GuiMainMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,6 +13,6 @@ public class MixinGuiMainMenu {
 
     @Inject(method = "initGui", at = @At("HEAD"))
     public void onInitGui(CallbackInfo ci) {
-        ExampleMod.logger.info("Hello from Main Menu!");
+        Nautilus.logger.info("Hello from Main Menu!");
     }
 }

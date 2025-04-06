@@ -1,6 +1,6 @@
-package com.example.mixins.transformers.modidhider;
+package com.github.itsempa.nautilus.mixins.transformers.modidhider;
 
-import com.example.ExampleMod;
+import com.github.itsempa.nautilus.Nautilus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinSkytilsFunnny {
     @Inject(method = "joinedSkyblock*", at = @At("HEAD"), expect = 0, cancellable = true, remap = false)
     public void onJoinedSkyblockHead(CallbackInfo ci) {
-        if (!ExampleMod.HIDE_MOD_ID) return;
+        if (!Nautilus.HIDE_MOD_ID) return;
         ci.cancel();
     }
 }

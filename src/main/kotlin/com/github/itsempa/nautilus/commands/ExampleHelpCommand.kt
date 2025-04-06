@@ -1,23 +1,23 @@
-package com.example.commands
+package com.github.itsempa.nautilus.commands
 
 import at.hannibal2.skyhanni.config.commands.CommandBuilder
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
-import com.example.ExampleMod
+import com.github.itsempa.nautilus.Nautilus
 import net.minecraft.util.IChatComponent
 
 object ExampleHelpCommand {
 
     private const val COMMANDS_PER_PAGE = 15
-    private val HELP_ID = ExampleMod.MOD_ID.hashCode()
+    private val HELP_ID = Nautilus.MOD_ID.hashCode()
 
     private fun createCommandEntry(command: CommandBuilder): IChatComponent {
         val category = command.category
         val color = category.color
         val description = command.description.splitLines(200).replace("§r", "§7")
-        val categoryDescription = category.description.replace("SkyHanni", ExampleMod.MOD_NAME).splitLines(200).replace("§r", "§7")
+        val categoryDescription = category.description.replace("SkyHanni", Nautilus.MOD_NAME).splitLines(200).replace("§r", "§7")
 
         return Text.text("§7 - $color${command.name}") {
             this.hover = Text.multiline(
@@ -36,7 +36,7 @@ object ExampleHelpCommand {
             it.name.contains(search, ignoreCase = true) || it.description.contains(search, ignoreCase = true)
         }
 
-        val title = "${ExampleMod.MOD_NAME} Commands" + if (search.isNotBlank()) "Matching: \"$search\"" else ""
+        val title = "${Nautilus.MOD_NAME} Commands" + if (search.isNotBlank()) "Matching: \"$search\"" else ""
 
         Text.displayPaginatedList(
             title,

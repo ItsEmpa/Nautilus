@@ -1,4 +1,4 @@
-package com.example
+package com.github.itsempa.nautilus
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.deps.moulconfig.managed.ManagedConfig
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
-import com.example.config.Features
-import com.example.events.ExampleCommandRegistrationEvent
-import com.example.mixins.transformers.skyhanni.AccessorSkyHanniEvents
-import com.example.modules.ExampleModules
-import com.example.modules.Module
+import com.github.itsempa.nautilus.config.Features
+import com.github.itsempa.nautilus.events.ExampleCommandRegistrationEvent
+import com.github.itsempa.nautilus.mixins.transformers.skyhanni.AccessorSkyHanniEvents
+import com.github.itsempa.nautilus.modules.Nautilusules
+import com.github.itsempa.nautilus.modules.Module
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
@@ -21,19 +21,19 @@ import java.io.File
 
 @Module
 @Mod(
-    modid = ExampleMod.MOD_ID,
-    name = ExampleMod.MOD_NAME,
+    modid = Nautilus.MOD_ID,
+    name = Nautilus.MOD_NAME,
     clientSideOnly = true,
     useMetadata = true,
-    version = ExampleMod.VERSION,
+    version = Nautilus.VERSION,
     dependencies = "before:skyhanni",
     modLanguageAdapter = "at.hannibal2.skyhanni.utils.system.KotlinLanguageAdapter",
 )
-object ExampleMod {
+object Nautilus {
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
-        ExampleModules.modules.loadModules()
+        Nautilusules.modules.loadModules()
 
         ExampleCommandRegistrationEvent.post()
     }
@@ -52,7 +52,7 @@ object ExampleMod {
         runCatching {
             for (method in obj.javaClass.declaredMethods) {
                 @Suppress("CAST_NEVER_SUCCEEDS")
-                (SkyHanniEvents as AccessorSkyHanniEvents).`examplemod$registerMethod`(method, obj)
+                (SkyHanniEvents as AccessorSkyHanniEvents).`nautilus$registerMethod`(method, obj)
             }
             MinecraftForge.EVENT_BUS.register(obj)
             modules.add(obj)

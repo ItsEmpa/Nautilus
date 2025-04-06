@@ -1,4 +1,4 @@
-package com.example.mixins.init;
+package com.github.itsempa.nautilus.mixins.init;
 
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
