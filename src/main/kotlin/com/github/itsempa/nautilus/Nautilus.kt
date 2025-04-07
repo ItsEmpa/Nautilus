@@ -6,8 +6,8 @@ import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.config.Features
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.mixins.transformers.skyhanni.AccessorSkyHanniEvents
-import com.github.itsempa.nautilus.modules.NautilusModules
 import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.modules.NautilusModules
 import com.github.itsempa.nautilus.utils.NautilusUtils
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
@@ -69,7 +69,7 @@ object Nautilus {
     fun consoleLog(message: String) = logger.info(message)
 
     @JvmField
-    val modules: MutableList<Any> = ArrayList()
+    val modules: MutableList<Any> = mutableListOf()
 
     @JvmStatic
     val feature: Features get() = ConfigManager.managedConfig.instance

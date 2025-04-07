@@ -93,11 +93,9 @@ dependencies {
 
     compileOnly(libs.jbAnnotations)
     headlessLwjgl(libs.headlessLwjgl)
-    /* Uncomment if you want to make an auto updater
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
-    */
 
     compileOnly(ksp(project("annotations"))!!)
 
@@ -219,6 +217,7 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
+    relocate("moe.nea.libautoupdate", "$baseGroup.deps.libautoupdate")
 }
 
 tasks.jar {

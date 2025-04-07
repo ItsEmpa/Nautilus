@@ -2,12 +2,6 @@ package com.github.itsempa.nautilus.features.misc.update
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.deps.libautoupdate.CurrentVersion
-import at.hannibal2.skyhanni.deps.libautoupdate.GithubReleaseUpdateSource
-import at.hannibal2.skyhanni.deps.libautoupdate.PotentialUpdate
-import at.hannibal2.skyhanni.deps.libautoupdate.UpdateContext
-import at.hannibal2.skyhanni.deps.libautoupdate.UpdateTarget
-import at.hannibal2.skyhanni.deps.libautoupdate.UpdateUtils
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -17,12 +11,16 @@ import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChatUtils
 import com.github.itsempa.nautilus.utils.helpers.McClient
 import com.google.gson.JsonElement
+import moe.nea.libautoupdate.CurrentVersion
+import moe.nea.libautoupdate.GithubReleaseUpdateSource
+import moe.nea.libautoupdate.PotentialUpdate
+import moe.nea.libautoupdate.UpdateContext
+import moe.nea.libautoupdate.UpdateTarget
+import moe.nea.libautoupdate.UpdateUtils
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 import kotlin.math.pow
 
-// TODO: dont use the libautoupdate bundled in SkyHanni, as it causes problems when both
-//  SkyHanni and Nautilus want to update at the same time
 @Module
 object UpdateManager {
 
@@ -92,7 +90,7 @@ object UpdateManager {
 
     fun checkUpdate(forceUpdate: Boolean = false) {
         NautilusChatUtils.chat("Checking for updates...")
-        activePromise = context.checkUpdate("balls") // TODO: get correct updateStream
+        activePromise = context.checkUpdate("pre") // TODO: get correct updateStream
             .thenAcceptAsync({
                 potentialUpdate = it
                 if (!it.isUpdateAvailable) return@thenAcceptAsync NautilusChatUtils.chat("No updates found.")
