@@ -1,7 +1,6 @@
 package com.github.itsempa.nautilus
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.config.Features
@@ -9,6 +8,7 @@ import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.mixins.transformers.skyhanni.AccessorSkyHanniEvents
 import com.github.itsempa.nautilus.modules.NautilusModules
 import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.utils.NautilusUtils
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
@@ -49,11 +49,11 @@ object Nautilus {
             modules.add(obj)
         }.onFailure {
             DelayedRun.runNextTick {
-                ErrorManager.logErrorWithData(
+                NautilusUtils.logErrorWithData(
                     it,
-                    "§c${MOD_NAME} ERROR! Something went wrong while initializing events",
-                    ignoreErrorCache = true,
-                    betaOnly = false,
+                    "Something went wrong while initializing events.",
+                    "module" to obj.javaClass.simpleName,
+                    ignoreErrorCache = true
                 )
             }
         }

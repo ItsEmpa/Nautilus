@@ -15,8 +15,7 @@ object NautilusChatUtils {
     private const val CHAT_PREFIX = "[${Nautilus.MOD_NAME}] "
 
     fun debug(message: String) {
-        // TODO: add config option for debug
-        if (/*true && */internalChat(DEBUG_PREFIX + message)) {
+        if (Nautilus.feature.about.debug && internalChat(DEBUG_PREFIX + message)) {
             Nautilus.consoleLog(DEBUG_PREFIX_NO_COLOR + message)
         }
     }

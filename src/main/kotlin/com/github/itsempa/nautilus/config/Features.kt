@@ -26,8 +26,8 @@ class Features : Config() {
     }
 
     @Expose
-    @Category(name = "Example", desc = "")
-    val exampleCategory: ExampleCategory = ExampleCategory()
+    @Category(name = "About", desc = "")
+    val about: About = About()
 
     @Expose
     val storage: Storage = Storage()

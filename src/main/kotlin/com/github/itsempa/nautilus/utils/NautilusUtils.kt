@@ -1,8 +1,28 @@
 package com.github.itsempa.nautilus.utils
 
 import at.hannibal2.skyhanni.deps.moulconfig.observer.Property
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import com.github.itsempa.nautilus.Nautilus
 
 object NautilusUtils {
+    // TODO: replace with own custom error manager
+    fun logErrorWithData(
+        throwable: Throwable,
+        message: String,
+        vararg extraData: Pair<String, Any?>,
+        ignoreErrorCache: Boolean = false,
+        noStackTrace: Boolean = false,
+    ) {
+        ErrorManager.logErrorWithData(
+            throwable,
+            "§c${Nautilus.MOD_NAME.uppercase()} ERROR!! $message. Please report this to Empa.",
+            extraData = extraData,
+            ignoreErrorCache = ignoreErrorCache,
+            noStackTrace = noStackTrace,
+            betaOnly = false,
+        )
+    }
+
     fun <T : Enum<T>> Enum<T>.toFormattedName(): String =
         name.split("_").joinToString(" ") { it.lowercase().replaceFirstChar(Char::uppercase) }
 
