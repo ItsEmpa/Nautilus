@@ -1,8 +1,13 @@
 package com.github.itsempa.nautilus.utils
 
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.deps.moulconfig.observer.Property
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.Nautilus
+import net.minecraft.entity.EntityLivingBase
 
 object NautilusUtils {
     // TODO: replace with own custom error manager
@@ -22,6 +27,16 @@ object NautilusUtils {
             betaOnly = false,
         )
     }
+
+    val Mob.hasDied: Boolean get() = baseEntity.hasDied
+
+    fun Mob.getLorenzVec() = baseEntity.getLorenzVec()
+
+    val Mob.entityId get() = baseEntity.entityId
+
+    fun SkyHanniRenderWorldEvent.exactLocation(mob: Mob) = exactLocation(mob.baseEntity)
+
+    val EntityLivingBase.hasDied get() = isDead || health <= 0f
 
     fun <T : Enum<T>> Enum<T>.toFormattedName(): String =
         name.split("_").joinToString(" ") { it.lowercase().replaceFirstChar(Char::uppercase) }

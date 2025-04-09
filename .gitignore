@@ -4,6 +4,7 @@
 run/
 build/
 bin/
+/.kotlin/*
 
 # gradle
 build
