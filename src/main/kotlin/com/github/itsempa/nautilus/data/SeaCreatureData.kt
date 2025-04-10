@@ -1,6 +1,7 @@
 package com.github.itsempa.nautilus.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.MobEvent
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.SeaCreature
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -27,15 +29,14 @@ import com.github.itsempa.nautilus.utils.NautilusUtils.entityId
 import com.github.itsempa.nautilus.utils.NautilusUtils.exactLocation
 import com.github.itsempa.nautilus.utils.NautilusUtils.getLorenzVec
 import com.github.itsempa.nautilus.utils.NautilusUtils.hasDied
+import com.github.itsempa.nautilus.utils.NautilusUtils.removeIf
 import com.google.common.cache.RemovalCause
+import net.minecraft.entity.EntityLivingBase
 import java.awt.Color
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-// TODO: figure out why some mobs do not get removed from the cache, why some get added all at once,
-//  and why pyroclastic worms sometimes get removed
-// TODO: make it so that instead of using TimeLimitedCache, we just use a regular mutable map and remove mobs from it
-//  on tick and add them to the sea creatures map
+// TODO: replace "handleMobs" functions with code in their event for faster detection
 @Suppress("UnstableApiUsage")
 @Module
 object SeaCreatureData {
@@ -54,8 +55,11 @@ object SeaCreatureData {
 
         fun isLoaded(): Boolean = mob != null
 
+        private val entity: EntityLivingBase? get() = EntityUtils.getEntityByID(entityId) as? EntityLivingBase
+
         fun getExactPosOrLast(renderWorld: SkyHanniRenderWorldEvent): LorenzVec? {
             val mob = mob ?: return lastKnownPos
+            // TODO: use custom canBeSeen function that properly supports fire eels and F5
             return if (mob.canBeSeen()) renderWorld.exactLocation(mob).also { lastKnownPos = it }
             else lastKnownPos
         }
@@ -74,9 +78,7 @@ object SeaCreatureData {
     private var mobsToFind = 0
     private var lastSeaCreatureFished = SimpleTimeMark.farPast()
 
-    private val recentMobs = TimeLimitedCache<Mob, SimpleTimeMark>(2.seconds) { mob, time, cause ->
-        if (cause == RemovalCause.EXPIRED && mob != null && time != null) addMob(mob, time, isOwn = false)
-    }
+    private val recentMobs = mutableMapOf<Mob, SimpleTimeMark>()
 
     private var lastBobberLocation: LorenzVec? = null
 
@@ -84,9 +86,7 @@ object SeaCreatureData {
     private var lastMagmaSlugLocation: LorenzVec? = null
     private var lastMagmaSlugTime = SimpleTimeMark.farPast()
 
-    private val recentBabyMagmaSlugs = TimeLimitedCache<Mob, SimpleTimeMark>(2.seconds) { mob, time, cause ->
-        if (cause == RemovalCause.EXPIRED && mob != null && time != null) addMob(mob, time, isOwn = false, isBabySlug = true)
-    }
+    private val recentBabyMagmaSlugs = mutableMapOf<Mob, SimpleTimeMark>()
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -228,6 +228,7 @@ object SeaCreatureData {
             val mobPos = mob.getLorenzVec()
             val exactPos = data.getExactPosOrLast(event) ?: continue
             val aabb = mob.boundingBox.offset(-mobPos.x, -mobPos.y, -mobPos.z).offset(exactPos.x, exactPos.y, exactPos.z)
+            // TODO: make function for getting the proper bounding box of a mob counting extra entities
             event.drawBoundingBox(
                 aabb,
                 color,
@@ -239,17 +240,23 @@ object SeaCreatureData {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        recentMobs.forEach { _ -> } // TODO: find a better way to force the cleanup of the cache
-        recentBabyMagmaSlugs.forEach { _ -> }
+        recentMobs.removeIf { (mob, time) ->
+            if (time.passedSince() < 1.2.seconds) return@removeIf false
+            addMob(mob, time, isOwn = false)
+            return@removeIf true
+        }
+        recentBabyMagmaSlugs.removeIf { (mob, time) ->
+            if (time.passedSince() < 1.2.seconds) return@removeIf false
+            addMob(mob, time, isOwn = false, isBabySlug = true)
+            return@removeIf true
+        }
         if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 2.seconds) babyMagmaSlugsToFind = 0
         val bobber = FishingApi.bobber ?: return
         lastBobberLocation = bobber.getLorenzVec()
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
-        reset()
-    }
+    fun onWorldChange(event: WorldChangeEvent) = reset()
 
     val BABY_MAGMA_SLUG = SeaCreature(
         "Baby Magma Slug",
@@ -275,7 +282,10 @@ object SeaCreatureData {
 
     @HandleEvent
     fun onCommand(event: NautilusCommandRegistrationEvent) {
-        event.register("ntresetdata") {
+        event.register("nautilusresetdata") {
+            this.aliases = listOf("ntresetdata")
+            this.description = "Resets Sea Creature Data"
+            this.category = CommandCategory.DEVELOPER_TEST
             callback { reset() }
         }
     }

@@ -28,15 +28,17 @@ object NautilusUtils {
         )
     }
 
-    val Mob.hasDied: Boolean get() = baseEntity.hasDied
+    fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.removeIf(predicate)
+
+    inline val Mob.hasDied: Boolean get() = baseEntity.hasDied
 
     fun Mob.getLorenzVec() = baseEntity.getLorenzVec()
 
-    val Mob.entityId get() = baseEntity.entityId
+    inline val Mob.entityId get() = baseEntity.entityId
 
     fun SkyHanniRenderWorldEvent.exactLocation(mob: Mob) = exactLocation(mob.baseEntity)
 
-    val EntityLivingBase.hasDied get() = isDead || health <= 0f
+    inline val EntityLivingBase.hasDied get() = isDead || health <= 0f
 
     fun <T : Enum<T>> Enum<T>.toFormattedName(): String =
         name.split("_").joinToString(" ") { it.lowercase().replaceFirstChar(Char::uppercase) }
