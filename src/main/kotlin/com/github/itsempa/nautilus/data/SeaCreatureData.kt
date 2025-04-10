@@ -15,11 +15,13 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.utils.NautilusChatUtils
 import com.github.itsempa.nautilus.utils.NautilusRenderUtils.drawBoundingBox
 import com.github.itsempa.nautilus.utils.NautilusUtils.entityId
 import com.github.itsempa.nautilus.utils.NautilusUtils.exactLocation
@@ -32,6 +34,8 @@ import kotlin.time.Duration.Companion.seconds
 
 // TODO: figure out why some mobs do not get removed from the cache, why some get added all at once,
 //  and why pyroclastic worms sometimes get removed
+// TODO: make it so that instead of using TimeLimitedCache, we just use a regular mutable map and remove mobs from it
+//  on tick and add them to the sea creatures map
 @Suppress("UnstableApiUsage")
 @Module
 object SeaCreatureData {
@@ -70,7 +74,7 @@ object SeaCreatureData {
     private var mobsToFind = 0
     private var lastSeaCreatureFished = SimpleTimeMark.farPast()
 
-    private val recentMobs = TimeLimitedCache<Mob, SimpleTimeMark>(1.seconds) { mob, time, cause ->
+    private val recentMobs = TimeLimitedCache<Mob, SimpleTimeMark>(2.seconds) { mob, time, cause ->
         if (cause == RemovalCause.EXPIRED && mob != null && time != null) addMob(mob, time, isOwn = false)
     }
 
@@ -80,7 +84,7 @@ object SeaCreatureData {
     private var lastMagmaSlugLocation: LorenzVec? = null
     private var lastMagmaSlugTime = SimpleTimeMark.farPast()
 
-    private val recentBabyMagmaSlugs = TimeLimitedCache<Mob, SimpleTimeMark>(1.seconds) { mob, time, cause ->
+    private val recentBabyMagmaSlugs = TimeLimitedCache<Mob, SimpleTimeMark>(2.seconds) { mob, time, cause ->
         if (cause == RemovalCause.EXPIRED && mob != null && time != null) addMob(mob, time, isOwn = false, isBabySlug = true)
     }
 
@@ -90,11 +94,13 @@ object SeaCreatureData {
         val data = entityIdToData[mob.entityId]
         if (data != null) {
             seaCreatures[mob] = data
+            NautilusChatUtils.debug("FOUND: matching data for mob ${mob.name} with id ${mob.entityId}")
             data.mob = mob
             return
         }
 
         if (mob.name == "Baby Magma Slug") {
+            NautilusChatUtils.debug("SPAWN: Baby Magma Slug with id ${mob.entityId}")
             recentBabyMagmaSlugs[mob] = SimpleTimeMark.now()
             DelayedRun.runNextTick {
                 handleBabySlugs()
@@ -102,6 +108,7 @@ object SeaCreatureData {
             return
         }
         if (mob.name !in SeaCreatureManager.allFishingMobs) return
+        NautilusChatUtils.debug("SPAWN: ${mob.name} with id ${mob.entityId}")
         recentMobs[mob] = SimpleTimeMark.now()
         handleOwnMob()
     }
@@ -111,14 +118,22 @@ object SeaCreatureData {
         val mob = event.mob
         recentBabyMagmaSlugs.remove(mob)
         recentMobs.remove(mob)
+        if (mob.name == "Baby Magma Slug") {
+            NautilusChatUtils.debug("DESPAWN: Baby Magma Slug with id ${mob.entityId}")
+        }
+        if (mob.name in SeaCreatureManager.allFishingMobs) {
+            NautilusChatUtils.debug("DESPAWN: ${mob.name} with id ${mob.entityId}")
+        }
         val data = seaCreatures[mob] ?: return
         seaCreatures.remove(mob)
         val oldId = data.entityId
         val newId = mob.entityId
         if (mob.hasDied) {
+            NautilusChatUtils.debug("DEATH: ${mob.name} with id $newId (own: ${data.isOwn})")
             entityIdToData.remove(newId)
             if (data.isOwn) {
                 if (mob.name == "Magma Slug") {
+                    NautilusChatUtils.debug("FOUND: Own Magma Slug death with id $newId")
                     lastMagmaSlugLocation = mob.getLorenzVec()
                     babyMagmaSlugsToFind += 3
                     lastMagmaSlugTime = SimpleTimeMark.now()
@@ -128,6 +143,7 @@ object SeaCreatureData {
             }
             return
         } else if (oldId != newId) { // we update the entity id in case the baseEntity has changed at some point
+            NautilusChatUtils.debug("UPDATE: Changed entity id for ${mob.name} from $oldId to $newId")
             entityIdToData.remove(oldId)
             entityIdToData[newId] = data
             data.entityId = newId
@@ -140,6 +156,7 @@ object SeaCreatureData {
         lastSeaCreatureFished = SimpleTimeMark.now()
         lastNameFished = event.seaCreature.name
         mobsToFind = if (event.doubleHook) 2 else 1
+        NautilusChatUtils.debug("CATCH: ${event.seaCreature.name} (double hook: $mobsToFind)")
         handleOwnMob()
     }
 
@@ -153,6 +170,7 @@ object SeaCreatureData {
         val pos = if (isOwn || mob.canBeSeen()) mob.getLorenzVec() else null
         val data = SeaCreatureData(isOwn, seaCreature, mob.entityId, time, mob, pos)
         // TODO: add event for sea creature spawn
+        NautilusChatUtils.debug("ADD: ${mob.name} with id ${mob.entityId} (own: $isOwn)")
         seaCreatures[mob] = data
         entityIdToData[mob.entityId] = data
     }
@@ -160,9 +178,10 @@ object SeaCreatureData {
     private fun handleOwnMob() {
         if (lastSeaCreatureFished.passedSince() > 1.seconds) return
         val name = lastNameFished ?: return
+        val lastBobber = lastBobberLocation ?: return
         // TODO: create a sortedByFiltered function that removes elements when the comparator returns null
-        val mobs = recentMobs.asSequence().filter { (mob, _) -> mob.name == name }.map {
-            it to it.key.baseEntity.distanceTo(lastBobberLocation!!)
+        val mobs = recentMobs.asSequence().filter { (mob, data) -> mob.name == name && data.passedSince() < 1.5.seconds }.map {
+            it to it.key.baseEntity.distanceTo(lastBobber)
         }.filter { it.second <= 3 }
             .sortedBy { it.second }
             .take(mobsToFind).toList()
@@ -174,7 +193,10 @@ object SeaCreatureData {
             addMob(mob, time, isOwn = true)
             recentMobs.remove(mob)
         }
-        if (mobsToFind == 0) lastNameFished = null
+        if (mobsToFind == 0) {
+            lastNameFished = null
+            lastBobberLocation = null
+        }
     }
 
     private fun handleBabySlugs() {
@@ -203,14 +225,22 @@ object SeaCreatureData {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         for ((mob, data) in seaCreatures) {
             val color = if (data.isOwn) Color.GREEN else Color.BLUE
-            event.drawBoundingBox(event.exactBoundingBox(mob.baseEntity), color, wireframe = true)
+            val mobPos = mob.getLorenzVec()
+            val exactPos = data.getExactPosOrLast(event) ?: continue
+            val aabb = mob.boundingBox.offset(-mobPos.x, -mobPos.y, -mobPos.z).offset(exactPos.x, exactPos.y, exactPos.z)
+            event.drawBoundingBox(
+                aabb,
+                color,
+                wireframe = true,
+                throughBlocks = PlatformUtils.isDevEnvironment,
+            )
         }
     }
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        recentMobs.entries // TODO: find a better way to force the cleanup of the cache
-        recentBabyMagmaSlugs.entries
+        recentMobs.forEach { _ -> } // TODO: find a better way to force the cleanup of the cache
+        recentBabyMagmaSlugs.forEach { _ -> }
         if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 2.seconds) babyMagmaSlugsToFind = 0
         val bobber = FishingApi.bobber ?: return
         lastBobberLocation = bobber.getLorenzVec()
@@ -218,6 +248,18 @@ object SeaCreatureData {
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
+        reset()
+    }
+
+    val BABY_MAGMA_SLUG = SeaCreature(
+        "Baby Magma Slug",
+        fishingExperience = 730,
+        chatColor = "§c",
+        rare = false,
+        rarity = LorenzRarity.RARE,
+    )
+
+    private fun reset() {
         entityIdToData.clear()
         seaCreatures.clear() // TODO: add event for sea creature removal
         recentMobs.clear()
@@ -231,14 +273,14 @@ object SeaCreatureData {
         mobsToFind = 0
     }
 
-    val BABY_MAGMA_SLUG = SeaCreature(
-        "Baby Magma Slug",
-        fishingExperience = 730,
-        chatColor = "§c",
-        rare = false,
-        rarity = LorenzRarity.RARE,
-    )
+    @HandleEvent
+    fun onCommand(event: NautilusCommandRegistrationEvent) {
+        event.register("ntresetdata") {
+            callback { reset() }
+        }
+    }
 
+    // TODO: make own debug data collect event
     @HandleEvent
     fun onDebugCollect(event: DebugDataCollectEvent) {
         event.title("Nautilus Sea Creatures")

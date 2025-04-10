@@ -20,9 +20,9 @@ object NautilusChatUtils {
         }
     }
 
-    fun userError(message: String) = internalChat(USER_ERROR_PREFIX + message)
+    fun userError(message: String) = chat(message, prefixColor = "§c")
 
-    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") {
+    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§b") {
         val text = (if (prefix) prefixColor + CHAT_PREFIX else "") + message
         ChatUtils.chat(text, false)
     }
@@ -34,7 +34,7 @@ object NautilusChatUtils {
         hover: String = "§eClick here!",
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
-        prefixColor: String = "§e",
+        prefixColor: String = "§b",
         oneTimeClick: Boolean = false,
         onClick: () -> Unit,
     ) {
@@ -46,7 +46,7 @@ object NautilusChatUtils {
         hover: List<String>,
         command: String? = null,
         prefix: Boolean = true,
-        prefixColor: String = "§e",
+        prefixColor: String = "§b",
     ) {
         val text = (if (prefix) prefixColor + CHAT_PREFIX else "") + message
         ChatUtils.hoverableChat(text, hover, command, false)
@@ -58,7 +58,7 @@ object NautilusChatUtils {
         hover: String = "§eOpen $url",
         autoOpen: Boolean = false,
         prefix: Boolean = true,
-        prefixColor: String = "§e",
+        prefixColor: String = "§b",
     ) {
         val text = (if (prefix) prefixColor + CHAT_PREFIX else "") + message
         ChatUtils.clickableLinkChat(text, url, hover, autoOpen, false)
@@ -67,7 +67,7 @@ object NautilusChatUtils {
     fun multiComponentMessage(
         components: List<ChatComponentText>,
         prefix: Boolean = true,
-        prefixColor: String = "§e",
+        prefixColor: String = "§b",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         ChatUtils.chat(TextHelper.join(components).prefix(msgPrefix))
