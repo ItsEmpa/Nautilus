@@ -4,11 +4,17 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.deps.moulconfig.observer.Property
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LocationUtils.union
+import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.Nautilus
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.util.AxisAlignedBB
+import kotlin.time.Duration
 
+// TODO: separate some functions into other util objects
 object NautilusUtils {
     // TODO: replace with own custom error manager
     fun logErrorWithData(
@@ -27,12 +33,24 @@ object NautilusUtils {
             betaOnly = false,
         )
     }
+    
+    fun SimpleTimeMark.isInPastOrAlmost(maxError: Duration): Boolean {
+        val passedSince = passedSince()
+        return passedSince.isPositive() || passedSince.absoluteValue <= maxError
+    }
 
     fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.removeIf(predicate)
 
     inline val Mob.hasDied: Boolean get() = baseEntity.hasDied
 
     fun Mob.getLorenzVec() = baseEntity.getLorenzVec()
+
+    fun SkyHanniRenderWorldEvent.exactBoundingBoxExtraEntities(mob: Mob): AxisAlignedBB {
+        val aabb = exactBoundingBox(mob.baseEntity)
+        return aabb.union(
+            mob.extraEntities.map { exactBoundingBox(it) },
+        ) ?: aabb
+    }
 
     inline val Mob.entityId get() = baseEntity.entityId
 
