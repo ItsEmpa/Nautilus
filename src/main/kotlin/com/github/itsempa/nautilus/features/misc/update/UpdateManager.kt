@@ -10,8 +10,6 @@ import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChatUtils
 import com.github.itsempa.nautilus.utils.helpers.McClient
-import com.google.gson.JsonElement
-import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.GithubReleaseUpdateSource
 import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
@@ -19,19 +17,16 @@ import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
-import kotlin.math.pow
 
 @Module
 object UpdateManager {
 
     private val config get() = Nautilus.feature.about
 
-    private var _activePromise: CompletableFuture<*>? = null
-    private var activePromise: CompletableFuture<*>?
-        get() = _activePromise
+    private var activePromise: CompletableFuture<*>? = null
         set(value) {
-            _activePromise?.cancel(true)
-            _activePromise = value
+            field?.cancel(true)
+            field = value
         }
 
     var updateState: UpdateState = UpdateState.NONE
@@ -44,26 +39,7 @@ object UpdateManager {
     private val context = UpdateContext(
         GithubReleaseUpdateSource("ItsEmpa", "Nautilus"),
         UpdateTarget.deleteAndSaveInTheSameFolder(this::class.java),
-        object : CurrentVersion {
-            val normalDelegate = CurrentVersion.ofTag(Nautilus.VERSION)
-            override fun display() = normalDelegate.display()
-            override fun isOlderThan(element: JsonElement?): Boolean {
-                val version = element?.asString ?: return true
-
-                fun getVersionNumber(input: String): Int { // very primitive semver parsing
-                    val splits = input.split(".").asReversed()
-                    var result = 0
-                    for (i in splits.indices) {
-                        result += splits[i].toInt() * 100.0.pow(i).toInt()
-                    }
-                    return result
-                }
-
-                val currentVersion = getVersionNumber(Nautilus.VERSION)
-                val newVersion = getVersionNumber(version)
-                return currentVersion < newVersion
-            }
-        },
+        Nautilus.SEM_VER,
         Nautilus.MOD_ID,
     )
 
@@ -90,7 +66,7 @@ object UpdateManager {
 
     fun checkUpdate(forceUpdate: Boolean = false) {
         NautilusChatUtils.chat("Checking for updates...")
-        activePromise = context.checkUpdate("pre") // TODO: get correct updateStream
+        activePromise = context.checkUpdate("pre")
             .thenAcceptAsync({
                 potentialUpdate = it
                 if (!it.isUpdateAvailable) return@thenAcceptAsync NautilusChatUtils.chat("No updates found.")

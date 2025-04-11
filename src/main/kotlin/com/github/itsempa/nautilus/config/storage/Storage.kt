@@ -1,6 +1,7 @@
 package com.github.itsempa.nautilus.config.storage
 
 import com.github.itsempa.nautilus.Nautilus
+import com.github.itsempa.nautilus.features.misc.update.SemVersion
 import com.google.gson.annotations.Expose
 
 class Storage {
@@ -10,6 +11,6 @@ class Storage {
 
     // TODO: use this to get changelog between versions on startup
     @Expose
-    val lastUsedVersion: String = Nautilus.VERSION
+    val lastUsedVersion: SemVersion = Nautilus.SEM_VER
 
 }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.config.Features
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.features.misc.update.SemVersion
 import com.github.itsempa.nautilus.mixins.transformers.skyhanni.AccessorSkyHanniEvents
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.modules.NautilusModules
@@ -20,7 +21,6 @@ import org.apache.logging.log4j.Logger
     modid = Nautilus.MOD_ID,
     name = Nautilus.MOD_NAME,
     clientSideOnly = true,
-    useMetadata = true,
     version = Nautilus.VERSION,
     dependencies = "before:skyhanni",
     modLanguageAdapter = "at.hannibal2.skyhanni.utils.system.KotlinLanguageAdapter",
@@ -62,6 +62,8 @@ object Nautilus {
     const val MOD_ID = "@MOD_ID@"
     const val VERSION = "@MOD_VER@"
     const val MOD_NAME = "@MOD_NAME@"
+
+    val SEM_VER = SemVersion.fromString(VERSION)
 
     @JvmField
     val logger: Logger = LogManager.getLogger(MOD_NAME)
