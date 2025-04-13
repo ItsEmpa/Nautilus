@@ -7,12 +7,6 @@ import moe.nea.libautoupdate.CurrentVersion
 
 data class SemVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<SemVersion>, CurrentVersion {
 
-    override fun isOlderThan(element: JsonElement?): Boolean {
-        val version = element?.asString ?: return true
-        val semVer = fromString(version)
-        return semVer < this
-    }
-
     inline val asString: String get() = toString()
 
     override fun toString(): String = "$major.$minor.$patch"
@@ -25,6 +19,12 @@ data class SemVersion(val major: Int, val minor: Int, val patch: Int) : Comparab
             minor != other.minor -> minor.compareTo(other.minor)
             else -> patch.compareTo(other.patch)
         }
+    }
+
+    override fun isOlderThan(element: JsonElement?): Boolean {
+        val version = element?.asString ?: return true
+        val semVer = fromString(version)
+        return semVer < this
     }
 
     companion object {
