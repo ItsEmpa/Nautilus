@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.Nautilus
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
+import kotlin.math.abs
 import kotlin.time.Duration
 
 // TODO: separate some functions into other util objects
@@ -33,6 +34,8 @@ object NautilusUtils {
             betaOnly = false,
         )
     }
+
+    fun AxisAlignedBB.getHeight() = abs(maxY - minY)
     
     fun SimpleTimeMark.isInPastOrAlmost(maxError: Duration): Boolean {
         val passedSince = passedSince()

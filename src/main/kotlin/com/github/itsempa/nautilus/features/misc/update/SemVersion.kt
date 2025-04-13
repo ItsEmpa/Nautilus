@@ -1,6 +1,7 @@
 package com.github.itsempa.nautilus.features.misc.update
 
 import at.hannibal2.skyhanni.utils.json.SimpleStringTypeAdapter
+import com.github.itsempa.nautilus.utils.NautilusUtils.orZero
 import com.google.gson.JsonElement
 import moe.nea.libautoupdate.CurrentVersion
 
@@ -30,9 +31,9 @@ data class SemVersion(val major: Int, val minor: Int, val patch: Int) : Comparab
         fun fromString(version: String): SemVersion {
             val parts = version.split('.')
             return SemVersion(
-                parts.getOrNull(0)?.toIntOrNull() ?: 0,
-                parts.getOrNull(1)?.toIntOrNull() ?: 0,
-                parts.getOrNull(2)?.toIntOrNull() ?: 0,
+                parts.getOrNull(0)?.toIntOrNull().orZero(),
+                parts.getOrNull(1)?.toIntOrNull().orZero(),
+                parts.getOrNull(2)?.toIntOrNull().orZero(),
             )
         }
 

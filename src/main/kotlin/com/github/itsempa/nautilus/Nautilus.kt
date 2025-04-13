@@ -1,5 +1,6 @@
 package com.github.itsempa.nautilus
 
+
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.utils.DelayedRun
 import com.github.itsempa.nautilus.config.ConfigManager
@@ -10,6 +11,12 @@ import com.github.itsempa.nautilus.mixins.transformers.skyhanni.AccessorSkyHanni
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.modules.NautilusModules
 import com.github.itsempa.nautilus.utils.NautilusUtils
+import com.github.itsempa.nautilus.utils.tryError
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
@@ -53,7 +60,7 @@ object Nautilus {
                     it,
                     "Something went wrong while initializing events.",
                     "module" to obj.javaClass.simpleName,
-                    ignoreErrorCache = true
+                    ignoreErrorCache = true,
                 )
             }
         }
@@ -66,14 +73,26 @@ object Nautilus {
     val SEM_VER = SemVersion.fromString(VERSION)
 
     @JvmField
-    val logger: Logger = LogManager.getLogger(MOD_NAME)
-
-    fun consoleLog(message: String) = logger.info(message)
-
-    @JvmField
     val modules: MutableList<Any> = mutableListOf()
 
     @JvmStatic
     val feature: Features get() = ConfigManager.managedConfig.instance
+
+
+    @JvmField
+    val logger: Logger = LogManager.getLogger(MOD_NAME)
+
+    fun consoleLog(message: String) = logger.info(message)
+
+    private val globalJob: Job = Job(null)
+    private val coroutineScope = CoroutineScope(CoroutineName(MOD_NAME) + SupervisorJob(globalJob))
+
+    fun launchCoroutine(function: suspend () -> Unit) {
+        coroutineScope.launch {
+            tryError({ it.message ?: "Asynchronous exception caught" }) {
+                function()
+            }
+        }
+    }
 
 }

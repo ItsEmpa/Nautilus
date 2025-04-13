@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.SeaCreature
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -42,13 +43,17 @@ data class SeaCreatureData(
 
     }
 
+    inline val name: String get() = seaCreature.name
+
     inline val isRare: Boolean get() = seaCreature.rare
+
+    inline val rarity: LorenzRarity get() = seaCreature.rarity
 
     inline val despawnTime: SimpleTimeMark get() = spawnTime + SeaCreatureApi.DESPAWN_TIME
 
     fun isLoaded(): Boolean = mob != null
 
-    private val entity: EntityLivingBase? get() = EntityUtils.getEntityByID(entityId) as? EntityLivingBase
+    val entity: EntityLivingBase? get() = mob?.baseEntity ?: EntityUtils.getEntityByID(entityId) as? EntityLivingBase
 
     private var hasDespawnedTimeLimit: Boolean = false
 
@@ -64,10 +69,11 @@ data class SeaCreatureData(
     fun canBeSeen(): Boolean {
         val mob = mob ?: return false
         val pos = mob.baseEntity.getLorenzVec()
-        val newPos = if (seaCreature.name == "Fire Eel") pos.up() else pos
+        val newPos = if (name == "Fire Eel") pos.up() else pos
         return newPos.canBeSeen() // TODO: create canBeSeen function that takes into account F5
     }
 
+    @Suppress("HandleEventInspection")
     fun update(renderWorld: SkyHanniRenderWorldEvent) {
         val mob = mob ?: return
         if (!canBeSeen()) return

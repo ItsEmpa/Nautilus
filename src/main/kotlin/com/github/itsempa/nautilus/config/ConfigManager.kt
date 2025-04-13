@@ -18,7 +18,11 @@ import java.io.File
 @Module
 object ConfigManager {
 
-    val managedConfig = ManagedConfig.create(File("config/${Nautilus.MOD_ID}/config.json"), Features::class.java) {
+    private val directory = File("config/${Nautilus.MOD_ID}")
+
+    fun file(name: String): File = File(directory, name)
+
+    val managedConfig = ManagedConfig.create(file("config.json"), Features::class.java) {
         customProcessor(ConfigVersionDisplay::class.java) { processor, _ ->
             GuiOptionEditorUpdateCheck(processor)
         }
