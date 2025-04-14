@@ -9,7 +9,7 @@ import com.github.itsempa.nautilus.config.storage.Storage
 import com.github.itsempa.nautilus.modules.Module
 
 @Module
-object NautilusData {
+object NautilusStorage {
 
     val storage: Storage get() = Nautilus.feature.storage
 
