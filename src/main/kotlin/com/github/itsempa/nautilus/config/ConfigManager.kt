@@ -11,6 +11,7 @@ import com.github.itsempa.nautilus.features.misc.update.ConfigVersionDisplay
 import com.github.itsempa.nautilus.features.misc.update.GuiOptionEditorUpdateCheck
 import com.github.itsempa.nautilus.features.misc.update.SemVersion
 import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.utils.TimePeriod
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import java.io.File
@@ -32,7 +33,9 @@ object ConfigManager {
                 .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
                 .enableComplexMapKeySerialization()
                 .addSkyHanniTypeAdapters()
+                // TODO: create annotation for automatically adding type adapters
                 .registerTypeAdapter(SemVersion.TYPE_ADAPTER)
+                .registerTypeAdapter(TimePeriod.TYPE_ADAPTER)
         }
         throwOnFailure()
     }
@@ -54,6 +57,7 @@ object ConfigManager {
         return registerTypeAdapter(T::class.java, newAdapter)
     }
 
+    // TODO: find a way to get all factories in skyhanni's base gson builder dynamically
     private fun GsonBuilder.addSkyHanniTypeAdapters(): GsonBuilder =
         registerTypeAdapter(SkyHanniTypeAdapters.UUID)
             .registerTypeAdapter(SkyHanniTypeAdapters.VEC_STRING)
