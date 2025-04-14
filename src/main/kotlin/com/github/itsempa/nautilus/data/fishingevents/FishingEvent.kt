@@ -3,8 +3,8 @@ package com.github.itsempa.nautilus.data.fishingevents
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orFalse
 import com.github.itsempa.nautilus.utils.NautilusUtils.minBy
-import com.github.itsempa.nautilus.utils.NautilusUtils.orFalse
 import com.github.itsempa.nautilus.utils.TimePeriod
 
 // WIP

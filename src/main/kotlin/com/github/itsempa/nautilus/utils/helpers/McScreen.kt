@@ -1,7 +1,7 @@
 package com.github.itsempa.nautilus.utils.helpers
 
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
-import com.github.itsempa.nautilus.utils.NautilusUtils.cast
+import com.github.itsempa.nautilus.utils.NautilusNullableUtils.cast
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest

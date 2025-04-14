@@ -1,7 +1,7 @@
 package com.github.itsempa.nautilus.features.misc.update
 
 import at.hannibal2.skyhanni.utils.json.SimpleStringTypeAdapter
-import com.github.itsempa.nautilus.utils.NautilusUtils.orZero
+import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orZero
 import com.google.gson.JsonElement
 import moe.nea.libautoupdate.CurrentVersion
 

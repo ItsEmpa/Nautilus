@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
-import com.github.itsempa.nautilus.utils.NautilusUtils.exactBoundingBoxExtraEntities
-import com.github.itsempa.nautilus.utils.NautilusUtils.exactLocation
-import com.github.itsempa.nautilus.utils.NautilusUtils.getLorenzVec
+import com.github.itsempa.nautilus.utils.NautilusEntityUtils.exactBoundingBoxExtraEntities
+import com.github.itsempa.nautilus.utils.NautilusEntityUtils.exactLocation
+import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
 import com.github.itsempa.nautilus.utils.NautilusUtils.isInPastOrAlmost
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
