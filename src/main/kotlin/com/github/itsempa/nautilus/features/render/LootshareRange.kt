@@ -40,7 +40,7 @@ object LootshareRange {
         for (seaCreature in seaCreatures) {
             if (!seaCreature.isLoaded()) continue
             val pos = seaCreature.pos ?: continue
-            val color = if (pos.distanceToPlayer() < RANGE) LorenzColor.GREEN else LorenzColor.WHITE
+            val color = if (seaCreature.isOwn || pos.distanceToPlayer() < RANGE) LorenzColor.GREEN else LorenzColor.WHITE
             event.drawSphereWireframeInWorld(color.toColor(), pos, RANGE)
         }
     }
