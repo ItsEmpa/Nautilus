@@ -41,6 +41,7 @@ object SeaCreatureApi {
     private val entityIdToData = TimeLimitedCache<Int, SeaCreatureData>(DESPAWN_TIME) { id, data, cause ->
         if (cause == RemovalCause.EXPIRED && data != null && id != null) data.despawn(true)
     }
+    fun getSeaCreatures(): List<SeaCreatureData> = entityIdToData.values.toList()
     private val seaCreatures = mutableMapOf<Mob, SeaCreatureData>()
 
     private var lastNameFished: String? = null

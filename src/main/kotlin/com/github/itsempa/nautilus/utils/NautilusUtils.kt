@@ -57,6 +57,14 @@ object NautilusUtils {
 
     fun <T : Any> T.asProperty(): Property<T> = Property.of(this)
 
+    fun String.toSplitSet(delimiter: String = ","): Set<String> = split(delimiter).map(String::trim).toSet()
+
+    fun Property<String>.toSet(lowercase: Boolean = true, delimiter: String = ","): Set<String> {
+        var value = get()
+        if (lowercase) value = value.lowercase()
+        return value.toSplitSet(delimiter)
+    }
+
     inline fun <T, C : Comparable<C>> minBy(a: T, b: T, comparator: (T) -> C): T = if (comparator(a) < comparator(b)) a else b
     inline fun <T, C : Comparable<C>> maxBy(a: T, b: T, comparator: (T) -> C): T = if (comparator(a) > comparator(b)) a else b
 

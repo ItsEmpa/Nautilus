@@ -40,7 +40,6 @@ data class SeaCreatureData(
             aabb = null
             pos = null
         }
-
     }
 
     inline val name: String get() = seaCreature.name
@@ -51,7 +50,7 @@ data class SeaCreatureData(
 
     inline val despawnTime: SimpleTimeMark get() = spawnTime + SeaCreatureApi.DESPAWN_TIME
 
-    fun isLoaded(): Boolean = mob != null
+    fun isLoaded(): Boolean = entity != null
 
     val entity: EntityLivingBase? get() = mob?.baseEntity ?: EntityUtils.getEntityByID(entityId) as? EntityLivingBase
 
