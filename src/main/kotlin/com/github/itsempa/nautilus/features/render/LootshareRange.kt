@@ -18,7 +18,7 @@ import com.github.itsempa.nautilus.utils.NautilusUtils.toSet
 object LootshareRange {
     private val config get() = Nautilus.feature.render
 
-    const val RANGE = 30.0f // TODO: get correct range
+    const val RANGE = 30.0f
 
     private var names = setOf<String>()
     private val seaCreatures = mutableSetOf<SeaCreatureData>()

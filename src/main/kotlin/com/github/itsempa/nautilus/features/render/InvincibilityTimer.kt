@@ -42,13 +42,13 @@ object InvincibilityTimer {
         for (seaCreature in seaCreatures) {
             if (!seaCreature.isLoaded()) continue
             val height = seaCreature.aabb?.getHeight() ?: continue
-            val pos = seaCreature.pos?.up(height + 1) ?: continue
+            val pos = seaCreature.pos?.up(height + 1.5) ?: continue
             val time = seaCreature.spawnTime + INVINCIBILITY
             if (time.passedSince() > 1.seconds) continue
             val timeLeft = time.timeUntil()
             event.drawString(pos, "§b${timeLeft.format(showMilliSeconds = true)}")
             if (!seaCreature.isOwn) continue
-            event.drawString(pos.up(), "§aOWN MOB")
+            event.drawString(pos.up(0.5), "§aOWN MOB")
         }
     }
 

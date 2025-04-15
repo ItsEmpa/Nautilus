@@ -8,11 +8,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.exactBoundingBoxExtraEntities
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.exactLocation
+import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getBoundingBoxExtraEntities
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
+import com.github.itsempa.nautilus.utils.NautilusUtils.getCenter
 import com.github.itsempa.nautilus.utils.NautilusUtils.isInPastOrAlmost
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
@@ -90,10 +91,8 @@ data class SeaCreatureData(
     fun <T : Any> removeExtraData(key: SeaCreatureExtraData<T>) = extraData.remove(key)
 
     fun canBeSeen(): Boolean {
-        val mob = mob ?: return false
-        val pos = mob.baseEntity.getLorenzVec()
-        val newPos = if (name == "Fire Eel") pos.up() else pos
-        return newPos.canBeSeen() // TODO: create canBeSeen function that takes into account F5
+        val mob = mob ?: return false // TODO: create canBeSeen function that takes into account F5
+        return mob.getBoundingBoxExtraEntities().getCenter().canBeSeen()
     }
 
     @Suppress("HandleEventInspection")

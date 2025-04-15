@@ -21,6 +21,13 @@ object NautilusEntityUtils {
         ) ?: aabb
     }
 
+    fun Mob.getBoundingBoxExtraEntities(): AxisAlignedBB {
+        val aabb = baseEntity.entityBoundingBox
+        return aabb.union(
+            extraEntities.map { it.entityBoundingBox },
+        ) ?: aabb
+    }
+
     inline val Mob.entityId get() = baseEntity.entityId
 
     fun SkyHanniRenderWorldEvent.exactLocation(mob: Mob) = exactLocation(mob.baseEntity)
