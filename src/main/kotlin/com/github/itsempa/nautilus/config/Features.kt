@@ -34,5 +34,9 @@ class Features : Config() {
     val render: RenderConfig = RenderConfig()
 
     @Expose
+    @Category(name = "Dev", desc = "")
+    val dev: DevConfig = DevConfig()
+
+    @Expose
     val storage: Storage = Storage()
 }

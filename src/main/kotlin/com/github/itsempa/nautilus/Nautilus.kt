@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.utils.DelayedRun
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.config.Features
+import com.github.itsempa.nautilus.data.NautilusRepoManager
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.features.misc.update.SemVersion
 import com.github.itsempa.nautilus.mixins.transformers.skyhanni.AccessorSkyHanniEvents
@@ -14,9 +15,11 @@ import com.github.itsempa.nautilus.utils.NautilusUtils
 import com.github.itsempa.nautilus.utils.tryError
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
@@ -40,6 +43,7 @@ object Nautilus {
         NautilusModules.modules.loadModules()
 
         NautilusCommandRegistrationEvent.post()
+        NautilusRepoManager.initRepo()
     }
 
 
@@ -78,7 +82,6 @@ object Nautilus {
     @JvmStatic
     val feature: Features get() = ConfigManager.managedConfig.instance
 
-
     @JvmField
     val logger: Logger = LogManager.getLogger(MOD_NAME)
 
@@ -91,6 +94,14 @@ object Nautilus {
         coroutineScope.launch {
             tryError({ it.message ?: "Asynchronous exception caught" }) {
                 function()
+            }
+        }
+    }
+
+    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit) {
+        launchCoroutine {
+            withContext(Dispatchers.IO) {
+                block()
             }
         }
     }

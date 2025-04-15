@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.deps.moulconfig.managed.ManagedConfig
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.features.misc.update.ConfigVersionDisplay
@@ -12,6 +13,7 @@ import com.github.itsempa.nautilus.features.misc.update.GuiOptionEditorUpdateChe
 import com.github.itsempa.nautilus.features.misc.update.SemVersion
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.TimePeriod
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import java.io.File
@@ -19,11 +21,11 @@ import java.io.File
 @Module
 object ConfigManager {
 
-    private val directory = File("config/${Nautilus.MOD_ID}")
+    val gson: Gson = BaseGsonBuilder.gson().addNautilusTypeAdapters().create()
 
-    fun file(name: String): File = File(directory, name)
+    val directory = File("config/${Nautilus.MOD_ID}")
 
-    val managedConfig = ManagedConfig.create(file("config.json"), Features::class.java) {
+    val managedConfig = ManagedConfig.create(File(directory, "config.json"), Features::class.java) {
         customProcessor(ConfigVersionDisplay::class.java) { processor, _ ->
             GuiOptionEditorUpdateCheck(processor)
         }
@@ -33,9 +35,7 @@ object ConfigManager {
                 .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
                 .enableComplexMapKeySerialization()
                 .addSkyHanniTypeAdapters()
-                // TODO: create annotation for automatically adding type adapters
-                .registerTypeAdapter(SemVersion.TYPE_ADAPTER)
-                .registerTypeAdapter(TimePeriod.TYPE_ADAPTER)
+                .addNautilusTypeAdapters()
         }
         throwOnFailure()
     }
@@ -55,6 +55,12 @@ object ConfigManager {
     private inline fun <reified T> GsonBuilder.registerTypeAdapter(adapter: TypeAdapter<T>, nullSafe: Boolean = true): GsonBuilder {
         val newAdapter = if (nullSafe) adapter.nullSafe() else adapter
         return registerTypeAdapter(T::class.java, newAdapter)
+    }
+
+    // TODO: create annotation for automatically adding type adapters
+    fun GsonBuilder.addNautilusTypeAdapters(): GsonBuilder {
+        return registerTypeAdapter(SemVersion.TYPE_ADAPTER)
+            .registerTypeAdapter(TimePeriod.TYPE_ADAPTER)
     }
 
     // TODO: find a way to get all factories in skyhanni's base gson builder dynamically

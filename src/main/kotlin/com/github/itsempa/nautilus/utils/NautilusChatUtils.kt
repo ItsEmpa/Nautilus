@@ -1,7 +1,9 @@
 package com.github.itsempa.nautilus.utils
 
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.prefix
 import com.github.itsempa.nautilus.Nautilus
@@ -41,6 +43,15 @@ object NautilusChatUtils {
         val text = (if (prefix) prefixColor + CHAT_PREFIX else "") + message
         ChatUtils.clickableChat(text, onClick, hover, expireAt, false, oneTimeClick = oneTimeClick)
     }
+
+    fun clickToClipboard(message: String, lines: List<String>) {
+        val text = lines.joinToString("\n") { "§7$it" }
+        clickableChat(
+            "$message §7(hover for info)",
+            hover = "$text\n \n§eClick to copy to clipboard!"
+        ) { ClipboardUtils.copyToClipboard(text.removeColor()) }
+    }
+
     fun hoverableChat(
         message: String,
         hover: List<String>,
