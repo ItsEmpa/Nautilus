@@ -40,17 +40,15 @@ data class TimePeriod(
     fun isInPast(): Boolean = start > now()
     fun isInFuture(): Boolean = end < now()
 
-    constructor(start: Long, end: Long) : this(start.asTimeMark(), end.asTimeMark())
-    constructor(start: SimpleTimeMark, duration: Duration) : this(start, start + duration)
     constructor(start: SkyBlockTime, end: SkyBlockTime) : this(start.asTimeMark(), end.asTimeMark())
 
     companion object {
         fun fromString(string: String): TimePeriod {
             val (first, second) = string.split("-").map { it.toLong() }
-            return TimePeriod(first, second)
+            return TimePeriod(first.asTimeMark(), second.asTimeMark())
         }
         infix fun SimpleTimeMark.until(other: SimpleTimeMark): TimePeriod = TimePeriod(this, other)
-        infix fun SimpleTimeMark.until(duration: Duration): TimePeriod = TimePeriod(this, duration)
+        infix fun SimpleTimeMark.until(duration: Duration): TimePeriod = TimePeriod(this, this + duration)
 
         val TYPE_ADAPTER = SimpleStringTypeAdapter(
             TimePeriod::asString,

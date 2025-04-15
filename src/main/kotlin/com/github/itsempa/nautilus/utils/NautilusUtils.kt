@@ -2,6 +2,7 @@ package com.github.itsempa.nautilus.utils
 
 import at.hannibal2.skyhanni.deps.moulconfig.observer.Property
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.plus
@@ -31,6 +32,12 @@ object NautilusUtils {
     }
 
     fun AxisAlignedBB.getHeight() = abs(maxY - minY)
+
+    fun AxisAlignedBB.getCenter(): LorenzVec = LorenzVec(
+        (minX + maxX) / 2,
+        (minY + maxY) / 2,
+        (minZ + maxZ) / 2,
+    )
     
     fun SimpleTimeMark.isInPastOrAlmost(maxError: Duration): Boolean {
         val passedSince = passedSince()

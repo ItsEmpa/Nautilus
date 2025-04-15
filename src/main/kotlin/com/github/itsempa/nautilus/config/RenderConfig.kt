@@ -8,13 +8,11 @@ import com.google.gson.annotations.Expose
 
 class RenderConfig {
 
-    // TODO: UNTESTED
     @Expose
     @ConfigOption(name = "Invincibility Timer", desc = "Show a timer on top of sea creatures and Vanquishers.")
     @ConfigEditorBoolean
     var invincibility = false
 
-    // TODO: UNTESTED
     @Expose
     @ConfigOption(name = "Lootshare Range", desc = "Shows the range at which you can lootshare.")
     @ConfigEditorBoolean
