@@ -11,27 +11,31 @@ import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.validate
-import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.ksp.writeTo
 
 class ModuleProcessor(
     private val generator: CodeGenerator,
     private val logger: KSPLogger,
 ) : SymbolProcessor {
+    companion object {
+        private const val MODULE_PACKAGE = "com.github.itsempa.nautilus.modules"
+        private const val FILE_NAME = "NautilusModules"
+        private val moduleClass = Module::class
+        private val moduleName = moduleClass.simpleName!!
+        private val moduleQualifiedName = moduleClass.qualifiedName!!
 
-    private val moduleClass = Module::class
-    private val moduleName = moduleClass.simpleName!!
-    private val moduleQualifiedName = moduleClass.qualifiedName!!
+        @OptIn(KspExperimental::class)
+        private fun KSClassDeclaration.getModuleAnnotation(): Module = getAnnotationsByType(moduleClass).first()
+    }
+
     private var run = false
-
-    @OptIn(KspExperimental::class)
-    private fun KSClassDeclaration.getModuleAnnotation(): Module = getAnnotationsByType(moduleClass).first()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         if (run) return emptyList()
@@ -42,19 +46,19 @@ class ModuleProcessor(
 
         logger.warn("--- $moduleName Processor ---")
         logger.warn("Found ${validSymbols.size} modules")
-        logger.warn("Generating NautilusModules.kt")
+        logger.warn("Generating $FILE_NAME.kt")
 
-        val file = FileSpec.builder("com.github.itsempa.nautilus.modules", "NautilusModules")
+        val file = FileSpec.builder(MODULE_PACKAGE, FILE_NAME)
             .indent("    ")
             .addType(
-                TypeSpec.objectBuilder("NautilusModules").apply {
+                TypeSpec.objectBuilder(FILE_NAME).apply {
                     this.addProperty(
                         PropertySpec.builder("isDev", Boolean::class).apply {
                             this.addModifiers(KModifier.PRIVATE)
                             this.initializer(
-                                CodeBlock.builder().apply {
+                                buildCodeBlock {
                                     add("at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment")
-                                }.build(),
+                                }
                             )
                         }.build(),
                     )
@@ -65,7 +69,7 @@ class ModuleProcessor(
                             List::class.asClassName().parameterizedBy(Any::class.asClassName()),
                         ).apply {
                             this.initializer(
-                                CodeBlock.builder().apply {
+                                buildCodeBlock {
                                     add("buildList {\n")
                                     validSymbols.forEach { symbol ->
                                         val string = buildString {
@@ -75,7 +79,7 @@ class ModuleProcessor(
                                         add("$string\n")
                                     }
                                     add("}\n")
-                                }.build(),
+                                },
                             )
                         }.build(),
                     )
@@ -88,7 +92,7 @@ class ModuleProcessor(
             Dependencies(true, *validSymbols.mapNotNull(KSClassDeclaration::containingFile).toTypedArray()),
         )
 
-        logger.warn("Generated NautilusModules.kt")
+        logger.warn("Generated $FILE_NAME.kt")
 
         return emptyList()
     }

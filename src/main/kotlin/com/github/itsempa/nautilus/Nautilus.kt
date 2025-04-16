@@ -40,10 +40,10 @@ object Nautilus {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
         ConfigManager // Load ConfigManager class to initialize config
+        NautilusRepoManager.initRepo()
         NautilusModules.modules.loadModules()
 
         NautilusCommandRegistrationEvent.post()
-        NautilusRepoManager.initRepo()
     }
 
 

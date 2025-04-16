@@ -46,7 +46,7 @@ object NautilusRepoManager {
 
     val gson get() = ConfigManager.gson
 
-    val repoLocation = File(ConfigManager.directory, "repo")
+    private val repoLocation = File(ConfigManager.directory, "repo")
 
     private val config get() = Nautilus.feature.dev
 
@@ -66,8 +66,8 @@ object NautilusRepoManager {
     private var lastRepoUpdate = SimpleTimeMark.now()
     private var repoDownloadFailed = false
 
-    val successfulConstants = mutableListOf<String>()
-    val unsuccessfulConstants = mutableListOf<String>()
+    private val successfulConstants = mutableListOf<String>()
+    private val unsuccessfulConstants = mutableListOf<String>()
 
     private var lastConstant: String? = null
 
@@ -81,8 +81,7 @@ object NautilusRepoManager {
     private var shouldManuallyReload = false
 
     private var currentlyFetching = false
-    var commitTime: SimpleTimeMark? = null
-        private set
+    private var commitTime: SimpleTimeMark? = null
 
     @HandleEvent
     fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
@@ -136,18 +135,14 @@ object NautilusRepoManager {
             }
             lastConstant = null
         }
-        if (answerMessage.isNotEmpty() && !error) {
-            NautilusChatUtils.chat("§a$answerMessage")
-        }
+        if (answerMessage.isNotEmpty() && !error) NautilusChatUtils.chat("§a$answerMessage")
         if (error) {
             NautilusChatUtils.clickableChat(
-                "Error with the repo detected, try /shupdaterepo to fix it!",
+                "Error with the repo detected, try /ntupdaterepo to fix it!",
                 hover = "§eClick to update the repo!",
                 prefixColor = "§c",
             ) { updateRepo() }
-            if (unsuccessfulConstants.isEmpty()) {
-                unsuccessfulConstants.add("All Constants")
-            }
+            if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
         }
     }
 
@@ -207,10 +202,10 @@ object NautilusRepoManager {
                         }
                         add("")
                         add("latest commit sha: §e$currentDownloadedCommit")
-                        latestRepoCommitTime?.let<SimpleTimeMark, Unit> { latestTime ->
+                        latestRepoCommitTime?.let { latestTime ->
                             add("latest commit time: §b$latestTime")
                             add("  (§b${latestTime.passedSince().format()} ago§7)")
-                            currentDownloadedCommitTime?.let<SimpleTimeMark, Unit> { localTime ->
+                            currentDownloadedCommitTime?.let { localTime ->
                                 val outdatedDuration = latestTime - localTime
                                 add("")
                                 add("outdated by: §b${outdatedDuration.format()}")
@@ -227,9 +222,10 @@ object NautilusRepoManager {
             itemsZip.createNewFile()
 
             val url = URL(getDownloadUrl(latestRepoCommit))
-            val urlConnection = url.openConnection()
-            urlConnection.connectTimeout = 15000
-            urlConnection.readTimeout = 30000
+            val urlConnection = url.openConnection().apply {
+                connectTimeout = 15000
+                readTimeout = 30000
+            }
 
             RepoUtils.recursiveDelete(repoLocation)
             repoLocation.mkdirs()
@@ -287,10 +283,10 @@ object NautilusRepoManager {
     private fun getCurrentCommitFile(): File = File(ConfigManager.directory, "currentCommit.json")
 
     private fun readCurrentCommit(): Pair<String, SimpleTimeMark?>? {
-        val currentCommitJSON: JsonObject? = getJsonFromFile(getCurrentCommitFile())
-        val sha = currentCommitJSON?.get("sha")?.asString
-        val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark()
-        return sha?.let { it to time }
+        val currentCommitJSON = getJsonFromFile(getCurrentCommitFile()) ?: return null
+        val sha = currentCommitJSON.get("sha")?.asString ?: return null
+        val time = currentCommitJSON.get("time")?.asLong?.asTimeMark()
+        return sha to time
     }
 
     /**
@@ -400,15 +396,10 @@ object NautilusRepoManager {
     fun <T> getConstant(repoLocation: File, constant: String, gson: Gson, clazz: Class<T>?, type: Type? = null): T {
         val name = "constants/$constant.json"
         val jsonFile = File(repoLocation, name)
-        if (!jsonFile.isFile) {
-            throw RepoError("Repo file '$name' not found.")
-        }
+        if (!jsonFile.isFile) throw RepoError("Repo file '$name' not found.")
         BufferedReader(InputStreamReader(FileInputStream(jsonFile), StandardCharsets.UTF_8)).use { reader ->
-            if (type == null) {
-                return gson.fromJson(reader, clazz)
-            } else {
-                return gson.fromJson(reader, type)
-            }
+            return if (type == null) gson.fromJson(reader, clazz)
+            else gson.fromJson(reader, type)
         }
     }
 

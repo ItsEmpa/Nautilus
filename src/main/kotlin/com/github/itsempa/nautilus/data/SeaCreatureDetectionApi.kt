@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
@@ -26,6 +25,7 @@ import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.entityId
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.hasDied
+import com.github.itsempa.nautilus.utils.NautilusEntityUtils.spawnTime
 import com.github.itsempa.nautilus.utils.NautilusUtils.removeIf
 import com.google.common.cache.RemovalCause
 import kotlin.time.Duration.Companion.minutes
@@ -41,6 +41,7 @@ object SeaCreatureDetectionApi {
     private val entityIdToData = TimeLimitedCache<Int, SeaCreatureData>(DESPAWN_TIME) { id, data, cause ->
         if (cause == RemovalCause.EXPIRED && data != null && id != null) data.despawn(true)
     }
+
     fun getSeaCreatures(): List<SeaCreatureData> = entityIdToData.values.toList()
     private val seaCreatures = mutableMapOf<Mob, SeaCreatureData>()
 
@@ -147,7 +148,7 @@ object SeaCreatureDetectionApi {
         mobsToFind -= mobs.size
         for ((entry, _) in mobs) {
             val mob = entry.key
-            val time = SimpleTimeMark.now() - mob.baseEntity.ticksExisted.ticks
+            val time = mob.baseEntity.spawnTime
             addMob(mob, time, isOwn = true)
             recentMobs.remove(mob)
         }
@@ -171,7 +172,7 @@ object SeaCreatureDetectionApi {
         babyMagmaSlugsToFind -= slugs.size
         for ((entry, _) in slugs) {
             val mob = entry.key
-            val time = SimpleTimeMark.now() - mob.baseEntity.ticksExisted.ticks
+            val time = mob.baseEntity.spawnTime
             addMob(mob, time, isOwn = true, isBabySlug = true)
             recentBabyMagmaSlugs.remove(mob)
         }
