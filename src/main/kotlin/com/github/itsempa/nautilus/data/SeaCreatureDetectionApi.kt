@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 // TODO: maybe replace "handleMobs" functions with code in their event for faster detection?
 @Suppress("UnstableApiUsage")
 @Module
-object SeaCreatureApi {
+object SeaCreatureDetectionApi {
 
     val DESPAWN_TIME = 6.minutes
 

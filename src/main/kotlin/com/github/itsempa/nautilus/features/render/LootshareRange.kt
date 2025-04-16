@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.data.SeaCreatureApi
 import com.github.itsempa.nautilus.data.SeaCreatureData
+import com.github.itsempa.nautilus.data.SeaCreatureDetectionApi
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusUtils.toSet
@@ -60,7 +60,7 @@ object LootshareRange {
 
     private fun reloadMobs() {
         seaCreatures.clear()
-        SeaCreatureApi.getSeaCreatures().forEach(::addMob)
+        SeaCreatureDetectionApi.getSeaCreatures().forEach(::addMob)
     }
 
     private fun updateNames() {

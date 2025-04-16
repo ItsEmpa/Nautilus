@@ -61,7 +61,7 @@ data class SeaCreatureData(
 
     inline val rarity: LorenzRarity get() = seaCreature.rarity
 
-    inline val despawnTime: SimpleTimeMark get() = spawnTime + SeaCreatureApi.DESPAWN_TIME
+    inline val despawnTime: SimpleTimeMark get() = spawnTime + SeaCreatureDetectionApi.DESPAWN_TIME
 
     fun isLoaded(): Boolean = entity != null
 
