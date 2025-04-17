@@ -4,30 +4,18 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.SeaCreature
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.github.itsempa.nautilus.data.EntityViewApi.canActuallyBeSeen
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.exactBoundingBoxExtraEntities
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.exactLocation
-import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getBoundingBoxExtraEntities
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
-import com.github.itsempa.nautilus.utils.NautilusUtils.getCenter
 import com.github.itsempa.nautilus.utils.NautilusUtils.isInPastOrAlmost
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
-import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.seconds
-
-data class SeaCreatureExtraData<T : Any>(
-    val key: String,
-    private val type: KClass<T>,
-) {
-    companion object {
-        inline fun <reified T : Any> of(key: String): SeaCreatureExtraData<T> = SeaCreatureExtraData(key, T::class)
-    }
-}
 
 data class SeaCreatureData(
     val isOwn: Boolean,
@@ -36,8 +24,6 @@ data class SeaCreatureData(
     val spawnTime: SimpleTimeMark,
     var mob: Mob?,
 ) {
-
-    private val extraData = mutableMapOf<SeaCreatureExtraData<*>, Any>()
 
     var pos: LorenzVec?
         private set
@@ -78,21 +64,9 @@ data class SeaCreatureData(
         return isTimeLimit
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Any> getExtraData(key: SeaCreatureExtraData<T>): T? = extraData[key] as T?
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Any> getExtraDataOrPut(key: SeaCreatureExtraData<T>, defaultValue: () -> T): T {
-        return extraData.getOrPut(key) { defaultValue() } as T
-    }
-
-    fun <T : Any> setExtraData(key: SeaCreatureExtraData<T>, value: T) = extraData.put(key, value)
-
-    fun <T : Any> removeExtraData(key: SeaCreatureExtraData<T>) = extraData.remove(key)
-
     fun canBeSeen(): Boolean {
         val mob = mob ?: return false // TODO: create canBeSeen function that takes into account F5
-        return mob.getBoundingBoxExtraEntities().getCenter().canBeSeen()
+        return mob.baseEntity.canActuallyBeSeen() || mob.extraEntities.any { it.canActuallyBeSeen() }
     }
 
     @Suppress("HandleEventInspection")

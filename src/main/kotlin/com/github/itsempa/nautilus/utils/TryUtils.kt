@@ -17,14 +17,14 @@ inline fun <T> tryOrNull(func: () -> T): T? {
     }
 }
 
-inline fun tryOrFalse(func: () -> Boolean): Boolean {
+inline fun <T> tryOrDefault(default: T, func: () -> T): T {
     contract {
         callsInPlace(func, InvocationKind.AT_MOST_ONCE)
     }
     return try {
         func()
     } catch (_: Throwable) {
-        false
+        default
     }
 }
 
