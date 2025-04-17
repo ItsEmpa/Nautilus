@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 public interface AccessorSkyHanniEvents {
 
     @SuppressWarnings("unused")
-    @Invoker("registerMethod")
+    @Invoker(value = "registerMethod", remap = false)
     void nautilus$registerMethod(Method method, Object instance);
 
 }

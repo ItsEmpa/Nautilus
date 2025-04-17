@@ -21,7 +21,7 @@ object NautilusHelpCommand {
 
         return TextHelper.text("§7 - $color${command.name}") {
             this.hover = TextHelper.multiline(
-                "§e/${command.name}",
+                "§3/${command.name}",
                 if (description.isNotEmpty()) description.prependIndent("  ") else null,
                 "",
                 "$color§l${category.categoryName}",
