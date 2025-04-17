@@ -9,18 +9,21 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.VanquisherEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChatUtils
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.hasDied
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.spawnTime
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,8 +39,20 @@ object VanquisherApi {
     private val spawnPattern = "§aA §r§cVanquisher §r§ais spawning nearby!".toPattern()
 
     private var lastOwnVanqTime = SimpleTimeMark.farPast()
-    private var lastOwnVanqSpawnPos: LorenzVec? = null
-    private var vanquisherAmount = 0
+    private var vanqSpawnEntity: EntityArmorStand? = null
+
+    private var lastPossibleVanqSpawnEntity: EntityArmorStand? = null
+
+    private var lastVanqSpawnEntityPos: LorenzVec? = null
+    private var lastVanqSpawnEntityTime = SimpleTimeMark.farPast()
+    private var lastVanqSoundPos: LorenzVec? = null
+    private var lastVanqSoundTime = SimpleTimeMark.farPast()
+
+    private fun printDebug(message: String) {
+        if (debugStart.passedSince() > 10.seconds) debugStart = SimpleTimeMark.now()
+        NautilusChatUtils.debug("Vanq $message: ${debugStart.passedSince().inWholeMilliseconds}ms")
+    }
+    private var debugStart = SimpleTimeMark.farPast()
 
     private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes) { mob, data, _ ->
         if (mob != null && data != null) VanquisherEvent.DeSpawn(data).post()
@@ -47,38 +62,58 @@ object VanquisherApi {
     fun onChat(event: SkyHanniChatEvent) {
         if (spawnPattern.matches(event.message)) {
             lastOwnVanqTime = SimpleTimeMark.now()
-            ++vanquisherAmount
             VanquisherEvent.OwnSpawn.post()
+            printDebug("Message")
+            DelayedRun.runNextTick(::handleOwnVanq)
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onSound(event: PlaySoundEvent) {
         if (event.soundName != "mob.wither.spawn" || event.pitch != 1f || event.volume != 2f) return
-        NautilusChatUtils.debug("Played Vanquisher spawn sound, last spawn: ${lastOwnVanqTime.passedSince().format()}")
+        lastVanqSoundPos = event.location
+        lastVanqSoundTime = SimpleTimeMark.now()
+        printDebug("Sound")
+        DelayedRun.runNextTick(::handleOwnVanq)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         val entity = event.entity as? EntityArmorStand ?: return
         val helmet = entity.getStandHelmet() ?: return
-        // TODO: get what item vanquisher entity armor stand animation has as helmet
-
+        if (helmet.item != Items.skull || helmet.metadata != 1) return // wither skeleton skull
+        lastVanqSpawnEntityPos = entity.getLorenzVec()
+        lastPossibleVanqSpawnEntity = entity
+        lastVanqSpawnEntityTime = SimpleTimeMark.now()
+        printDebug("Entity")
+        DelayedRun.runNextTick(::handleOwnVanq)
     }
 
     private fun handleOwnVanq() {
-
+        val soundPos = lastVanqSoundPos ?: return
+        val entityPos = lastVanqSpawnEntityPos ?: return
+        val entity = lastPossibleVanqSpawnEntity ?: return
+        val now = SimpleTimeMark.now()
+        if (now - lastVanqSoundTime > 2.seconds) return
+        if (now - lastVanqSpawnEntityTime > 2.seconds) return
+        if (now - lastOwnVanqTime > 2.seconds) return
+        if (soundPos.distance(entityPos) > 3) return
+        vanqSpawnEntity = entity
+        lastVanqSpawnEntityPos = null
+        lastVanqSoundPos = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
         if (mob.name != "Vanquisher") return
+        printDebug("Mob")
         val isOwn = mob.isOwnVanq()
-        if (isOwn) --vanquisherAmount
-        val data = VanquisherData(isOwn, mob, mob.baseEntity.spawnTime)
+        val spawnTime = mob.baseEntity.spawnTime
+        val data = VanquisherData(isOwn, mob, spawnTime)
         vanquishers[mob] = data
         VanquisherEvent.Spawn(data).post()
+        NautilusChatUtils.debug("Spawned Vanquisher (isOwn: $isOwn, time: $spawnTime)")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
@@ -90,21 +125,32 @@ object VanquisherApi {
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (vanquisherAmount == 0 && lastOwnVanqTime.passedSince() < 15.seconds) return
-        vanquisherAmount = 0
+        if ((lastPossibleVanqSpawnEntity != null || lastVanqSpawnEntityPos != null || lastVanqSoundPos != null) &&
+            lastOwnVanqTime.passedSince() > 5.seconds) {
+            lastPossibleVanqSpawnEntity = null
+            lastVanqSpawnEntityPos = null
+            lastVanqSoundPos = null
+        }
+
+        if (vanqSpawnEntity != null && lastOwnVanqTime.passedSince() > 8.seconds) {
+            vanqSpawnEntity = null
+        }
+
     }
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         vanquishers.clear()
-        vanquisherAmount = 0
+        lastPossibleVanqSpawnEntity = null
+        lastVanqSpawnEntityPos = null
+        lastVanqSoundPos = null
+        vanqSpawnEntity = null
     }
 
-    @Suppress("UnusedReceiverParameter")
     private fun Mob.isOwnVanq(): Boolean {
-        if (vanquisherAmount <= 0) return false
-        if (lastOwnVanqTime.passedSince() > 10.seconds) return false // TODO: actually get good time
-        // TODO: check position somehow?
+        val spawnEntity = vanqSpawnEntity ?: return false
+        if (baseEntity.distanceTo(spawnEntity) > 4) return false
+        if (lastOwnVanqTime.passedSince() > 7.seconds) return false // TODO: actually get good time
         return true
     }
 
