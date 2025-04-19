@@ -240,7 +240,7 @@ object NautilusRepoManager {
             } catch (e: IOException) {
                 NautilusUtils.logErrorWithData(
                     e,
-                    "Failed to download SkyHanni Repo",
+                    "Failed to download Nautilus Repo",
                     "url" to url,
                     "command" to command,
                 )
@@ -351,7 +351,7 @@ object NautilusRepoManager {
                     if (!isInTree(dir, newFile)) {
                         throw RuntimeException(
                             "Nautilus detected an invalid zip file. This is a potential security risk, " +
-                                "please report this on the SkyHanni discord.",
+                                "please report this on the Nautilus discord.",
                         )
                     }
                     val fos = FileOutputStream(newFile)
