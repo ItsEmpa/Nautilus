@@ -27,14 +27,9 @@ object LootshareRange {
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = addMob(event.seaCreature)
 
     @HandleEvent
-    fun onSeaCreatureDeSpawn(event: SeaCreatureEvent.DeSpawn) {
-        if (event.forced) seaCreatures.remove(event.seaCreature)
-    }
+    fun onSeaCreatureRemove(event: SeaCreatureEvent.Remove) = seaCreatures.remove(event.seaCreature)
 
-    @HandleEvent
-    fun onSeaCreatureDeath(event: SeaCreatureEvent.Death) = seaCreatures.remove(event.seaCreature)
-
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.lootshareRange) return
         for (seaCreature in seaCreatures) {

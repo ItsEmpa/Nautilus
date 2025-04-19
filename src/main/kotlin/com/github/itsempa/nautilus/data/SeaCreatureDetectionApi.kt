@@ -39,7 +39,7 @@ object SeaCreatureDetectionApi {
     val DESPAWN_TIME = 6.minutes
 
     private val entityIdToData = TimeLimitedCache<Int, SeaCreatureData>(DESPAWN_TIME) { id, data, cause ->
-        if (cause == RemovalCause.EXPIRED && data != null && id != null) data.despawn(true)
+        if (cause == RemovalCause.EXPIRED && data != null && id != null) data.forceRemove()
     }
 
     fun getSeaCreatures(): List<SeaCreatureData> = entityIdToData.values.toList()
@@ -91,9 +91,14 @@ object SeaCreatureDetectionApi {
         seaCreatures.remove(mob)
         val oldId = data.entityId
         val newId = mob.entityId
-        if (data.despawn()) entityIdToData.remove(oldId)
+        data.despawn()
+        if (mob.isInRender()) {
+            entityIdToData.remove(oldId)
+            data.forceRemove()
+        }
         if (mob.hasDied) {
             entityIdToData.remove(oldId)
+            data.forceRemove()
             if (data.isOwn) {
                 if (mob.name == "Magma Slug") {
                     lastMagmaSlugLocation = mob.getLorenzVec()
@@ -181,12 +186,12 @@ object SeaCreatureDetectionApi {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         for (data in seaCreatures.values) data.update(event)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
         recentMobs.removeIf { (mob, time) ->
             if (time.passedSince() < 1.2.seconds) return@removeIf false
@@ -215,7 +220,7 @@ object SeaCreatureDetectionApi {
     )
 
     private fun reset() {
-        entityIdToData.values.forEach { it.despawn(true) }
+        entityIdToData.values.forEach { it.forceRemove() }
         entityIdToData.clear()
         seaCreatures.clear()
         recentMobs.clear()

@@ -17,12 +17,7 @@ object SeaCreatureHighlight {
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = seaCreatures.add(event.seaCreature)
 
     @HandleEvent
-    fun onSeaCreatureDeath(event: SeaCreatureEvent.Death) = seaCreatures.remove(event.seaCreature)
-
-    @HandleEvent
-    fun onSeaCreatureDeSpawn(event: SeaCreatureEvent.DeSpawn) {
-        if (event.forced) seaCreatures.remove(event.seaCreature)
-    }
+    fun onSeaCreatureDeSpawn(event: SeaCreatureEvent.Remove) = seaCreatures.remove(event.seaCreature)
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {

@@ -12,10 +12,8 @@ import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.exactBoundingBoxExtraEntities
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.exactLocation
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
-import com.github.itsempa.nautilus.utils.NautilusUtils.isInPastOrAlmost
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.AxisAlignedBB
-import kotlin.time.Duration.Companion.seconds
 
 data class SeaCreatureData(
     val isOwn: Boolean,
@@ -39,6 +37,7 @@ data class SeaCreatureData(
             aabb = null
             pos = null
         }
+        updateCanBeSeen()
     }
 
     inline val name: String get() = seaCreature.name
@@ -46,6 +45,8 @@ data class SeaCreatureData(
     inline val isRare: Boolean get() = seaCreature.rare
 
     inline val rarity: LorenzRarity get() = seaCreature.rarity
+
+    inline val health: Int? get() = mob?.health?.toInt()
 
     inline val despawnTime: SimpleTimeMark get() = spawnTime + SeaCreatureDetectionApi.DESPAWN_TIME
 
@@ -55,24 +56,31 @@ data class SeaCreatureData(
 
     private var hasDespawnedTimeLimit: Boolean = false
 
-    /** Returns true if it despawned because of time limit */
-    fun despawn(forceTime: Boolean = false): Boolean {
-        val isTimeLimit = forceTime || (mob?.isInRender() == true && despawnTime.isInPastOrAlmost(10.seconds))
-        if (isTimeLimit && hasDespawnedTimeLimit) return false
-        hasDespawnedTimeLimit = isTimeLimit
-        SeaCreatureEvent.DeSpawn(this, isTimeLimit).post()
-        return isTimeLimit
+    fun despawn() {
+        SeaCreatureEvent.DeSpawn(this).post()
     }
 
-    fun canBeSeen(): Boolean {
-        val mob = mob ?: return false // TODO: create canBeSeen function that takes into account F5
-        return mob.baseEntity.canActuallyBeSeen() || mob.extraEntities.any { it.canActuallyBeSeen() }
+    private var hasRemoved: Boolean = false
+    fun forceRemove() {
+        if (hasRemoved) return
+        hasRemoved = true
+        SeaCreatureEvent.Remove(this).post()
+    }
+
+    private var canBeSeenCache = false
+
+    fun canBeSeen(): Boolean = canBeSeenCache
+
+    private fun updateCanBeSeen(): Boolean {
+        val mob = mob ?: return false
+        canBeSeenCache = mob.baseEntity.canActuallyBeSeen() || mob.extraEntities.any { it.canActuallyBeSeen() }
+        return canBeSeenCache
     }
 
     @Suppress("HandleEventInspection")
     fun update(renderWorld: SkyHanniRenderWorldEvent) {
         val mob = mob ?: return
-        if (!canBeSeen()) return
+        if (!updateCanBeSeen()) return
         aabb = renderWorld.exactBoundingBoxExtraEntities(mob)
         pos = renderWorld.exactLocation(mob)
     }

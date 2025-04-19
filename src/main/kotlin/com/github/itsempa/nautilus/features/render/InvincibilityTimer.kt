@@ -29,14 +29,9 @@ object InvincibilityTimer {
     }
 
     @HandleEvent
-    fun onSeaCreatureDeSpawn(event: SeaCreatureEvent.DeSpawn) {
-        if (event.forced) seaCreatures.remove(event.seaCreature)
-    }
+    fun onSeaCreatureDeSpawn(event: SeaCreatureEvent.Remove) = seaCreatures.remove(event.seaCreature)
 
-    @HandleEvent
-    fun onSeaCreatureDeath(event: SeaCreatureEvent.Death) = seaCreatures.remove(event.seaCreature)
-
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config) return
         for (seaCreature in seaCreatures) {
