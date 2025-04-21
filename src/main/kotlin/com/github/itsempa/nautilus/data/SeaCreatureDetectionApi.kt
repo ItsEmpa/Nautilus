@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.SeaCreature
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
@@ -192,7 +190,7 @@ object SeaCreatureDetectionApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         recentMobs.removeIf { (mob, time) ->
             if (time.passedSince() < 1.2.seconds) return@removeIf false
             addMob(mob, time, isOwn = false)
@@ -209,7 +207,7 @@ object SeaCreatureDetectionApi {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) = reset()
+    fun onWorldChange() = reset()
 
     val BABY_MAGMA_SLUG = SeaCreature(
         "Baby Magma Slug",

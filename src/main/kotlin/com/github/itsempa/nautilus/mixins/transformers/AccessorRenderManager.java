@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.mixins.transformers.skyhanni;
+package com.github.itsempa.nautilus.mixins.transformers;
 
 import net.minecraft.client.renderer.entity.RenderManager;
 import org.spongepowered.asm.mixin.Mixin;

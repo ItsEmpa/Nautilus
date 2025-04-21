@@ -3,7 +3,6 @@ package com.github.itsempa.nautilus.features.render
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -29,7 +28,7 @@ object MobHealthDisplay {
     fun onSeaCreatureRemove(event: SeaCreatureEvent.Remove) = healthMap.remove(event.seaCreature)
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         for (seaCreature in healthMap.keys) {
             if (!seaCreature.isLoaded() || !seaCreature.canBeSeen()) continue
             val health = seaCreature.health ?: continue

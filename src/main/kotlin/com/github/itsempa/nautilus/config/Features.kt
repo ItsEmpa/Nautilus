@@ -34,6 +34,10 @@ class Features : Config() {
     val render: RenderConfig = RenderConfig()
 
     @Expose
+    @Category(name = "Misc", desc = "")
+    val misc: MiscConfig = MiscConfig()
+
+    @Expose
     @Category(name = "Dev", desc = "")
     val dev: DevConfig = DevConfig()
 

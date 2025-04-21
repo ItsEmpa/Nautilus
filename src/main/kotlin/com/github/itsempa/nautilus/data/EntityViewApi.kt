@@ -2,10 +2,9 @@ package com.github.itsempa.nautilus.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import com.github.itsempa.nautilus.mixins.transformers.skyhanni.AccessorRenderManager
+import com.github.itsempa.nautilus.mixins.transformers.AccessorRenderManager
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusUtils.removeIf
 import com.github.itsempa.nautilus.utils.helpers.McClient
@@ -32,7 +31,7 @@ object EntityViewApi {
     private val DELAY = 10.milliseconds
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         val now = SimpleTimeMark.now()
 
         for (query in queries.values) {
