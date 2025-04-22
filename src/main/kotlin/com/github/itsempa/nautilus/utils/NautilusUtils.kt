@@ -59,9 +59,6 @@ object NautilusUtils {
 
     fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.removeIf(predicate)
 
-    fun <T : Enum<T>> Enum<T>.toFormattedName(): String =
-        name.split("_").joinToString(" ") { it.lowercase().replaceFirstChar(Char::uppercase) }
-
     fun <T : Any> T.asProperty(): Property<T> = Property.of(this)
 
     fun String.toSplitSet(delimiter: String = ","): Set<String> = split(delimiter).map(String::trim).toSet()
@@ -71,9 +68,6 @@ object NautilusUtils {
         if (lowercase) value = value.lowercase()
         return value.toSplitSet(delimiter)
     }
-
-    inline fun <T, C : Comparable<C>> minBy(a: T, b: T, comparator: (T) -> C): T = if (comparator(a) < comparator(b)) a else b
-    inline fun <T, C : Comparable<C>> maxBy(a: T, b: T, comparator: (T) -> C): T = if (comparator(a) > comparator(b)) a else b
 
     inline val Int.thousands get(): Int = this * 1_000
     inline val Int.millions get(): Int = this * 1_000_000

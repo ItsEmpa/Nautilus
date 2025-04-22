@@ -9,7 +9,9 @@ import net.minecraft.item.ItemStack
 @Suppress("unused")
 object McPlayer {
 
-    val self: EntityPlayerSP get() = McClient.self.thePlayer
+    val self: EntityPlayerSP get() = selfNull!!
+    val selfNull: EntityPlayerSP? get() = McClient.self.thePlayer
+    val exists: Boolean get() = selfNull != null
 
     val isSneaking: Boolean get() = self.isSneaking
     val heldItem: ItemStack? get() = self.heldItem

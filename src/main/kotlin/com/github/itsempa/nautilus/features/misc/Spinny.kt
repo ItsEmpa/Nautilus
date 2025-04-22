@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.modules.Module
-import com.github.itsempa.nautilus.utils.NautilusChatUtils
+import com.github.itsempa.nautilus.utils.NautilusChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 
@@ -29,15 +29,15 @@ object Spinny {
             val newValue = !config.enabled
             config.enabled = newValue
             val text = if (newValue) "§aenabled" else "§cdisabled"
-            NautilusChatUtils.chat("Set spin to $text!")
+            NautilusChat.chat("Set spin to $text!")
             return
         } else {
             val number = args.first().formatIntOrNull()?.coerceIn(-500..500)
             if (number == null) {
-                NautilusChatUtils.userError("Invalid number!")
+                NautilusChat.userError("Invalid number!")
                 return
             }
-            NautilusChatUtils.chat("Set spin speed to $number!")
+            NautilusChat.chat("Set spin speed to $number!")
             if (!config.enabled) config.enabled = true
             config.spinSpeed = number
         }

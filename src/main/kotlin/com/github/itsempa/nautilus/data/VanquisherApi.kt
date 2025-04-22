@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.VanquisherEvent
 import com.github.itsempa.nautilus.modules.Module
-import com.github.itsempa.nautilus.utils.NautilusChatUtils
+import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.hasDied
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.spawnTime
 import net.minecraft.entity.item.EntityArmorStand
@@ -50,7 +50,7 @@ object VanquisherApi {
 
     private fun printDebug(message: String) {
         if (debugStart.passedSince() > 10.seconds) debugStart = SimpleTimeMark.now()
-        NautilusChatUtils.debug("Vanq $message: ${debugStart.passedSince().inWholeMilliseconds}ms")
+        NautilusChat.debug("Vanq $message: ${debugStart.passedSince().inWholeMilliseconds}ms")
     }
     private var debugStart = SimpleTimeMark.farPast()
 
@@ -113,7 +113,7 @@ object VanquisherApi {
         val data = VanquisherData(isOwn, mob, spawnTime)
         vanquishers[mob] = data
         VanquisherEvent.Spawn(data).post()
-        NautilusChatUtils.debug("Spawned Vanquisher (isOwn: $isOwn, time: $spawnTime)")
+        NautilusChat.debug("Spawned Vanquisher (isOwn: $isOwn, time: $spawnTime)")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)

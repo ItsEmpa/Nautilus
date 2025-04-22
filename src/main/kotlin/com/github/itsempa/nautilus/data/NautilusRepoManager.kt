@@ -14,7 +14,7 @@ import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.events.NautilusRepositoryReloadEvent
 import com.github.itsempa.nautilus.modules.Module
-import com.github.itsempa.nautilus.utils.NautilusChatUtils
+import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusUtils
 import com.github.itsempa.nautilus.utils.tryCatch
 import com.github.itsempa.nautilus.utils.tryOrNull
@@ -135,9 +135,9 @@ object NautilusRepoManager {
             }
             lastConstant = null
         }
-        if (answerMessage.isNotEmpty() && !error) NautilusChatUtils.chat("§a$answerMessage")
+        if (answerMessage.isNotEmpty() && !error) NautilusChat.chat("§a$answerMessage")
         if (error) {
-            NautilusChatUtils.clickableChat(
+            NautilusChat.clickableChat(
                 "Error with the repo detected, try /ntupdaterepo to fix it!",
                 hover = "§eClick to update the repo!",
                 prefixColor = "§c",
@@ -176,7 +176,7 @@ object NautilusRepoManager {
                 unsuccessfulConstants.isEmpty()
             ) {
                 if (command) {
-                    NautilusChatUtils.clickToClipboard(
+                    NautilusChat.clickToClipboard(
                         "§7The repo is already up to date!",
                         lines = buildList {
                             add("latest commit sha: §e$currentDownloadedCommit")
@@ -192,7 +192,7 @@ object NautilusRepoManager {
             }
 
             if (command) {
-                NautilusChatUtils.clickToClipboard(
+                NautilusChat.clickToClipboard(
                     "Repo is outdated, updating..",
                     lines = buildList {
                         add("local commit sha: §e$latestRepoCommit")

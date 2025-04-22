@@ -6,7 +6,7 @@ import com.github.itsempa.nautilus.data.repo.FishingDropsRepo
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.events.NautilusRepositoryReloadEvent
 import com.github.itsempa.nautilus.modules.Module
-import com.github.itsempa.nautilus.utils.NautilusChatUtils
+import com.github.itsempa.nautilus.utils.NautilusChat
 
 @Module(devOnly = true)
 object RepoTest {
@@ -26,7 +26,7 @@ object RepoTest {
             }
             text
         }
-        NautilusChatUtils.chat(msg)
+        NautilusChat.chat(msg)
     }
 
     @HandleEvent

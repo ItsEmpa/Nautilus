@@ -1,10 +1,9 @@
-package com.github.itsempa.nautilus.config
+package com.github.itsempa.nautilus.config.render
 
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.Accordion
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorBoolean
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorText
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigOption
-import com.github.itsempa.nautilus.config.render.HealthDisplayConfig
 import com.github.itsempa.nautilus.utils.NautilusUtils.asProperty
 import com.google.gson.annotations.Expose
 
