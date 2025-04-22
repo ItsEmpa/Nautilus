@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.features.render
+package com.github.itsempa.nautilus.features.gui
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -16,7 +16,7 @@ import com.github.itsempa.nautilus.utils.NautilusUtils.toSet
 @Module
 object MobHealthDisplay {
 
-    private val config get() = Nautilus.feature.render.healthDisplay
+    private val config get() = Nautilus.feature.gui.healthDisplay
 
     private var names = setOf<String>()
     private val healthMap = mutableMapOf<SeaCreatureData, Int>()
@@ -71,7 +71,7 @@ object MobHealthDisplay {
 
     private fun reloadMobs() {
         healthMap.clear()
-        SeaCreatureDetectionApi.getSeaCreatures().forEach(::addMob)
+        SeaCreatureDetectionApi.getSeaCreatures().forEach(MobHealthDisplay::addMob)
     }
 
     private fun updateNames() {

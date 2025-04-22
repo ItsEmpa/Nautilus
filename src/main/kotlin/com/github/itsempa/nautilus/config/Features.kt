@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.deps.moulconfig.annotations.Category
 import at.hannibal2.skyhanni.deps.moulconfig.common.MyResourceLocation
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.dev.DevConfig
+import com.github.itsempa.nautilus.config.gui.GuiConfig
 import com.github.itsempa.nautilus.config.misc.MiscConfig
 import com.github.itsempa.nautilus.config.render.RenderConfig
 import com.github.itsempa.nautilus.config.storage.Storage
@@ -35,6 +36,10 @@ class Features : Config() {
     @Expose
     @Category(name = "Render", desc = "")
     val render: RenderConfig = RenderConfig()
+
+    @Expose
+    @Category(name = "Gui", desc = "")
+    val gui: GuiConfig = GuiConfig()
 
     @Expose
     @Category(name = "Misc", desc = "")

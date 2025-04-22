@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.features.misc
+package com.github.itsempa.nautilus.features.gui
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.TitleManager
@@ -9,7 +9,7 @@ import com.github.itsempa.nautilus.modules.Module
 @Module
 object CameraMoveWarning {
 
-    private val config get() = Nautilus.feature.misc.cameraMove
+    private val config get() = Nautilus.feature.gui.cameraMove
 
     @HandleEvent
     fun onCatch(event: FishCatchEvent) {

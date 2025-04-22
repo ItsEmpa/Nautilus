@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.config.render
+package com.github.itsempa.nautilus.config.gui
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorBoolean

@@ -10,9 +10,4 @@ class MiscConfig {
     @ConfigOption(name = "Spin", desc = "")
     @Accordion
     val spin: SpinConfig = SpinConfig()
-
-    @Expose
-    @ConfigOption(name = "Camera Move Warning", desc = "")
-    @Accordion
-    val cameraMove: CameraMoveConfig = CameraMoveConfig()
 }

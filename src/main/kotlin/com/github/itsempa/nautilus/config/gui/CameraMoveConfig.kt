@@ -1,9 +1,10 @@
-package com.github.itsempa.nautilus.config.misc
+package com.github.itsempa.nautilus.config.gui
 
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.Accordion
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorBoolean
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorSlider
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigOption
+import com.github.itsempa.nautilus.config.misc.SoundConfig
 import com.google.gson.annotations.Expose
 
 class CameraMoveConfig {

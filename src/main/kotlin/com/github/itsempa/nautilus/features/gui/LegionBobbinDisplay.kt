@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.features.misc
+package com.github.itsempa.nautilus.features.gui
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 @Module
 object LegionBobbinDisplay {
 
-    private val config get() = Nautilus.feature.render.legionBobbinDisplay
+    private val config get() = Nautilus.feature.gui.legionBobbinDisplay
 
     private const val BOBBERS_DISTANCE = 30.0
     private const val BOBBERS_LIMIT = 10

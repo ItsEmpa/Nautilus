@@ -1,6 +1,5 @@
 package com.github.itsempa.nautilus.config.render
 
-import at.hannibal2.skyhanni.deps.moulconfig.annotations.Accordion
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorBoolean
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorText
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigOption
@@ -23,16 +22,6 @@ class RenderConfig {
     @ConfigOption(name = "Lootshare Mobs", desc = "The name of the sea creatures to show the lootshare range for, separated by commas.")
     @ConfigEditorText
     val lootshareMobs = "Lord Jawbus, Thunder".asProperty()
-
-    @Expose
-    @ConfigOption(name = "Health Display", desc = "")
-    @Accordion
-    val healthDisplay = HealthDisplayConfig()
-
-    @Expose
-    @ConfigOption(name = "Legion & Bobbin' Time Display", desc = "")
-    @Accordion
-    val legionBobbinDisplay: LegionBobbinConfig = LegionBobbinConfig()
 
 
 }
