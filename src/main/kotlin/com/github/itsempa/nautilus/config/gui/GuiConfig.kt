@@ -21,4 +21,9 @@ class GuiConfig {
     @Accordion
     val legionBobbinDisplay: LegionBobbinConfig = LegionBobbinConfig()
 
+    @Expose
+    @ConfigOption(name = "Rain Timer", desc = "")
+    @Accordion
+    val rainTimer: RainTimerConfig = RainTimerConfig()
+
 }
