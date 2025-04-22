@@ -54,7 +54,7 @@ object RainTimer {
     private fun tryWarn() {
         if (lastWarning.passedSince() < 5.seconds) return
         lastWarning = SimpleTimeMark.now()
-        TitleManager.sendTitle("§3Rain Timer is low!")
+        TitleManager.sendTitle("§cRain Timer is low!")
         config.sound.playSound()
     }
 
