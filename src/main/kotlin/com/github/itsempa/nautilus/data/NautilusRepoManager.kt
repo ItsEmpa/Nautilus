@@ -1,6 +1,5 @@
 package com.github.itsempa.nautilus.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.repo.RepoUtils
@@ -96,8 +95,7 @@ object NautilusRepoManager {
     @JvmStatic
     fun updateRepo() {
         shouldManuallyReload = true
-        //checkRepoLocation()
-        SkyHanniMod.launchIOCoroutine {
+        Nautilus.launchIOCoroutine {
             fetchRepository(command = true)
             reloadRepository("Repo updated successfully.")
             if (unsuccessfulConstants.isNotEmpty()) {
