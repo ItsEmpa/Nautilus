@@ -29,4 +29,10 @@ class RenderConfig {
     @Accordion
     val healthDisplay = HealthDisplayConfig()
 
+    @Expose
+    @ConfigOption(name = "Legion & Bobbin' Time Display", desc = "")
+    @Accordion
+    val legionBobbinDisplay: LegionBobbinConfig = LegionBobbinConfig()
+
+
 }
