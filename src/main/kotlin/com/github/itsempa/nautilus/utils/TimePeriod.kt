@@ -40,12 +40,12 @@ data class TimePeriod(
     fun isInPast(): Boolean = start > now()
     fun isInFuture(): Boolean = end < now()
 
-    constructor(start: SkyBlockTime, end: SkyBlockTime) : this(start.asTimeMark(), end.asTimeMark())
+    constructor(start: SkyBlockTime, end: SkyBlockTime) : this(start.toTimeMark(), end.toTimeMark())
 
     companion object {
         fun fromString(string: String): TimePeriod {
-            val (first, second) = string.split("-").map { it.toLong() }
-            return TimePeriod(first.asTimeMark(), second.asTimeMark())
+            val (first, second) = string.split("-").map { it.toLong().asTimeMark() }
+            return TimePeriod(first, second)
         }
         infix fun SimpleTimeMark.until(other: SimpleTimeMark): TimePeriod = TimePeriod(this, other)
         infix fun SimpleTimeMark.until(duration: Duration): TimePeriod = TimePeriod(this, this + duration)
