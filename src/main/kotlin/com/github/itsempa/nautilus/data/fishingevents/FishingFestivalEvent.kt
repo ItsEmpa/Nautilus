@@ -36,10 +36,10 @@ object FishingFestivalEvent : FishingEvent("FISHING_FESTIVAL") {
     }
 
     override fun onStart() {
-        NautilusChat.debug("Started Fishing Festival event")
+        NautilusChat.chat("Started Fishing Festival event")
     }
 
     override fun onEnd() {
-        NautilusChat.debug("Ended Fishing Festival event")
+        NautilusChat.chat("Ended Fishing Festival event")
     }
 }
