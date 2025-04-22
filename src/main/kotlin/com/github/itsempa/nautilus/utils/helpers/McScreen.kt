@@ -1,6 +1,6 @@
 package com.github.itsempa.nautilus.utils.helpers
 
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.cast
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
@@ -17,7 +17,7 @@ object McScreen {
 
     val containerChest: ContainerChest? get() = chest?.inventorySlots?.cast<ContainerChest>()
 
-    val inventoryName: String get() = containerChest?.getInventoryName().orEmpty()
+    val inventoryName: String get() = InventoryCompat.getOpenChestName()
 
     fun display(screen: GuiScreen?) = McClient.self.displayGuiScreen(screen)
 

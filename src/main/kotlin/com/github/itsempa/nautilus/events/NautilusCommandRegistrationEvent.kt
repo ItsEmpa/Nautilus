@@ -11,7 +11,7 @@ object NautilusCommandRegistrationEvent : SkyHanniEvent() {
         if (NautilusCommands.commandsList.any { it.name == name }) {
             error("The command '$name is already registered!'")
         }
-        ClientCommandHandler.instance.registerCommand(info.toSimpleCommand())
+        ClientCommandHandler.instance.registerCommand(info.toCommand())
         NautilusCommands.commandsList.add(info)
     }
 }

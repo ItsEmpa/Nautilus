@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.plus
 import com.github.itsempa.nautilus.Nautilus
 import net.minecraft.util.AxisAlignedBB
 import kotlin.math.abs
