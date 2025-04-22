@@ -2,36 +2,18 @@ package com.github.itsempa.nautilus.data.fishingevents
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.github.itsempa.nautilus.events.MayorDataUpdateEvent
+import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orFalse
 import com.github.itsempa.nautilus.utils.TimePeriod
 import com.github.itsempa.nautilus.utils.minBy
-
-// WIP
-/**
- * TODO: add this logic to fishing festival
- *
- *         override fun MutableList<FishingEvent>.addAll() {
- *             val startYear = ElectionApi.nextMayorTimestamp.toSkyBlockTime().year - 1
- *
- *             fun add(time: SkyBlockTime) = add(FishingFestival(time))
- *             if (Perk.EXTRA_EVENT_FISHING.isActive) add(SkyBlockTime(startYear, 6, 22))
- *
- *             if (Perk.FISHING_FESTIVAL.isActive) {
- *                 if (!ElectionCandidate.JERRY.isActive()) {
- *                     for (i in 1..12) {
- *                         val year = if (i < 4) startYear + 1 else startYear
- *                         add(SkyBlockTime(year, i, 1))
- *                     }
- *                 } else {
- *                     // deal with Perkpocalypse fishing festivals
- *                 }
- *             }
- *         }
- */
+import kotlin.time.Duration
 
 abstract class FishingEvent(val internalName: String) {
     abstract val name: String
+    abstract val duration: Duration
 
     var isActive: Boolean = false
         private set
@@ -54,30 +36,57 @@ abstract class FishingEvent(val internalName: String) {
         events.add(this)
     }
 
-    // TODO: Handle updating next timePeriod, mayor rotation/first detection, and repo overrides
     private fun onSecondPassed() {
         if (nextUpdate.isInFuture()) return
         val isNow = timePeriod?.isNow().orFalse()
         if (isNow == isActive) return
         isActive = isNow
+        if (isNow) onStart()
+        else {
+            onEnd()
+            internalUpdateTimePeriod()
+        }
         if (!isActive) internalUpdateTimePeriod()
     }
+
+    protected abstract fun onStart()
+
+    protected abstract fun onEnd()
 
     private fun internalUpdateTimePeriod() {
         val override = overrideTimePeriods.filter { it.isNow() || it.isInFuture() }.minByOrNull { it.timeUntilStart() }
         val next = updateNextTimePeriod()
-        timePeriod = when {
+        val newPeriod = when {
             override == null -> next
             next == null -> override
             else -> minBy(next, override) {
                 if (it.isNow()) it.end else it.start
             }
         }
+        val oldActive = isActive
+
+        if (newPeriod != timePeriod) timePeriod = newPeriod
+
+        if (newPeriod != null) {
+            val (start, end) = newPeriod
+            nextUpdate = if (start.isInPast()) end else start
+
+            val nowActive = newPeriod.isNow()
+            if (nowActive && !oldActive) {
+                isActive = true
+                onStart()
+            }
+        }
     }
 
-    //@Module
+    @Module
     companion object {
         private val events = mutableListOf<FishingEvent>()
+
+        // TODO: use repo for override time periods
+
+        @HandleEvent(eventTypes = [HypixelJoinEvent::class, MayorDataUpdateEvent::class])
+        fun onForceUpdate() = events.forEach(FishingEvent::internalUpdateTimePeriod)
 
         @HandleEvent
         fun onSecondPassed(event: SecondPassedEvent) = events.forEach(FishingEvent::onSecondPassed)
