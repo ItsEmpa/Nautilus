@@ -24,9 +24,15 @@ data class TimePeriod(
     operator fun minus(duration: Duration): TimePeriod = TimePeriod(start, end - duration)
     operator fun plus(period: TimePeriod): TimePeriod = TimePeriod(min(start, period.start), max(end, period.end))
 
-    inline val asString: String get() = toString()
-
     override fun toString(): String = "${start.toMillis()}-${end.toMillis()}"
+
+    fun formatString(): String = buildString {
+        if (start.isInPast()) append("${start.passedSince()} ago")
+        else append("in ${start.timeUntil()}")
+        append(" --- ")
+        if (end.isInPast()) append("${end.passedSince()} ago")
+        else append("in ${end.timeUntil()}")
+    }
 
     val duration: Duration get() = end - start
 
@@ -48,10 +54,9 @@ data class TimePeriod(
             return TimePeriod(first, second)
         }
         infix fun SimpleTimeMark.until(other: SimpleTimeMark): TimePeriod = TimePeriod(this, other)
-        infix fun SimpleTimeMark.until(duration: Duration): TimePeriod = TimePeriod(this, this + duration)
 
         val TYPE_ADAPTER = SimpleStringTypeAdapter(
-            TimePeriod::asString,
+            TimePeriod::toString,
             ::fromString,
         )
     }
