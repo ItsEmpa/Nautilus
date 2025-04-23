@@ -3,7 +3,7 @@ package com.github.itsempa.nautilus.features.dev
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import com.github.itsempa.nautilus.data.categories.FishingCategory
 import com.github.itsempa.nautilus.modules.Module
 
@@ -14,7 +14,13 @@ object FishingCategoryDisplay {
 
     @HandleEvent
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        pos.renderString("Current Category: ${FishingCategory.activeCategory?.internalName ?: "None"}", posLabel = "Fishing Category")
+        pos.renderStrings(
+            listOf(
+                "Current Category: ${FishingCategory.activeCategory?.internalName ?: "None"}",
+                "Extra Categories: ${FishingCategory.extraCategories.map { it.internalName }.ifEmpty { "None" }}",
+            ),
+            posLabel = "Fishing Categories"
+        )
     }
 
 }
