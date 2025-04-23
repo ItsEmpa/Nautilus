@@ -43,8 +43,8 @@ data class TimePeriod(
     fun timeUntilEnd(): Duration = end - now()
 
     fun isNow(): Boolean = now() in this
-    fun isInPast(): Boolean = start > now()
-    fun isInFuture(): Boolean = end < now()
+    fun isInPast(): Boolean = end < now()
+    fun isInFuture(): Boolean = start > now()
 
     constructor(start: SkyBlockTime, end: SkyBlockTime) : this(start.toTimeMark(), end.toTimeMark())
 

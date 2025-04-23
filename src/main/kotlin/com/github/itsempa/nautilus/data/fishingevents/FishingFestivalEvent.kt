@@ -32,7 +32,7 @@ object FishingFestivalEvent : FishingEvent("FISHING_FESTIVAL") {
                 }
             }
         }
-        return list.minByOrNull { if (it.isNow()) it.end else it.start }
+        return list.filter { !it.isInPast() }.minByOrNull { if (it.isNow()) it.end else it.start }
     }
 
     override fun onStart() {

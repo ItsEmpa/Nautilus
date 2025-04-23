@@ -57,7 +57,7 @@ abstract class FishingEvent(val internalName: String) {
     protected abstract fun onEnd()
 
     private fun internalUpdateTimePeriod() {
-        val override = overrideTimePeriods.filter { it.isNow() || it.isInFuture() }.minByOrNull { it.timeUntilStart() }
+        val override = overrideTimePeriods.filter { !it.isInPast() }.minByOrNull { if (it.isNow()) it.end else it.start }
         val next = updateNextTimePeriod()
         val newPeriod = when {
             override == null -> next
