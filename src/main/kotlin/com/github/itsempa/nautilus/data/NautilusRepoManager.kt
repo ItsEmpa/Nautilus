@@ -3,7 +3,6 @@ package com.github.itsempa.nautilus.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.repo.RepoUtils
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
@@ -119,8 +118,6 @@ object NautilusRepoManager {
 
     private fun reloadRepository(answerMessage: String = "") {
         if (!shouldManuallyReload) return
-        // TODO move away and use own error manager
-        ErrorManager.resetCache()
         error = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()

@@ -16,7 +16,7 @@ import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import kotlin.reflect.KClass
 
-//@Suppress("unused")
+@Suppress("unused")
 sealed class FishingCategory(val internalName: String, private val extraEvent: Boolean = false) {
     private var parent: FishingCategory? = null
     private val children: MutableList<FishingCategory> = mutableListOf()
@@ -162,7 +162,7 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
         }
 
         @HandleEvent
-        fun SecondPassed(event: SecondPassedEvent) {
+        fun onSecondPassed(event: SecondPassedEvent) {
             val result = findCategories()
             if (result == null) {
                 activeCategory = null
@@ -205,7 +205,7 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
             val newParent = clazz.objectInstance as? FishingCategory
             if (newParent != null) {
                 put(newParent.internalName, newParent)
-                newParent?.parent = parent
+                newParent.parent = parent
             }
             val parentToAssign = newParent ?: parent
             clazz.nestedClasses.forEach {
@@ -221,7 +221,6 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
                 val prefix = "  ".repeat(level)
                 val suffix = if (activeCategory == category) "§cACTIVE"
                 else if (category in extraCategories) "§eEXTRA" else ""
-                // add tick emoji
                 val tick = if (category.checkActive()) "§a✔" else "§7✘"
 
                 NautilusChat.debug("$prefix${category.internalName} - $tick $suffix")
