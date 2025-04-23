@@ -90,10 +90,6 @@ object SeaCreatureDetectionApi {
         val oldId = data.entityId
         val newId = mob.entityId
         data.despawn()
-        if (mob.isInRender()) {
-            entityIdToData.remove(oldId)
-            data.forceRemove()
-        }
         if (mob.hasDied) {
             entityIdToData.remove(oldId)
             data.forceRemove()
