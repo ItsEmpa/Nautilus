@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.github.itsempa.nautilus.events.FishingEventUpdate
 import com.github.itsempa.nautilus.events.MayorDataUpdateEvent
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.modules.Module
@@ -38,6 +39,8 @@ sealed class FishingEvent(val internalName: String) {
     protected abstract fun onStart()
     protected abstract fun onEnd()
 
+    protected open fun shouldPostEvents(): Boolean = true
+
     init {
         @Suppress("LeakingThis")
         events.add(this)
@@ -50,9 +53,11 @@ sealed class FishingEvent(val internalName: String) {
 
     private fun internalStart() {
         onStart()
+        if (shouldPostEvents()) FishingEventUpdate.Start(this)
     }
     private fun internalEnd() {
         onEnd()
+        if (shouldPostEvents()) FishingEventUpdate.End(this)
     }
 
     private fun updateTimePeriodAndState() {
@@ -87,8 +92,8 @@ sealed class FishingEvent(val internalName: String) {
         @HandleEvent(eventTypes = [HypixelJoinEvent::class, MayorDataUpdateEvent::class])
         fun onForceUpdate() = events.forEach(FishingEvent::updateTimePeriodAndState)
 
-        @HandleEvent
-        fun onSecondPassed(event: SecondPassedEvent) = events.forEach(FishingEvent::onSecondPassed)
+        @HandleEvent(SecondPassedEvent::class)
+        fun onSecondPassed() = events.forEach(FishingEvent::onSecondPassed)
 
         @HandleEvent
         fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
