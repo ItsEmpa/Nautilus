@@ -15,7 +15,7 @@ import com.github.itsempa.nautilus.utils.TimePeriod.Companion.getCurrentOrNext
 import com.github.itsempa.nautilus.utils.minBy
 import kotlin.time.Duration
 
-abstract class FishingEvent(val internalName: String) {
+sealed class FishingEvent(val internalName: String) {
     abstract val name: String
     abstract val duration: Duration
 
@@ -35,6 +35,9 @@ abstract class FishingEvent(val internalName: String) {
     /** Updates the [timePeriod] of the event to be the next event (or null if there isn't a next one). */
     abstract fun updateNextTimePeriod(): TimePeriod?
 
+    protected abstract fun onStart()
+    protected abstract fun onEnd()
+
     init {
         @Suppress("LeakingThis")
         events.add(this)
@@ -42,19 +45,17 @@ abstract class FishingEvent(val internalName: String) {
 
     private fun onSecondPassed() {
         if (nextUpdate.isInFuture()) return
-        val isNow = timePeriod?.isNow().orFalse()
-        if (isNow == isActive) return
-        isActive = isNow
-        if (isNow) onStart()
-        else onEnd()
-        internalUpdateTimePeriod()
+        updateTimePeriodAndState()
     }
 
-    protected abstract fun onStart()
+    private fun internalStart() {
+        onStart()
+    }
+    private fun internalEnd() {
+        onEnd()
+    }
 
-    protected abstract fun onEnd()
-
-    private fun internalUpdateTimePeriod() {
+    private fun updateTimePeriodAndState() {
         val override = overrideTimePeriods.getCurrentOrNext()
         val next = updateNextTimePeriod()
         val newPeriod = when {
@@ -62,29 +63,29 @@ abstract class FishingEvent(val internalName: String) {
             next == null -> override
             else -> minBy(next, override, TimePeriod::getNextUpdate)
         }
-        val oldActive = isActive
 
-        if (newPeriod != timePeriod) timePeriod = newPeriod
+        if (newPeriod != timePeriod) {
+            timePeriod = newPeriod
+            nextUpdate = newPeriod?.getNextUpdate() ?: SimpleTimeMark.farPast()
+        }
 
-        if (newPeriod != null) {
-            nextUpdate = newPeriod.getNextUpdate()
-
-            val nowActive = newPeriod.isNow()
-            if (nowActive && !oldActive) {
-                isActive = true
-                onStart()
-            }
+        val nowActive = newPeriod?.isNow().orFalse()
+        if (nowActive != isActive) {
+            isActive = nowActive
+            if (nowActive) internalStart()
+            else internalEnd()
         }
     }
 
     @Module
     companion object {
         private val events = mutableListOf<FishingEvent>()
+        fun getEvents(): List<FishingEvent> = events
 
         // TODO: use repo for override time periods
 
         @HandleEvent(eventTypes = [HypixelJoinEvent::class, MayorDataUpdateEvent::class])
-        fun onForceUpdate() = events.forEach(FishingEvent::internalUpdateTimePeriod)
+        fun onForceUpdate() = events.forEach(FishingEvent::updateTimePeriodAndState)
 
         @HandleEvent
         fun onSecondPassed(event: SecondPassedEvent) = events.forEach(FishingEvent::onSecondPassed)
