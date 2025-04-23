@@ -46,6 +46,11 @@ data class TimePeriod(
     fun isInPast(): Boolean = end < now()
     fun isInFuture(): Boolean = start > now()
 
+    fun currentOrFuture(): Boolean = !isInPast()
+
+    /** Assumes that the timePeriod isn't in the past. */
+    fun getNextUpdate(): SimpleTimeMark = if (isNow()) end else start
+
     constructor(start: SkyBlockTime, end: SkyBlockTime) : this(start.toTimeMark(), end.toTimeMark())
 
     companion object {
@@ -59,5 +64,9 @@ data class TimePeriod(
             TimePeriod::toString,
             ::fromString,
         )
+
+        fun Collection<TimePeriod>.getCurrentOrNext(): TimePeriod? {
+            return this.filter { it.currentOrFuture() }.minByOrNull(TimePeriod::getNextUpdate)
+        }
     }
 }

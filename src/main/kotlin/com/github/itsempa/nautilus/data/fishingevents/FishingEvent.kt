@@ -11,6 +11,7 @@ import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orFalse
 import com.github.itsempa.nautilus.utils.TimePeriod
+import com.github.itsempa.nautilus.utils.TimePeriod.Companion.getCurrentOrNext
 import com.github.itsempa.nautilus.utils.minBy
 import kotlin.time.Duration
 
@@ -45,11 +46,8 @@ abstract class FishingEvent(val internalName: String) {
         if (isNow == isActive) return
         isActive = isNow
         if (isNow) onStart()
-        else {
-            onEnd()
-            internalUpdateTimePeriod()
-        }
-        if (!isActive) internalUpdateTimePeriod()
+        else onEnd()
+        internalUpdateTimePeriod()
     }
 
     protected abstract fun onStart()
@@ -57,22 +55,19 @@ abstract class FishingEvent(val internalName: String) {
     protected abstract fun onEnd()
 
     private fun internalUpdateTimePeriod() {
-        val override = overrideTimePeriods.filter { !it.isInPast() }.minByOrNull { if (it.isNow()) it.end else it.start }
+        val override = overrideTimePeriods.getCurrentOrNext()
         val next = updateNextTimePeriod()
         val newPeriod = when {
             override == null -> next
             next == null -> override
-            else -> minBy(next, override) {
-                if (it.isNow()) it.end else it.start
-            }
+            else -> minBy(next, override, TimePeriod::getNextUpdate)
         }
         val oldActive = isActive
 
         if (newPeriod != timePeriod) timePeriod = newPeriod
 
         if (newPeriod != null) {
-            val (start, end) = newPeriod
-            nextUpdate = if (start.isInPast()) end else start
+            nextUpdate = newPeriod.getNextUpdate()
 
             val nowActive = newPeriod.isNow()
             if (nowActive && !oldActive) {
@@ -102,8 +97,8 @@ abstract class FishingEvent(val internalName: String) {
                     val text = events.joinToString("\n") {
                         buildString {
                             appendLine(it.internalName)
-                            appendLine("  - timePeriod: ${it.timePeriod?.formatString()}")
-                            appendLine("  - nextUpdate: in ${it.nextUpdate.timeUntil()} ")
+                            appendLine(" - timePeriod: ${it.timePeriod?.formatString()}")
+                            appendLine(" - nextUpdate: in ${it.nextUpdate.timeUntil()} ")
                             appendLine()
                         }
                     }

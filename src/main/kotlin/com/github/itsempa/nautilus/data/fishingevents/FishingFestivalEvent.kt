@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.TimePeriod
+import com.github.itsempa.nautilus.utils.TimePeriod.Companion.getCurrentOrNext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 
@@ -32,7 +33,7 @@ object FishingFestivalEvent : FishingEvent("FISHING_FESTIVAL") {
                 }
             }
         }
-        return list.filter { !it.isInPast() }.minByOrNull { if (it.isNow()) it.end else it.start }
+        return list.getCurrentOrNext()
     }
 
     override fun onStart() {
