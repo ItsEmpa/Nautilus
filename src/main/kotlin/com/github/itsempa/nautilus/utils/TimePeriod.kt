@@ -66,7 +66,7 @@ data class TimePeriod(
         )
 
         fun Collection<TimePeriod>.getCurrentOrNext(): TimePeriod? {
-            return this.filter { it.currentOrFuture() }.minByOrNull(TimePeriod::getNextUpdate)
+            return this.filter(TimePeriod::currentOrFuture).minByOrNull(TimePeriod::getNextUpdate)
         }
     }
 }
