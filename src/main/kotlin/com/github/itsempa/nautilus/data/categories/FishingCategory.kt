@@ -11,30 +11,39 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import com.github.itsempa.nautilus.data.CrystalHollowsArea
 import com.github.itsempa.nautilus.data.fishingevents.FishingFestivalEvent
+import com.github.itsempa.nautilus.data.fishingevents.JerrysWorkshopEvent
+import com.github.itsempa.nautilus.data.fishingevents.SpookyFestivalEvent
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
+import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orTrue
 import kotlin.reflect.KClass
 
 @Suppress("unused")
+/**
+ * The subclasses found here represent a graph/tree of different fishing categories,
+ * where the "children" are the nested classes, and for a category to be considered "active",
+ * all of its predecessors need to also be considered active.
+ */
 sealed class FishingCategory(val internalName: String, private val extraEvent: Boolean = false) {
-    private var parent: FishingCategory? = null
+    var parent: FishingCategory? = null
+        private set
     private val children: MutableList<FishingCategory> = mutableListOf()
 
     fun isMainActive() = this == activeCategory
     fun isExtraActive() = this in extraCategories
     fun isActive() = isMainActive() || isExtraActive()
+    fun hasParent() = parent != null
 
+    internal fun checkTreeActive(): Boolean = checkActive() && parent?.checkTreeActive().orTrue()
     internal open fun checkActive(): Boolean = false
 
-    private fun isPredecessor(potentialParent: FishingCategory): Boolean {
-        var current = parent
-        while (current != null) {
-            if (current == potentialParent) return true
-            current = current.parent
-        }
-        return false
+    fun getPredecessors(): List<FishingCategory> {
+        val parent = parent ?: return emptyList()
+        return parent.getPredecessors() + parent
     }
+
+    fun isPredecessor(potentialParent: FishingCategory): Boolean = potentialParent in getPredecessors()
 
     data object Lava : FishingCategory("LAVA") {
         override fun checkActive(): Boolean = lastWater == false
@@ -113,11 +122,11 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
 
         object Events {
             data object Spooky : FishingCategory("SPOOKY", true) {
-                override fun checkActive(): Boolean = false // TODO: Implement Spooky Fishing detection
+                override fun checkActive(): Boolean = SpookyFestivalEvent.isActive
             }
 
             data object Jerry : FishingCategory("JERRY", true) {
-                override fun checkActive(): Boolean = false // TODO: Implement Jerry Fishing detection
+                override fun checkActive(): Boolean = JerrysWorkshopEvent.isActive
             }
 
             data object FishingFestival : FishingCategory("FISHING_FESTIVAL", true) {
@@ -138,6 +147,8 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
             private set
 
         init {
+            // TODO: use getSealedObjects function and handle assigning parent and childrens on their own inits
+            // getSealedObjects<FishingCategory>().groupBy(FishingCategory::internalName)
             categories = buildMap {
                 recursiveLoad(Lava::class)
                 recursiveLoad(Water::class)
@@ -154,9 +165,9 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
 
         @HandleEvent
         fun onCommand(event: NautilusCommandRegistrationEvent) {
-            event.register("ntfishingcategorytest") {
+            event.register("ntdebugfishingcategories") {
                 this.description = "Prints the fishing category tree"
-                this.category = CommandCategory.DEVELOPER_TEST
+                this.category = CommandCategory.DEVELOPER_DEBUG
                 callback { printTree() }
             }
         }
@@ -215,24 +226,29 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
             return newParent
         }
 
-
+        // TODO: maybe slightly change the function to make it more compact
         private fun printTree() {
-            fun printCategory(category: FishingCategory, level: Int) {
-                val prefix = "  ".repeat(level)
-                val suffix = if (activeCategory == category) "§cACTIVE"
-                else if (category in extraCategories) "§eEXTRA" else ""
-                val tick = if (category.checkActive()) "§a✔" else "§7✘"
+            fun getPrefixes(childrenPrefix: String, currentIndex: Int, lastIndex: Int): Pair<String, String> {
+                return if (currentIndex == lastIndex) "$childrenPrefix└" to "$childrenPrefix "
+                else "$childrenPrefix├" to "${childrenPrefix}│"
+            }
+            fun printCategory(category: FishingCategory, currentPrefix: String, childrenPrefix: String) {
+                val suffix = if (category.isMainActive()) "§cACTIVE"
+                else if (category.isExtraActive()) "§eEXTRA" else ""
+                val tick = if (category.checkActive()) "§a✔" else "§c✘"
 
-                NautilusChat.debug("$prefix${category.internalName} - $tick $suffix")
-                for (child in category.children) {
-                    printCategory(child, level + 1)
+                NautilusChat.chat("§7$currentPrefix§3${category.internalName} §r§7- $tick $suffix", prefix = false)
+                val children = category.children
+                for ((index, child) in children.withIndex()) {
+                    val (parentPrefix, nextPrefix) = getPrefixes(childrenPrefix, index, children.lastIndex)
+                    printCategory(child, parentPrefix, nextPrefix)
                 }
             }
 
-            for (category in categories.values) {
-                if (category.parent == null) {
-                    printCategory(category, 0)
-                }
+            for ((index, parent) in parentCategories.withIndex()) {
+                val (thisPrefix, nextPrefix) = getPrefixes("", index, parentCategories.lastIndex)
+                printCategory(parent, thisPrefix, nextPrefix)
+
             }
         }
     }

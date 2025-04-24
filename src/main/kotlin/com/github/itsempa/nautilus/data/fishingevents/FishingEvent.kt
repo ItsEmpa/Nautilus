@@ -1,6 +1,7 @@
 package com.github.itsempa.nautilus.data.fishingevents
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
@@ -13,6 +14,7 @@ import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orFalse
 import com.github.itsempa.nautilus.utils.TimePeriod
 import com.github.itsempa.nautilus.utils.TimePeriod.Companion.getCurrentOrNext
+import com.github.itsempa.nautilus.utils.getSealedObjects
 import com.github.itsempa.nautilus.utils.minBy
 import kotlin.time.Duration
 
@@ -36,15 +38,10 @@ sealed class FishingEvent(val internalName: String) {
     /** Updates the [timePeriod] of the event to be the next event (or null if there isn't a next one). */
     abstract fun updateNextTimePeriod(): TimePeriod?
 
-    protected abstract fun onStart()
-    protected abstract fun onEnd()
+    protected open fun onStart() { /* Empty */ }
+    protected open fun onEnd() { /* Empty */ }
 
     protected open fun shouldPostEvents(): Boolean = true
-
-    init {
-        @Suppress("LeakingThis")
-        events.add(this)
-    }
 
     private fun onSecondPassed() {
         if (nextUpdate.isInFuture()) return
@@ -53,10 +50,12 @@ sealed class FishingEvent(val internalName: String) {
 
     private fun internalStart() {
         onStart()
+        NautilusChat.debug("Started Fishing Event $name (${timePeriod?.duration})")
         if (shouldPostEvents()) FishingEventUpdate.Start(this)
     }
     private fun internalEnd() {
         onEnd()
+        NautilusChat.debug("Ended Fishing Event $name")
         if (shouldPostEvents()) FishingEventUpdate.End(this)
     }
 
@@ -84,8 +83,7 @@ sealed class FishingEvent(val internalName: String) {
 
     @Module
     companion object {
-        private val events = mutableListOf<FishingEvent>()
-        fun getEvents(): List<FishingEvent> = events
+        val events: List<FishingEvent> = getSealedObjects<FishingEvent>()
 
         // TODO: use repo for override time periods
 
@@ -97,8 +95,9 @@ sealed class FishingEvent(val internalName: String) {
 
         @HandleEvent
         fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
-            event.register("ntfishingevent") {
+            event.register("ntdebugfishingevents") {
                 this.description = "Gives debug information about upcoming or current events."
+                this.category = CommandCategory.DEVELOPER_DEBUG
                 this.callback {
                     val text = events.joinToString("\n") {
                         buildString {

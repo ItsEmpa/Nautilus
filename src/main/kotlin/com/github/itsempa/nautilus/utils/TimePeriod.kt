@@ -65,6 +65,7 @@ data class TimePeriod(
             ::fromString,
         )
 
+        // TODO: make it so that if theres an event inside the time period of another event, it uses the longer event
         fun Collection<TimePeriod>.getCurrentOrNext(): TimePeriod? {
             return this.filter(TimePeriod::currentOrFuture).minByOrNull(TimePeriod::getNextUpdate)
         }

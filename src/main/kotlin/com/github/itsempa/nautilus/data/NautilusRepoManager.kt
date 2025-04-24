@@ -3,7 +3,6 @@ package com.github.itsempa.nautilus.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.repo.RepoUtils
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -103,7 +102,7 @@ object NautilusRepoManager {
                     "Error updating reading Sh Repo",
                     "unsuccessfulConstants" to unsuccessfulConstants,
                 )
-                ChatUtils.chat("§cFailed to load the repo! See above for more infos.")
+                NautilusChat.chat("§cFailed to load the repo! See above for more infos.")
                 return@launchIOCoroutine
             }
         }

@@ -11,4 +11,5 @@ object NautilusNullableUtils {
     inline fun Long?.orZero(): Long = this ?: 0L
 
     inline fun Boolean?.orFalse(): Boolean = this ?: false
+    inline fun Boolean?.orTrue(): Boolean = this ?: true
 }
