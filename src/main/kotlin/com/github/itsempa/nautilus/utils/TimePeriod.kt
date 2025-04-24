@@ -5,12 +5,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.json.SimpleStringTypeAdapter
-import com.google.gson.annotations.Expose
 import kotlin.time.Duration
 
 data class TimePeriod(
-    @Expose val start: SimpleTimeMark,
-    @Expose val end: SimpleTimeMark,
+    val start: SimpleTimeMark,
+    val end: SimpleTimeMark,
 ) {
     init {
         require(duration.isPositive()) { "TimePeriod cannot be empty" }
@@ -48,7 +47,7 @@ data class TimePeriod(
 
     fun currentOrFuture(): Boolean = !isInPast()
 
-    /** Assumes that the timePeriod isn't in the past. */
+    /** Assumes that the [TimePeriod] isn't in the past. */
     fun getNextUpdate(): SimpleTimeMark = if (isNow()) end else start
 
     constructor(start: SkyBlockTime, end: SkyBlockTime) : this(start.toTimeMark(), end.toTimeMark())

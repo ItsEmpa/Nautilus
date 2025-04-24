@@ -9,6 +9,7 @@ import com.github.itsempa.nautilus.Nautilus
 import net.minecraft.util.AxisAlignedBB
 import kotlin.math.abs
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 // TODO: separate some functions into other util objects
 object NautilusUtils {
@@ -70,4 +71,7 @@ object NautilusUtils {
 
     inline val Int.thousands get(): Int = this * 1_000
     inline val Int.millions get(): Int = this * 1_000_000
+    inline val Int.skyblockDays get(): Duration = (this * 20).minutes
+    inline val Int.skyblockMonths get(): Duration = (this * 31).skyblockDays
+    inline val Int.skyblockYears get(): Duration = (this * 12).skyblockMonths
 }
