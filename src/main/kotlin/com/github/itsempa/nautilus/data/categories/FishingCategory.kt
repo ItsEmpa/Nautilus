@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import com.github.itsempa.nautilus.data.CrystalHollowsArea
 import com.github.itsempa.nautilus.data.fishingevents.FishingFestivalEvent
 import com.github.itsempa.nautilus.data.fishingevents.JerrysWorkshopEvent
@@ -17,6 +16,7 @@ import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orTrue
+import com.github.itsempa.nautilus.utils.getSealedObjects
 import kotlin.reflect.KClass
 
 @Suppress("unused")
@@ -28,7 +28,7 @@ import kotlin.reflect.KClass
 sealed class FishingCategory(val internalName: String, private val extraEvent: Boolean = false) {
     var parent: FishingCategory? = null
         private set
-    private val children: MutableList<FishingCategory> = mutableListOf()
+    val children: List<FishingCategory> = getNestedClasses(this::class, this)
 
     fun isMainActive() = this == activeCategory
     fun isExtraActive() = this in extraCategories
@@ -147,13 +147,13 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
             private set
 
         init {
-            // TODO: use getSealedObjects function and handle assigning parent and childrens on their own inits
-            // getSealedObjects<FishingCategory>().groupBy(FishingCategory::internalName)
-            categories = buildMap {
-                recursiveLoad(Lava::class)
-                recursiveLoad(Water::class)
+            val list = getSealedObjects<FishingCategory>()
+            val map = mutableMapOf<String, FishingCategory>()
+            for (obj in list) {
+                check(map.put(obj.internalName, obj) == null) { "${obj.internalName} has a duplicate internal name" }
             }
-            parentCategories = categories.values.filter { it.parent == null }
+            categories = map
+            parentCategories = list.filter { !it.hasParent() }
         }
 
         fun getCategoryByInternalName(name: String): FishingCategory? = categories[name]
@@ -209,21 +209,18 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
             }
         }
 
-        private fun MutableMap<String, FishingCategory>.recursiveLoad(
-            clazz: KClass<*>,
-            parent: FishingCategory? = null,
-        ): FishingCategory? {
-            val newParent = clazz.objectInstance as? FishingCategory
-            if (newParent != null) {
-                put(newParent.internalName, newParent)
-                newParent.parent = parent
+        private fun getNestedClasses(clazz: KClass<*>, parent: FishingCategory): List<FishingCategory> {
+            val list = mutableListOf<FishingCategory>()
+            for (nested in clazz.nestedClasses) {
+                val nestedInstance = nested.objectInstance ?: continue
+                if (nestedInstance !is FishingCategory) {
+                    list.addAll(getNestedClasses(nested, parent))
+                    continue
+                }
+                nestedInstance.parent = parent
+                list.add(nestedInstance)
             }
-            val parentToAssign = newParent ?: parent
-            clazz.nestedClasses.forEach {
-                val child = recursiveLoad(it, parentToAssign)
-                parentToAssign?.children?.addNotNull(child)
-            }
-            return newParent
+            return list
         }
 
         // TODO: maybe slightly change the function to make it more compact
@@ -248,7 +245,6 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
             for ((index, parent) in parentCategories.withIndex()) {
                 val (thisPrefix, nextPrefix) = getPrefixes("", index, parentCategories.lastIndex)
                 printCategory(parent, thisPrefix, nextPrefix)
-
             }
         }
     }
