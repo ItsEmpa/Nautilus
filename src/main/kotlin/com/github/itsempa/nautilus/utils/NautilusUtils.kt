@@ -2,11 +2,13 @@ package com.github.itsempa.nautilus.utils
 
 import at.hannibal2.skyhanni.deps.moulconfig.observer.Property
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import com.github.itsempa.nautilus.Nautilus
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.Rotations
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -32,6 +34,21 @@ object NautilusUtils {
     }
 
     fun AxisAlignedBB.getHeight() = abs(maxY - minY)
+    fun AxisAlignedBB.getWidth() = max(abs(maxX - minX), abs(maxZ - minZ))
+
+    fun AxisAlignedBB.expandToInclude(pos: LorenzVec): AxisAlignedBB {
+        val (x, y, z) = pos
+        if (isInside(pos)) return this
+
+        return AxisAlignedBB(
+            minOf(this.minX, x),
+            minOf(this.minY, y),
+            minOf(this.minZ, z),
+            maxOf(this.maxX, x),
+            maxOf(this.maxY, y),
+            maxOf(this.maxZ, z),
+        )
+    }
 
     fun AxisAlignedBB.getCenter(): LorenzVec = LorenzVec(
         (minX + maxX) / 2,
@@ -68,6 +85,20 @@ object NautilusUtils {
         if (lowercase) value = value.lowercase()
         return value.toSplitSet(delimiter)
     }
+
+    private val ZERO_ROTATIONS = Rotations(0f, 0f, 0f)
+
+    fun Rotations.isZero(): Boolean = this == ZERO_ROTATIONS
+
+    fun <T> MutableCollection<T>.clearAnd(predicate: (T) -> Unit) {
+        val it = iterator()
+        while (it.hasNext()) {
+            predicate(it.next())
+            it.remove()
+        }
+    }
+
+    fun <K, V> MutableMap<K, V>.clearAnd(predicate: (Map.Entry<K, V>) -> Unit) = entries.clearAnd(predicate)
 
     inline val Int.thousands get(): Int = this * 1_000
     inline val Int.millions get(): Int = this * 1_000_000

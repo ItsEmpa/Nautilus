@@ -66,7 +66,7 @@ object FishingReelApi {
     private fun handleBobber() {
         if (!foundPlingSound || !foundCatchSound) return
         ++catchesSinceMove
-        FishCatchEvent(catchesSinceMove).post()
+        FishCatchEvent(catchesSinceMove, lastBobberLocation!!).post()
         foundPlingSound = false
         foundCatchSound = false
     }

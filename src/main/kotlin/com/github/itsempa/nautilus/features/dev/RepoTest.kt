@@ -1,6 +1,7 @@
 package com.github.itsempa.nautilus.features.dev
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import com.github.itsempa.nautilus.data.repo.FishingDropsRepo
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
@@ -32,6 +33,7 @@ object RepoTest {
     @HandleEvent
     fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
         event.register("ntrepotest") {
+            this.category = CommandCategory.DEVELOPER_TEST
             this.callback {
                 sendTest()
             }
