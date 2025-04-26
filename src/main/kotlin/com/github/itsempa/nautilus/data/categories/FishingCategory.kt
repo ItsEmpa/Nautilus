@@ -25,7 +25,7 @@ import kotlin.reflect.KClass
  * where the "children" are the nested classes, and for a category to be considered "active",
  * all of its predecessors need to also be considered active.
  */
-sealed class FishingCategory(val internalName: String, private val extraEvent: Boolean = false) {
+sealed class FishingCategory(val internalName: String, val extraCategory: Boolean = false) {
     var parent: FishingCategory? = null
         private set
     val children: List<FishingCategory> = getNestedClasses(this::class, this)
@@ -100,6 +100,7 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
             }
         }
 
+        // TODO: figure out what to do with this
         data object Park : FishingCategory("PARK") {
             override fun checkActive(): Boolean = IslandType.THE_PARK.isInIsland()
 
@@ -108,16 +109,16 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
             }
         }
 
-        data object Hotspot : FishingCategory("HOTSPOT") {
-            override fun checkActive(): Boolean = false // TODO: Implement Fishing in Hotspot detection
-
-            data object Bayou : FishingCategory("BAYOU") {
-                override fun checkActive(): Boolean = IslandType.BACKWATER_BAYOU.isInIsland()
-            }
+        data object Bayou : FishingCategory("BAYOU") {
+            override fun checkActive(): Boolean = IslandType.BACKWATER_BAYOU.isInIsland()
         }
 
         data object Oasis : FishingCategory("OASIS") {
             override fun checkActive(): Boolean = IslandType.THE_FARMING_ISLANDS.isInIsland()
+        }
+
+        data object Hotspot : FishingCategory("WATER_HOTSPOT", extraCategory = true) {
+            override fun checkActive(): Boolean = false // TODO: Implement Fishing in Hotspot detection
         }
 
         object Events {
@@ -191,9 +192,9 @@ sealed class FishingCategory(val internalName: String, private val extraEvent: B
             while (true) {
                 val activeChildren = current.children.filter { it.checkActive() }
 
-                eventCategories.addAll(activeChildren.filter { it.extraEvent })
+                eventCategories.addAll(activeChildren.filter { it.extraCategory })
 
-                val activeChild = activeChildren.find { !it.extraEvent }
+                val activeChild = activeChildren.find { !it.extraCategory }
 
                 if (activeChild == null) {
                     if (eventCategories.isNotEmpty()) {
