@@ -41,6 +41,8 @@ object HotspotApi {
         fun updateTime() {
             lastUpdate = SimpleTimeMark.now()
         }
+
+        @Suppress("DEPRECATION")
         fun addParticle(pos: LorenzVec) {
             updateTime()
             aabb = aabb.expandToInclude(pos)
