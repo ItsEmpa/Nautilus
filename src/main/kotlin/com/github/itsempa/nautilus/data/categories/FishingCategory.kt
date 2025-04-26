@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.json.SimpleStringTypeAdapter
 import com.github.itsempa.nautilus.data.CrystalHollowsArea
 import com.github.itsempa.nautilus.data.fishingevents.FishingFestivalEvent
 import com.github.itsempa.nautilus.data.fishingevents.JerrysWorkshopEvent
@@ -136,6 +137,10 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
     }
 
+    data object Unknown : FishingCategory("UNKNOWN") {
+        override fun checkActive(): Boolean = false
+    }
+
     @Module
     companion object {
         val categories: Map<String, FishingCategory>
@@ -157,7 +162,13 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
             parentCategories = list.filter { !it.hasParent() }
         }
 
+        val TYPE_ADAPTER = SimpleStringTypeAdapter(
+            FishingCategory::internalName,
+            FishingCategory::getCategoryByInternalNameOrUnknown,
+        )
+
         fun getCategoryByInternalName(name: String): FishingCategory? = categories[name]
+        fun getCategoryByInternalNameOrUnknown(name: String): FishingCategory = categories[name] ?: Unknown
 
         @HandleEvent
         fun onBobber(event: FishingBobberInLiquidEvent) {
