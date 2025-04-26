@@ -28,7 +28,7 @@ object HotspotApi {
             private set
 
         @Deprecated("Intended only for internal use")
-        var aabb: AxisAlignedBB = firstParticle.axisAlignedTo(firstParticle)
+        internal var aabb: AxisAlignedBB = firstParticle.axisAlignedTo(firstParticle)
             private set
         var center: LorenzVec = firstParticle
             private set
