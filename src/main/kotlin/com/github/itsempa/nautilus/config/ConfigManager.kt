@@ -1,6 +1,7 @@
 package com.github.itsempa.nautilus.config
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.deps.moulconfig.LegacyStringChromaColourTypeAdapter
 import at.hannibal2.skyhanni.deps.moulconfig.managed.ManagedConfig
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.categories.FishingCategory
+import com.github.itsempa.nautilus.data.fishingevents.FishingEvent
 import com.github.itsempa.nautilus.features.misc.update.ConfigVersionDisplay
 import com.github.itsempa.nautilus.features.misc.update.GuiOptionEditorUpdateCheck
 import com.github.itsempa.nautilus.features.misc.update.SemVersion
@@ -63,6 +65,7 @@ object ConfigManager {
         return registerTypeAdapter(SemVersion.TYPE_ADAPTER)
             .registerTypeAdapter(TimePeriod.TYPE_ADAPTER)
             .registerTypeAdapter(FishingCategory.TYPE_ADAPTER)
+            .registerTypeAdapter(FishingEvent.TYPE_ADAPTER)
     }
 
     // TODO: find a way to get all factories in skyhanni's base gson builder dynamically
@@ -79,5 +82,6 @@ object ConfigManager {
             .registerTypeAdapter(SkyHanniTypeAdapters.TIME_MARK)
             .registerTypeAdapter(SkyHanniTypeAdapters.DURATION)
             .registerTypeAdapter(SkyHanniTypeAdapters.LOCALE_DATE)
+            .registerTypeAdapter(LegacyStringChromaColourTypeAdapter(true))
 
 }

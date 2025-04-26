@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.json.SimpleStringTypeAdapter
+import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
 import com.github.itsempa.nautilus.data.CrystalHollowsArea
 import com.github.itsempa.nautilus.data.fishingevents.FishingFestivalEvent
 import com.github.itsempa.nautilus.data.fishingevents.JerrysWorkshopEvent
@@ -60,7 +60,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
                 override fun checkActive(): Boolean = !TrophyFish.checkActive()
 
                 data object Hotspot : FishingCategory("CI_HOTSPOT") {
-                    override fun checkActive(): Boolean = false // TODO: Implement Fishing in Hotsspot detection
+                    override fun checkActive(): Boolean = false // TODO: Implement Fishing in Hotspot detection
                 }
             }
         }
@@ -89,7 +89,11 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
             }
 
             data object AbyssalMines : FishingCategory("ABYSSAL_MINES") {
-                override fun checkActive(): Boolean = CrystalHollowsArea.JUNGLE.inArea()
+                override fun checkActive(): Boolean = CrystalHollowsArea.inAnyArea(
+                    CrystalHollowsArea.JUNGLE,
+                    CrystalHollowsArea.PRECURSOR_REMNANTS,
+                    CrystalHollowsArea.MITHRIL_DEPOSITS,
+                )
             }
         }
 
@@ -137,10 +141,6 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
     }
 
-    data object Unknown : FishingCategory("UNKNOWN") {
-        override fun checkActive(): Boolean = false
-    }
-
     @Module
     companion object {
         val categories: Map<String, FishingCategory>
@@ -162,13 +162,12 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
             parentCategories = list.filter { !it.hasParent() }
         }
 
-        val TYPE_ADAPTER = SimpleStringTypeAdapter(
+        val TYPE_ADAPTER = NullableStringTypeAdapter(
             FishingCategory::internalName,
-            FishingCategory::getCategoryByInternalNameOrUnknown,
+            FishingCategory::getCategoryByInternalName,
         )
 
         fun getCategoryByInternalName(name: String): FishingCategory? = categories[name]
-        fun getCategoryByInternalNameOrUnknown(name: String): FishingCategory = categories[name] ?: Unknown
 
         @HandleEvent
         fun onBobber(event: FishingBobberInLiquidEvent) {
@@ -241,6 +240,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
                 return if (currentIndex == lastIndex) "$childrenPrefix└" to "$childrenPrefix "
                 else "$childrenPrefix├" to "${childrenPrefix}│"
             }
+
             fun printCategory(category: FishingCategory, currentPrefix: String, childrenPrefix: String) {
                 val suffix = if (category.isMainActive()) "§cACTIVE"
                 else if (category.isExtraActive()) "§eEXTRA" else ""

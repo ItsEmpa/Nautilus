@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.util.AxisAlignedBB
 
-// Heat is active at Y=64.0 and below as of SkyBlock 0.20.1. We draw the line
-// one above to accurately show whether the player is inside the Magma Fields.
 private const val HEAT_HEIGHT = 65.0
 private const val MAX_HEIGHT = 190.0
 
@@ -43,4 +41,8 @@ enum class CrystalHollowsArea(private val aabb: AxisAlignedBB) {
     constructor(from: LorenzVec, to: LorenzVec) : this(from.axisAlignedTo(to))
 
     fun inArea(): Boolean = aabb.isPlayerInside()
+
+    companion object {
+        fun inAnyArea(vararg areas: CrystalHollowsArea) = areas.any(CrystalHollowsArea::inArea)
+    }
 }

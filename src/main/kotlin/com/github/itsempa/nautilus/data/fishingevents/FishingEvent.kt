@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
 import com.github.itsempa.nautilus.events.FishingEventUpdate
 import com.github.itsempa.nautilus.events.MayorDataUpdateEvent
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
@@ -84,6 +85,13 @@ sealed class FishingEvent(val internalName: String) {
     @Module
     companion object {
         val events: List<FishingEvent> = getSealedObjects<FishingEvent>()
+
+        val TYPE_ADAPTER = NullableStringTypeAdapter(
+            FishingEvent::internalName,
+            ::getByInternalName
+        )
+
+        fun getByInternalName(internalName: String): FishingEvent? = events.find { it.name == internalName }
 
         // TODO: use repo for override time periods
 
