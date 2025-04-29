@@ -19,7 +19,9 @@ object NautilusChat {
     private const val DEBUG_PREFIX = "$DEBUG_PREFIX_NO_COLOR§7"
     private const val USER_ERROR_PREFIX = "§c[${Nautilus.MOD_NAME}] "
     private const val CHAT_PREFIX = "[${Nautilus.MOD_NAME}] "
-    private const val PREFIX_COLOR = "§3"
+    const val PREFIX_COLOR = "§3"
+
+    fun prefixComponent(message: String): IChatComponent = TextHelper.text(PREFIX_COLOR + CHAT_PREFIX + message)
 
     fun debug(message: String) {
         if (Nautilus.feature.about.debug && internalChat(DEBUG_PREFIX + message)) {
@@ -94,7 +96,7 @@ object NautilusChat {
         prefixColor: String = PREFIX_COLOR,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        ChatUtils.chat(TextHelper.join(components).prefix(msgPrefix))
+        chat(TextHelper.join(components).prefix(msgPrefix))
     }
 
     fun chat(message: IChatComponent, send: Boolean = true): Boolean {

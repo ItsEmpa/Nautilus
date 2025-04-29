@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.deps.moulconfig.observer.Property
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import com.github.itsempa.nautilus.Nautilus
@@ -61,17 +63,6 @@ object NautilusUtils {
         return passedSince.isPositive() || passedSince.absoluteValue <= maxError
     }
 
-    operator fun SkyBlockTime.compareTo(other: SkyBlockTime): Int {
-        return when {
-            year != other.year -> year.compareTo(other.year)
-            month != other.month -> month.compareTo(other.month)
-            day != other.day -> day.compareTo(other.day)
-            hour != other.hour -> hour.compareTo(other.hour)
-            minute != other.minute -> minute.compareTo(other.minute)
-            else -> second.compareTo(other.second)
-        }
-    }
-
     operator fun SkyBlockTime.minus(duration: Duration): SkyBlockTime = this.plus(-duration)
 
     fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.removeIf(predicate)
@@ -98,6 +89,22 @@ object NautilusUtils {
         }
     }
 
+    fun LorenzVec.asChatMessage(): String = "x: ${x.toInt()} y: ${y.toInt()} z: ${z.toInt()}"
+
+    fun LorenzVec.asSimpleChatMessage(): String = "${x.toInt()} ${y.toInt()} ${z.toInt()}"
+
+    private val lorenzVecPattern = "x: (?<x>[\\d-,.]+) y: (?<y>[\\d-,.]+) z: (?<z>[\\d-,.]+)".toPattern()
+
+    fun String.asLorenzVec(): LorenzVec? {
+        return lorenzVecPattern.matchMatcher(this) {
+            val x = group("x").formatInt()
+            val y = group("y").formatInt()
+            val z = group("z").formatInt()
+            return LorenzVec(x, y, z)
+        }
+    }
+
+    fun LorenzVec.getBlockAABB() = boundingToOffset(1.0, 1.0, 1.0)
     fun <K, V> MutableMap<K, V>.clearAnd(predicate: (Map.Entry<K, V>) -> Unit) = entries.clearAnd(predicate)
 
     inline val Int.thousands get(): Int = this * 1_000

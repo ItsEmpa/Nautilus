@@ -5,8 +5,10 @@ import com.github.itsempa.nautilus.data.HotspotApi
 
 sealed class HotspotEvent(val hotspot: HotspotApi.Hotspot) : SkyHanniEvent() {
     class Detected(hotspot: HotspotApi.Hotspot) : HotspotEvent(hotspot)
+
+    // TODO: maybe add a "reason" for the removal in the event?
     class Removed(hotspot: HotspotApi.Hotspot) : HotspotEvent(hotspot)
 
-    // TODO: implement
+    class BuffFound(hotspot: HotspotApi.Hotspot) : HotspotEvent(hotspot)
     class Seen(hotspot: HotspotApi.Hotspot) : HotspotEvent(hotspot)
 }

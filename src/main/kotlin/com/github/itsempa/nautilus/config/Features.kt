@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.deps.moulconfig.Social
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.Category
 import at.hannibal2.skyhanni.deps.moulconfig.common.MyResourceLocation
 import com.github.itsempa.nautilus.Nautilus
+import com.github.itsempa.nautilus.config.chat.ChatConfig
 import com.github.itsempa.nautilus.config.dev.DevConfig
 import com.github.itsempa.nautilus.config.gui.GuiConfig
 import com.github.itsempa.nautilus.config.misc.MiscConfig
@@ -40,6 +41,10 @@ class Features : Config() {
     @Expose
     @Category(name = "Gui", desc = "")
     val gui: GuiConfig = GuiConfig()
+
+    @Expose
+    @Category(name = "Chat", desc = "")
+    val chat: ChatConfig = ChatConfig()
 
     @Expose
     @Category(name = "Misc", desc = "")

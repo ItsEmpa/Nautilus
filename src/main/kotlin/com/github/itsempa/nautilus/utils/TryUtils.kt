@@ -88,3 +88,19 @@ inline fun <T> tryThrowError(lazyMessage: (Throwable) -> String, func: () -> T):
         throw e
     }
 }
+
+@Throws(IllegalStateException::class)
+inline fun <T : Any> errorIfNull(value: T?, lazyMessage: () -> Any): T {
+    contract {
+        returns() implies (value != null)
+    }
+
+    if (value == null) {
+        val message = lazyMessage().toString()
+        val e = IllegalStateException(message)
+        NautilusUtils.logErrorWithData(e, message)
+        throw e
+    } else {
+        return value
+    }
+}
