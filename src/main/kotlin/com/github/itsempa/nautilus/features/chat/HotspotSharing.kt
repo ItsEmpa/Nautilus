@@ -32,6 +32,7 @@ import com.github.itsempa.nautilus.utils.NautilusUtils.asLorenzVec
 import com.github.itsempa.nautilus.utils.NautilusUtils.asSimpleChatMessage
 import com.github.itsempa.nautilus.utils.NautilusUtils.getBlockAABB
 import com.github.itsempa.nautilus.utils.errorIfNull
+import com.github.itsempa.nautilus.utils.helpers.McPlayer
 import net.minecraft.util.IChatComponent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -63,6 +64,7 @@ object HotspotSharing {
     fun onAllChat(event: PlayerAllChatEvent) = handleChatEvent(event)
 
     private fun handleChatEvent(event: AbstractChatEvent) {
+        if (!config.enabled) return
         coordMessagePattern.matchMatcher(event.message) {
             val buff = HotspotApi.HotspotBuff.getByStatName(group("buff"))
             val coords = group("coords").asLorenzVec() ?: return@matchMatcher
@@ -81,6 +83,7 @@ object HotspotSharing {
             if (shouldUpdate) {
                 waypoint = coords to buff
                 lastWaypointSet = SimpleTimeMark.now()
+                if (event.author != McPlayer.self.name) config.sound.playSound()
             }
         }
     }
@@ -114,6 +117,7 @@ object HotspotSharing {
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (!config.enabled) return
         val (pos, buff) = waypoint ?: return
         event.drawBoundingBox(pos.getBlockAABB(), LorenzColor.BLUE.toColor(), throughBlocks = true)
         event.drawString(pos.up(2), buff.toString(), seeThroughBlocks = true)
