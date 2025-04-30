@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.SeaCreature
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -73,6 +74,7 @@ data class SeaCreatureData(
 
     private fun updateCanBeSeen(): Boolean {
         val mob = mob ?: return false
+        mob.baseEntity.canBeSeen()
         canBeSeenCache = mob.baseEntity.canActuallyBeSeen() || mob.extraEntities.any { it.canActuallyBeSeen() }
         return canBeSeenCache
     }

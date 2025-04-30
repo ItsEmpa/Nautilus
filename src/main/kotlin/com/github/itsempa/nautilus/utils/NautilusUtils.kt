@@ -65,8 +65,6 @@ object NautilusUtils {
 
     operator fun SkyBlockTime.minus(duration: Duration): SkyBlockTime = this.plus(-duration)
 
-    fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.removeIf(predicate)
-
     fun <T : Any> T.asProperty(): Property<T> = Property.of(this)
 
     fun String.toSplitSet(delimiter: String = ","): Set<String> = split(delimiter).map(String::trim).toSet()

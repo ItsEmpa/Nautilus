@@ -24,7 +24,7 @@ import com.github.itsempa.nautilus.utils.NautilusEntityUtils.entityId
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.hasDied
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.spawnTime
-import com.github.itsempa.nautilus.utils.NautilusUtils.removeIf
+import com.github.itsempa.nautilus.utils.removeIf
 import com.google.common.cache.RemovalCause
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds

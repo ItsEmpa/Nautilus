@@ -19,9 +19,9 @@ object NautilusChat {
     private const val DEBUG_PREFIX = "$DEBUG_PREFIX_NO_COLOR§7"
     private const val USER_ERROR_PREFIX = "§c[${Nautilus.MOD_NAME}] "
     private const val CHAT_PREFIX = "[${Nautilus.MOD_NAME}] "
-    const val PREFIX_COLOR = "§3"
+    const val COLOR = "§3"
 
-    fun prefixComponent(message: String): IChatComponent = TextHelper.text(PREFIX_COLOR + CHAT_PREFIX + message)
+    fun prefixComponent(message: String): IChatComponent = TextHelper.text(COLOR + CHAT_PREFIX + message)
 
     fun debug(message: String) {
         if (Nautilus.feature.about.debug && internalChat(DEBUG_PREFIX + message)) {
@@ -31,7 +31,7 @@ object NautilusChat {
 
     fun userError(message: String) = chat(message, prefixColor = "§c")
 
-    fun chat(message: String, prefix: Boolean = true, prefixColor: String = PREFIX_COLOR) {
+    fun chat(message: String, prefix: Boolean = true, prefixColor: String = COLOR) {
         val text = (if (prefix) prefixColor + CHAT_PREFIX else "") + message
         ChatUtils.chat(text, false)
     }
@@ -51,7 +51,7 @@ object NautilusChat {
         hover: String = "§eClick here!",
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
-        prefixColor: String = PREFIX_COLOR,
+        prefixColor: String = COLOR,
         oneTimeClick: Boolean = false,
         onClick: () -> Unit,
     ) {
@@ -72,7 +72,7 @@ object NautilusChat {
         hover: List<String>,
         command: String? = null,
         prefix: Boolean = true,
-        prefixColor: String = PREFIX_COLOR,
+        prefixColor: String = COLOR,
     ) {
         val text = (if (prefix) prefixColor + CHAT_PREFIX else "") + message
         ChatUtils.hoverableChat(text, hover, command, false)
@@ -84,7 +84,7 @@ object NautilusChat {
         hover: String = "§eOpen $url",
         autoOpen: Boolean = false,
         prefix: Boolean = true,
-        prefixColor: String = PREFIX_COLOR,
+        prefixColor: String = COLOR,
     ) {
         val text = (if (prefix) prefixColor + CHAT_PREFIX else "") + message
         ChatUtils.clickableLinkChat(text, url, hover, autoOpen, false)
@@ -93,7 +93,7 @@ object NautilusChat {
     fun multiComponentMessage(
         components: List<ChatComponentText>,
         prefix: Boolean = true,
-        prefixColor: String = PREFIX_COLOR,
+        prefixColor: String = COLOR,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         chat(TextHelper.join(components).prefix(msgPrefix))

@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.github.itsempa.nautilus.mixins.transformers.AccessorRenderManager
 import com.github.itsempa.nautilus.modules.Module
-import com.github.itsempa.nautilus.utils.NautilusUtils.removeIf
 import com.github.itsempa.nautilus.utils.helpers.McClient
+import com.github.itsempa.nautilus.utils.removeIf
 import com.github.itsempa.nautilus.utils.tryOrDefault
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
