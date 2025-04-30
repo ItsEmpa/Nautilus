@@ -10,4 +10,10 @@ inline fun <reified K : Enum<K>, V> fullEnumMapOf(defaultValue: V): EnumMap<K, V
     }.toEnumMap()
 }
 
+inline fun <reified K : Enum<K>, V> fullEnumMapOf(defaultValue: () -> V): EnumMap<K, V> {
+    return buildMap {
+        for (enum in enumValues<K>()) put(enum, defaultValue())
+    }.toEnumMap()
+}
+
 fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.removeIf(predicate)

@@ -10,6 +10,7 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.utils.fullEnumMapOf
 
 @Module
 object NautilusCommands {
@@ -24,7 +25,17 @@ object NautilusCommands {
 
     val commandsList = mutableListOf<CommandBuilder>()
 
-    @HandleEvent
+    // Priority is set to the lowest so that all the commands have already been registered when this gets called
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onFinishCommandRegistration(event: NautilusCommandRegistrationEvent) {
+        val map = fullEnumMapOf<CommandCategory, MutableList<CommandBuilder>> { mutableListOf() }
+        for (command in commandsList) map[command.category]!!.add(command)
+        commandsList.clear()
+        map.values.forEach { list -> list.forEach { command -> commandsList.add(command) } }
+    }
+
+    // Priority is set to the highest so that these commands always appear at the top
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
         event.register("nautilus") {
             this.aliases = listOf("nt", "nautilusconfig", "ntconfig")

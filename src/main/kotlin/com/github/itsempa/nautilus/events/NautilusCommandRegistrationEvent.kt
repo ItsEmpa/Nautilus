@@ -8,10 +8,12 @@ import net.minecraftforge.client.ClientCommandHandler
 object NautilusCommandRegistrationEvent : SkyHanniEvent() {
     fun register(name: String, block: CommandBuilder.() -> Unit) {
         val info = CommandBuilder(name).apply(block)
-        if (NautilusCommands.commandsList.any { it.name == name }) {
+        val names = info.allNames().toSet()
+        if (NautilusCommands.commandsList.any { it.allNames().intersect(names).isNotEmpty() }) {
             error("The command '$name is already registered!'")
         }
         ClientCommandHandler.instance.registerCommand(info.toCommand())
         NautilusCommands.commandsList.add(info)
     }
+    private fun CommandBuilder.allNames(): List<String> = aliases + name
 }
