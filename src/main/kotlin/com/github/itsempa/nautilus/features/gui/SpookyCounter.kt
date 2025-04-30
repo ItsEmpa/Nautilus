@@ -96,7 +96,7 @@ object SpookyCounter {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isActive || FeeshApi.isFishing || !config.spookyCounter) return
+        if (!isActive || !FeeshApi.isFishing || !config.spookyCounter) return
         config.spookyCounterPos.renderRenderable(renderable, "Spooky Counter")
     }
 
