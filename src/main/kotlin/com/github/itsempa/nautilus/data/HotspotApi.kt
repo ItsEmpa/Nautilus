@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.FishCatchEvent
 import com.github.itsempa.nautilus.events.HotspotEvent
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusUtils.clearAnd
@@ -211,6 +212,18 @@ object HotspotApi {
                 ClipboardUtils.copyToClipboard(_hotspots.toString())
             }
         }
+    }
+
+    @HandleEvent
+    fun onDebug(event: NautilusDebugEvent) {
+        event.title("HotspotApi")
+        event.addIrrelevant(
+            "hotspots" to _hotspots,
+            "isHotspotFishing" to isHotspotFishing(),
+            "lastNearFishedHotspotTime" to lastNearFishedHotspotTime,
+            "lastHotspotFish" to lastHotspotFish,
+            "lastHotspotPos" to lastHotspotPos,
+        )
     }
 
     @HandleEvent

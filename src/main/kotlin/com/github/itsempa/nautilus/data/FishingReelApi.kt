@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.FishCatchEvent
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.ResettingValue
 import com.github.itsempa.nautilus.utils.helpers.McPlayer
@@ -81,5 +82,16 @@ object FishingReelApi {
         foundPlingSound = false
         foundCatchSound = false
         resetCatches()
+    }
+
+    @HandleEvent
+    fun onDebug(event: NautilusDebugEvent) {
+        event.title("Fishing Reel Api")
+        event.addIrrelevant(
+            "lastBobberLocation" to lastBobberLocation,
+            "foundPlingSound" to foundPlingSound,
+            "foundCatchSound" to foundCatchSound,
+            "catchesSinceMove" to catchesSinceMove,
+        )
     }
 }

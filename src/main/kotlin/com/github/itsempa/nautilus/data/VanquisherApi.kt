@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.VanquisherEvent
 import com.github.itsempa.nautilus.modules.Module
-import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.hasDied
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.spawnTime
 import net.minecraft.entity.item.EntityArmorStand
@@ -48,12 +48,6 @@ object VanquisherApi {
     private var lastVanqSoundPos: LorenzVec? = null
     private var lastVanqSoundTime = SimpleTimeMark.farPast()
 
-    private fun printDebug(message: String) {
-        if (debugStart.passedSince() > 10.seconds) debugStart = SimpleTimeMark.now()
-        NautilusChat.debug("Vanq $message: ${debugStart.passedSince().inWholeMilliseconds}ms")
-    }
-    private var debugStart = SimpleTimeMark.farPast()
-
     private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes) { mob, data, _ ->
         if (mob != null && data != null) VanquisherEvent.DeSpawn(data).post()
     }
@@ -63,7 +57,6 @@ object VanquisherApi {
         if (spawnPattern.matches(event.message)) {
             lastOwnVanqTime = SimpleTimeMark.now()
             VanquisherEvent.OwnSpawn.post()
-            printDebug("Message")
             DelayedRun.runNextTick(::handleOwnVanq)
         }
     }
@@ -73,7 +66,6 @@ object VanquisherApi {
         if (event.soundName != "mob.wither.spawn" || event.pitch != 1f || event.volume != 2f) return
         lastVanqSoundPos = event.location
         lastVanqSoundTime = SimpleTimeMark.now()
-        printDebug("Sound")
         DelayedRun.runNextTick(::handleOwnVanq)
     }
 
@@ -85,7 +77,6 @@ object VanquisherApi {
         lastVanqSpawnEntityPos = entity.getLorenzVec()
         lastPossibleVanqSpawnEntity = entity
         lastVanqSpawnEntityTime = SimpleTimeMark.now()
-        printDebug("Entity")
         DelayedRun.runNextTick(::handleOwnVanq)
     }
 
@@ -107,13 +98,11 @@ object VanquisherApi {
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
         if (mob.name != "Vanquisher") return
-        printDebug("Mob")
         val isOwn = mob.isOwnVanq()
         val spawnTime = mob.baseEntity.spawnTime
         val data = VanquisherData(isOwn, mob, spawnTime)
         vanquishers[mob] = data
         VanquisherEvent.Spawn(data).post()
-        NautilusChat.debug("Spawned Vanquisher (isOwn: $isOwn, time: $spawnTime)")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
@@ -152,6 +141,21 @@ object VanquisherApi {
         if (baseEntity.distanceTo(spawnEntity) > 4) return false
         if (lastOwnVanqTime.passedSince() > 7.seconds) return false // TODO: actually get good time
         return true
+    }
+
+    @HandleEvent
+    fun onDebug(event: NautilusDebugEvent) {
+        event.title("NautilusApi")
+        event.addIrrelevant(
+            "vanquishers" to vanquishers,
+            "lastOwnVanqTime" to lastOwnVanqTime,
+            "vanqSpawnEntity" to vanqSpawnEntity,
+            "lastPossibleVanqSpawnEntity" to lastPossibleVanqSpawnEntity,
+            "lastVanqSpawnEntityPos" to lastVanqSpawnEntityPos,
+            "lastVanqSpawnEntityTime" to lastVanqSpawnEntityTime,
+            "lastVanqSoundPos" to lastVanqSoundPos,
+            "lastVanqSoundTime" to lastVanqSoundTime,
+        )
     }
 
 }

@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.HotspotApi
 import com.github.itsempa.nautilus.events.HotspotEvent
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusRenderUtils.drawBoundingBox
@@ -167,5 +168,14 @@ object HotspotSharing {
     private fun getChatMessage(hotspot: HotspotApi.Hotspot): String =
         "[Nautilus] Hotspot with ${hotspot.buff?.statName ?: "Unknown"} buff at ${hotspot.center.asChatMessage()}"
 
+    @HandleEvent
+    fun onDebug(event: NautilusDebugEvent) {
+        event.title("Hotspot Sharing")
+        event.addIrrelevant(
+            "recentHotspots" to recentHotspots.entries,
+            "waypoint" to waypoint,
+            "lastWaypointSet" to lastWaypointSet,
+        )
+    }
 
 }

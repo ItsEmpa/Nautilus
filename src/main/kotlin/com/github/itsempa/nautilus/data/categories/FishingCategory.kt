@@ -1,7 +1,6 @@
 package com.github.itsempa.nautilus.data.categories
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
@@ -14,9 +13,8 @@ import com.github.itsempa.nautilus.data.HotspotApi
 import com.github.itsempa.nautilus.data.fishingevents.FishingFestivalEvent
 import com.github.itsempa.nautilus.data.fishingevents.JerrysWorkshopEvent
 import com.github.itsempa.nautilus.data.fishingevents.SpookyFestivalEvent
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
-import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orTrue
 import com.github.itsempa.nautilus.utils.getSealedObjects
 import kotlin.reflect.KClass
@@ -184,12 +182,9 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
 
         @HandleEvent
-        fun onCommand(event: NautilusCommandRegistrationEvent) {
-            event.register("ntdebugfishingcategories") {
-                this.description = "Prints the fishing category tree"
-                this.category = CommandCategory.DEVELOPER_DEBUG
-                callback { printTree() }
-            }
+        fun onDebug(event: NautilusDebugEvent) {
+            event.title("FishingCategories")
+            event.addIrrelevant(getTree())
         }
 
         @HandleEvent
@@ -244,18 +239,19 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
 
         // TODO: maybe slightly change the function to make it more compact
-        private fun printTree() {
+        private fun getTree(): List<String> {
+            val result = mutableListOf<String>()
             fun getPrefixes(childrenPrefix: String, currentIndex: Int, lastIndex: Int): Pair<String, String> {
                 return if (currentIndex == lastIndex) "$childrenPrefix└" to "$childrenPrefix "
                 else "$childrenPrefix├" to "${childrenPrefix}│"
             }
 
             fun printCategory(category: FishingCategory, currentPrefix: String, childrenPrefix: String) {
-                val suffix = if (category.isMainActive()) "§cACTIVE"
-                else if (category.isExtraActive()) "§eEXTRA" else ""
-                val tick = if (category.checkActive()) "§a✔" else "§c✘"
+                val suffix = if (category.isMainActive()) "ACTIVE"
+                else if (category.isExtraActive()) "EXTRA" else ""
+                val tick = if (category.checkActive()) "✔" else "✘"
 
-                NautilusChat.chat("§7$currentPrefix§3${category.internalName} §r§7- $tick $suffix", prefix = false)
+                result.add("$currentPrefix${category.internalName} - $tick $suffix")
                 val children = category.children
                 for ((index, child) in children.withIndex()) {
                     val (parentPrefix, nextPrefix) = getPrefixes(childrenPrefix, index, children.lastIndex)
@@ -267,6 +263,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
                 val (thisPrefix, nextPrefix) = getPrefixes("", index, parentCategories.lastIndex)
                 printCategory(parent, thisPrefix, nextPrefix)
             }
+            return result
         }
     }
 }

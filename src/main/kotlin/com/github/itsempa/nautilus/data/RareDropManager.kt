@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SizeLimitedSet
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.RareDropEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.tryOrDefault
@@ -40,6 +42,9 @@ object RareDropManager {
     private val regex =
         "^§.§l(?<dropType>[\\w\\s]+ DROP)! (?:(?:§.)*\\((?:§.)*)?(?:(?<amount>[\\d,.]+)x )?(?:§r)?(?<item>.+?)(?:§.)*\\)?(?: (?:§.)*\\((?:§.)*\\+(?:§.)*(?<mf>[\\d,.]+)(?:% (?:§.)*)?(?<icon>[☘✯]).*\\))? ?(?:§.)*\$".toPattern()
 
+    @Suppress("UnstableApiUsage")
+    private val recentRareDrops = SizeLimitedSet<RareDropEvent>(10)
+
     @HandleEvent(onlyOnSkyblock = true, receiveCancelled = true)
     fun onChat(event: SkyHanniChatEvent) {
         regex.matchMatcher(event.message) {
@@ -49,8 +54,18 @@ object RareDropManager {
             val magicFind = groupOrNull("mf")?.formatInt()
             val icon = groupOrNull("icon")?.firstOrNull()
             val dropStat = if (icon != null) RareDropStat.fromIcon(icon) else null
-            RareDropEvent(item, amount, dropType, magicFind, dropStat).post()
+            val dropEvent = RareDropEvent(item, amount, dropType, magicFind, dropStat)
+            dropEvent.post()
+            recentRareDrops.add(dropEvent)
         }
+    }
+
+    @HandleEvent
+    fun onDebug(event: NautilusDebugEvent) {
+        event.title("RareDropManager")
+        event.addIrrelevant(
+            "recentRareDrops" to recentRareDrops,
+        )
     }
 
 

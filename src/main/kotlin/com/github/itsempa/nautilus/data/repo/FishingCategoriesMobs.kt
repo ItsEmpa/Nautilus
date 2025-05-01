@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import com.github.itsempa.nautilus.data.categories.FishingCategory
 import com.github.itsempa.nautilus.data.repo.json.FishingCategoriesMobsJson
 import com.github.itsempa.nautilus.data.repo.json.FishingCategoryMobsDataJson
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.NautilusRepositoryReloadEvent
 import com.github.itsempa.nautilus.modules.Module
 
@@ -20,5 +21,13 @@ object FishingCategoriesMobs {
     }
 
     fun FishingCategory.getMobs(): List<String> = categoriesMobData[this]?.mobs.orEmpty()
+
+    @HandleEvent
+    fun onDebug(event: NautilusDebugEvent) {
+        event.title("FishingCategoriesMobs")
+        event.addIrrelevant(
+            "categoriesMobData" to categoriesMobData.entries,
+        )
+    }
 
 }

@@ -1,15 +1,13 @@
 package com.github.itsempa.nautilus.data.fishingevents
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
-import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
 import com.github.itsempa.nautilus.events.FishingEventUpdate
 import com.github.itsempa.nautilus.events.MayorDataUpdateEvent
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orFalse
@@ -102,23 +100,18 @@ sealed class FishingEvent(val internalName: String) {
         fun onSecondPassed() = events.forEach(FishingEvent::onSecondPassed)
 
         @HandleEvent
-        fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
-            event.register("ntdebugfishingevents") {
-                this.description = "Gives debug information about upcoming or current events."
-                this.category = CommandCategory.DEVELOPER_DEBUG
-                this.callback {
-                    val text = events.joinToString("\n") {
-                        buildString {
-                            appendLine(it.internalName)
-                            appendLine(" - timePeriod: ${it.timePeriod?.formatString()}")
-                            appendLine(" - nextUpdate: in ${it.nextUpdate.timeUntil()} ")
-                            appendLine()
-                        }
+        fun onDebug(event: NautilusDebugEvent) {
+            event.title("FishingEvents")
+            event.addIrrelevant(
+                events.map {
+                    buildString {
+                        appendLine(it.internalName)
+                        appendLine(" - timePeriod: ${it.timePeriod?.formatString()}")
+                        appendLine(" - nextUpdate: in ${it.nextUpdate.timeUntil()} ")
+                        appendLine()
                     }
-                    ClipboardUtils.copyToClipboard(text)
-                    NautilusChat.chat("Copied Fishing Event data to clipboard!")
                 }
-            }
+            )
         }
     }
 }

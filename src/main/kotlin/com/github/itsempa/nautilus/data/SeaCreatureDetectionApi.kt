@@ -3,7 +3,6 @@ package com.github.itsempa.nautilus.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.entityId
@@ -256,23 +256,22 @@ object SeaCreatureDetectionApi {
         }
     }
 
-    // TODO: make own debug data collect event
     @HandleEvent
-    fun onDebugCollect(event: DebugDataCollectEvent) {
+    fun onDebug(event: NautilusDebugEvent) {
         event.title("Nautilus Sea Creatures")
-        event.addIrrelevant {
-            add("entityIdToData: ${entityIdToData.entries}")
-            add("seaCreatures: $seaCreatures")
-            add("recentMobs: ${recentMobs.entries}")
-            add("lastNameFished: $lastNameFished")
-            add("mobsToFind: $mobsToFind")
-            add("lastSeaCreatureFished: $lastSeaCreatureFished")
-            add("lastBobberLocation: $lastBobberLocation")
-            add("babyMagmaSlugsToFind: $babyMagmaSlugsToFind")
-            add("lastMagmaSlugLocation: $lastMagmaSlugLocation")
-            add("lastMagmaSlugTime: $lastMagmaSlugTime")
-            add("recentBabyMagmaSlugs: ${recentBabyMagmaSlugs.entries}")
-        }
+        event.addIrrelevant(
+            "entityIdToData" to entityIdToData.entries,
+            "seaCreatures" to seaCreatures.entries,
+            "lastNameFished" to lastNameFished,
+            "mobsToFind" to mobsToFind,
+            "lastSeaCreatureFished" to lastSeaCreatureFished,
+            "recentMobs" to recentMobs.entries,
+            "lastBobberLocation" to lastBobberLocation,
+            "babyMagmaSlugsToFind" to babyMagmaSlugsToFind,
+            "lastMagmaSlugLocation" to lastMagmaSlugLocation,
+            "lastMagmaSlugTime" to lastMagmaSlugTime,
+            "recentBabyMagmaSlugs" to recentBabyMagmaSlugs.entries,
+        )
     }
 
 

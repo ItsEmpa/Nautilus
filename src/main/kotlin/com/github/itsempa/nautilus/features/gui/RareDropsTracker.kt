@@ -19,7 +19,7 @@ import com.github.itsempa.nautilus.data.FeeshApi
 import com.github.itsempa.nautilus.data.NautilusStorage
 import com.github.itsempa.nautilus.data.categories.FishingCategory
 import com.github.itsempa.nautilus.data.repo.FishingCategoriesMobs.getMobs
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.RareDropEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.features.render.LootshareRange
@@ -193,11 +193,12 @@ object RareDropsTracker {
     }
 
     @HandleEvent
-    fun onCommand(event: NautilusCommandRegistrationEvent) {
-        event.register("ntbreak") {
-            callback {
-                NautilusChat.chat("hi this is a breakpoint")
-            }
-        }
+    fun onDebug(event: NautilusDebugEvent) {
+        event.title("Rare Drops Tracker")
+        event.addIrrelevant(
+            "recentDeaths" to recentDeaths,
+            "recentDroppedItems" to recentDroppedItems,
+            "activeDrops" to activeDrops,
+        )
     }
 }

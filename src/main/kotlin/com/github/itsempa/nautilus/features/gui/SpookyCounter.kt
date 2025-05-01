@@ -1,7 +1,6 @@
 package com.github.itsempa.nautilus.features.gui
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
@@ -17,10 +16,9 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.FeeshApi
 import com.github.itsempa.nautilus.data.fishingevents.SpookyFestivalEvent
 import com.github.itsempa.nautilus.events.FishingEventUpdate
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
-import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orZero
 import com.github.itsempa.nautilus.utils.fullEnumMapOf
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
@@ -140,25 +138,13 @@ object SpookyCounter {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
-        event.register("nttogglespookycounter") {
-            this.description = "Toggles the spooky counter"
-            this.category = CommandCategory.DEVELOPER_TEST
-            this.callback { args ->
-                isActive = !isActive
-                if (isActive) {
-                    resetCatchCount()
-                    catchAmount.replaceAll { mob, _ -> args.getOrNull(mob.ordinal)?.toIntOrNull().orZero() }
-                    startTime = SimpleTimeMark.now()
-                    updateDisplay()
-                } else {
-                    sendMessage()
-                    resetCatchCount()
-                    startTime = SimpleTimeMark.farPast()
-                    renderable = null
-                }
-            }
-        }
+    fun onDebug(event: NautilusDebugEvent) {
+        event.title("SpookyCounter")
+        event.addIrrelevant(
+            "isActive" to isActive,
+            "startTime" to startTime,
+            "catchAmount" to catchAmount.entries,
+        )
     }
 
     private fun resetCatchCount() = catchAmount.replaceAll { _, _ -> 0 }

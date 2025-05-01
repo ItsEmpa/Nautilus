@@ -38,6 +38,10 @@ class ResettingValue<T>(private val time: Duration, private val default: () -> T
         lastSet = SimpleTimeMark.now()
     }
 
+    override fun toString(): String {
+        return "ResettingValue(lastSet=$lastSet, hasReset=$hasReset, currentValue=$currentValue)"
+    }
+
     companion object {
         private val UNINITIALIZED_VALUE = Any()
     }

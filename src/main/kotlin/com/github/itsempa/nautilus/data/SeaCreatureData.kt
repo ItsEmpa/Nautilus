@@ -101,4 +101,19 @@ data class SeaCreatureData(
         aabb = renderWorld.exactBoundingBoxExtraEntities(mob)
         pos = renderWorld.exactLocation(mob)
     }
+
+    override fun toString(): String {
+        return buildString {
+            fun appendInfo(string: String) = append("$string, ")
+            append("SeaCreatureData(")
+            appendInfo("isOwn=$isOwn")
+            appendInfo("seaCreature=$seaCreature")
+            appendInfo("entityId=$entityId")
+            appendInfo("spawnTime=$spawnTime")
+            appendInfo("mob=$mob")
+            appendInfo("pos=$pos")
+            append("aabb=$aabb")
+            append(')')
+        }
+    }
 }
