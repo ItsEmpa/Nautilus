@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.SeaCreatureData
@@ -18,10 +19,12 @@ import com.github.itsempa.nautilus.utils.NautilusUtils.toSet
 object LootshareRange {
     private val config get() = Nautilus.feature.render
 
-    const val RANGE = 30.0f
+    private const val RANGE = 30.0f
 
     private var names = setOf<String>()
     private val seaCreatures = mutableSetOf<SeaCreatureData>()
+
+    fun isInRange(pos: LorenzVec): Boolean = pos.distanceToPlayer() < RANGE
 
     @HandleEvent
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = addMob(event.seaCreature)
@@ -35,7 +38,7 @@ object LootshareRange {
         for (seaCreature in seaCreatures) {
             if (!seaCreature.isLoaded()) continue
             val pos = seaCreature.pos ?: continue
-            val color = if (seaCreature.isOwn || pos.distanceToPlayer() < RANGE) LorenzColor.GREEN else LorenzColor.WHITE
+            val color = if (seaCreature.isOwn || isInRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
             event.drawSphereWireframeInWorld(color.toColor(), pos, RANGE)
         }
     }

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils
@@ -29,6 +30,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @Module
@@ -130,6 +132,11 @@ object HotspotApi {
     private val _hotspots = mutableListOf<Hotspot>()
     val hotspots: List<Hotspot> get() = _hotspots
 
+    // TODO: make better detection, this is ass
+    fun isHotspotFishing(): Boolean = lastNearFishedHotspotTime.passedSince() < 4.minutes && lastHotspotFish.passedSince() < 2.minutes
+
+    private var lastNearFishedHotspotTime = SimpleTimeMark.farPast()
+
     fun isInHotspot(pos: LorenzVec) = _hotspots.any { it.isInside(pos) }
 
     var lastHotspotFish: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -138,10 +145,21 @@ object HotspotApi {
     var lastHotspotPos: LorenzVec? = null
         private set
 
+    private fun ReceiveParticleEvent.isHotspotParticle(): Boolean {
+        return when (type) {
+            EnumParticleTypes.SMOKE_NORMAL -> {
+                speed == 0f && (count == 5 || count == 2)
+            }
+            EnumParticleTypes.REDSTONE -> {
+                count == 0 && speed == 1f
+            }
+            else -> false
+        }
+    }
+
     @HandleEvent(onlyOnIslands = [IslandType.HUB, IslandType.SPIDER_DEN, IslandType.BACKWATER_BAYOU, IslandType.CRIMSON_ISLE])
     fun onParticleReceive(event: ReceiveParticleEvent) {
-        if (event.type != EnumParticleTypes.SMOKE_NORMAL || event.speed != 0f) return
-        if (event.count != 5 && event.count != 2) return
+        if (!event.isHotspotParticle()) return
         val pos = event.location
         if (pos.getBlockAt() !is BlockLiquid && pos.down().getBlockAt() !is BlockLiquid) return
         val hotspot = _hotspots.find {
@@ -163,6 +181,13 @@ object HotspotApi {
             if (isOld) HotspotEvent.Removed(it).post()
             isOld
         }
+        if (isNearFishedHotspot()) lastNearFishedHotspotTime = SimpleTimeMark.now()
+    }
+
+    private fun isNearFishedHotspot(): Boolean {
+        val lastPos = lastHotspotPos ?: return false
+        if (!isInHotspot(lastPos)) return false
+        return lastPos.distanceToPlayer() < 30
     }
 
     @HandleEvent(onlyOnIslands = [IslandType.HUB, IslandType.SPIDER_DEN, IslandType.BACKWATER_BAYOU, IslandType.CRIMSON_ISLE])
@@ -194,6 +219,7 @@ object HotspotApi {
         _hotspots.clearAnd { hotspot ->
             HotspotEvent.Removed(hotspot).post()
         }
+        lastNearFishedHotspotTime = SimpleTimeMark.farPast()
     }
 
 }

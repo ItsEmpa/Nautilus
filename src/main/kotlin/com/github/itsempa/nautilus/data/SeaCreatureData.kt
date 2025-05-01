@@ -24,10 +24,16 @@ data class SeaCreatureData(
     var mob: Mob?,
 ) {
 
+    /** This tracks the last position of the sea creature that the user was able to see. */
     var pos: LorenzVec?
         private set
 
+    /** This tracks the last bounding box of the sea creature that the user was able to see. */
     var aabb: AxisAlignedBB?
+        private set
+
+    /** This tracks the real last position of the sea creature. Don't display this to the user */
+    internal var actualLastPos: LorenzVec
         private set
 
     init {
@@ -39,6 +45,7 @@ data class SeaCreatureData(
             pos = null
         }
         updateCanBeSeen()
+        actualLastPos = mob?.getLorenzVec() ?: LorenzVec(0.0, 0.0, 0.0)
     }
 
     inline val name: String get() = seaCreature.name
@@ -55,13 +62,20 @@ data class SeaCreatureData(
 
     val entity: EntityLivingBase? get() = mob?.baseEntity ?: EntityUtils.getEntityByID(entityId) as? EntityLivingBase
 
-    private var hasDespawnedTimeLimit: Boolean = false
+    private var hasDied: Boolean = false
 
     fun despawn() {
         SeaCreatureEvent.DeSpawn(this).post()
     }
 
+    fun sendDeath(seenDeath: Boolean = true) {
+        if (hasDied) return
+        hasDied = true
+        SeaCreatureEvent.Death(this, seenDeath).post()
+    }
+
     private var hasRemoved: Boolean = false
+
     fun forceRemove() {
         if (hasRemoved) return
         hasRemoved = true
@@ -82,6 +96,7 @@ data class SeaCreatureData(
     @Suppress("HandleEventInspection")
     fun update(renderWorld: SkyHanniRenderWorldEvent) {
         val mob = mob ?: return
+        actualLastPos = mob.getLorenzVec()
         if (!updateCanBeSeen()) return
         aabb = renderWorld.exactBoundingBoxExtraEntities(mob)
         pos = renderWorld.exactLocation(mob)

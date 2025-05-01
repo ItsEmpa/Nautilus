@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
 import com.github.itsempa.nautilus.data.CrystalHollowsArea
+import com.github.itsempa.nautilus.data.HotspotApi
 import com.github.itsempa.nautilus.data.fishingevents.FishingFestivalEvent
 import com.github.itsempa.nautilus.data.fishingevents.JerrysWorkshopEvent
 import com.github.itsempa.nautilus.data.fishingevents.SpookyFestivalEvent
@@ -60,7 +61,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
                 override fun checkActive(): Boolean = !TrophyFish.checkActive()
 
                 data object Hotspot : FishingCategory("CI_HOTSPOT") {
-                    override fun checkActive(): Boolean = false // TODO: Implement Fishing in Hotspot detection
+                    override fun checkActive(): Boolean = HotspotApi.isHotspotFishing()
                 }
             }
         }
@@ -123,7 +124,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
 
         data object Hotspot : FishingCategory("WATER_HOTSPOT", extraCategory = true) {
-            override fun checkActive(): Boolean = false // TODO: Implement Fishing in Hotspot detection
+            override fun checkActive(): Boolean = HotspotApi.isHotspotFishing()
         }
 
         object Events {
@@ -141,6 +142,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
     }
 
+    // TODO: create event for when active categories change
     @Module
     companion object {
         val categories: Map<String, FishingCategory>
@@ -151,6 +153,13 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
 
         var extraCategories: Set<FishingCategory> = emptySet()
             private set
+
+        val anyActiveCategories: Set<FishingCategory>
+            get() {
+                val activeCategory = activeCategory
+                return if (activeCategory == null) extraCategories
+                else extraCategories + activeCategory
+            }
 
         init {
             val list = getSealedObjects<FishingCategory>()

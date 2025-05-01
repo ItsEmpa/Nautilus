@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
@@ -24,6 +25,7 @@ import com.github.itsempa.nautilus.utils.NautilusEntityUtils.entityId
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.hasDied
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.spawnTime
+import com.github.itsempa.nautilus.utils.helpers.McPlayer
 import com.github.itsempa.nautilus.utils.removeIf
 import com.google.common.cache.RemovalCause
 import kotlin.time.Duration.Companion.minutes
@@ -101,7 +103,7 @@ object SeaCreatureDetectionApi {
                     handleBabySlugs()
                 }
             }
-            SeaCreatureEvent.Death(data).post()
+            data.sendDeath()
             return
         } else if (oldId != newId) { // we update the entity id in case the baseEntity has changed at some point
             entityIdToData.remove(oldId)
@@ -200,6 +202,22 @@ object SeaCreatureDetectionApi {
         if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 2.seconds) babyMagmaSlugsToFind = 0
         val bobber = FishingApi.bobber ?: return
         lastBobberLocation = bobber.getLorenzVec()
+    }
+
+    // This should hopefully make it so that if a sea creature dies while the player isn't in the area and the despawn timer
+    // isn't up yet, it will be assumed that it died
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!event.repeatSeconds(5)) return
+        val playerPos = McPlayer.pos
+        for ((_, data) in entityIdToData) {
+            if (data.isLoaded()) continue
+            val lastPos = data.actualLastPos
+            if (lastPos.distance(playerPos) > 20) continue
+            val timeUntil = data.despawnTime.timeUntil()
+            if (timeUntil < 10.seconds) continue
+            data.sendDeath(false)
+        }
     }
 
     @HandleEvent

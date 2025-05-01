@@ -29,6 +29,11 @@ class GuiConfig {
     val rainTimer: RainTimerConfig = RainTimerConfig()
 
     @Expose
+    @ConfigOption(name = "Rare Drops Tracker", desc = "")
+    @Accordion
+    val rareDropsTracker: RareDropsTrackerConfig = RareDropsTrackerConfig()
+
+    @Expose
     @ConfigOption(name = "Spooky Counter", desc = "Shows the amount of mobs you have fished in the current spooky festival.")
     @Accordion
     var spookyCounter: Boolean = true
