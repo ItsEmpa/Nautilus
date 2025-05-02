@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.features.misc
+package com.github.itsempa.nautilus.features.chat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory

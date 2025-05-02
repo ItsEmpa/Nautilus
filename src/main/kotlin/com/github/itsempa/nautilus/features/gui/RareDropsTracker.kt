@@ -11,12 +11,15 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.FeeshApi
 import com.github.itsempa.nautilus.data.NautilusStorage
+import com.github.itsempa.nautilus.data.RareDropStat
 import com.github.itsempa.nautilus.data.categories.FishingCategory
 import com.github.itsempa.nautilus.data.repo.FishingCategoriesMobs.getMobs
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
@@ -43,18 +46,25 @@ object RareDropsTracker {
         @Expose var seaCreaturesSince: Int = 0,
         @Expose var lastDrop: SimpleTimeMark = SimpleTimeMark.farPast(),
         @Expose var totalSeacreaturesCaught: Int = 0,
+        @Expose var totalMagicFind: Long = 0,
+        @Expose var lastMagicFind: Int? = null,
     ) {
         fun addSeaCreature(doubleHook: Boolean) {
             if (doubleHook) seaCreaturesSince += 2 else ++seaCreaturesSince
         }
 
-        fun getAverage(): Int? = if (totalSeacreaturesCaught == 0) null else count / totalSeacreaturesCaught
+        fun getAverageCreatures(): Int? =
+            if (totalSeacreaturesCaught == 0) null else count / totalSeacreaturesCaught
 
-        fun onDrop() {
+        fun getAverageMagicFind(): Double? =
+            if (totalSeacreaturesCaught == 0) null else (totalMagicFind.toDouble() / totalSeacreaturesCaught)
+
+        fun onDrop(magicFind: Int?) {
             totalSeacreaturesCaught += seaCreaturesSince
             ++count
             seaCreaturesSince = 0
             lastDrop = SimpleTimeMark.now()
+            if (magicFind != null) totalMagicFind += magicFind
         }
 
         fun reset() {
@@ -76,8 +86,18 @@ object RareDropsTracker {
         private val itemDisplayName: String? = null,
     ) {
         SCUTTLER_SHELL("Fiery Scuttler"),
-        FLASH("Thunder", "ULTIMATE_FLASH;1", checkChat = false, itemDisplayName = "§dFlash I"),
-        RADIOACTIVE_VIAL("Lord Jawbus", pluralMobName = "Jawbusses", displayMobName = "Jawbus"),
+        FLASH(
+            "Thunder",
+            "ULTIMATE_FLASH;1",
+            checkChat = false,
+            itemDisplayName = "§dFlash",
+        ),
+        RADIOACTIVE_VIAL(
+            "Lord Jawbus",
+            pluralMobName = "Jawbusses",
+            displayMobName = "Jawbus",
+            itemDisplayName = "§dVial",
+        ),
         BURNT_TEXTS("Ragnarok", checkChat = false),
         TIKI_MASK("Wiki Tiki"),
         TITANOBOA_SHED("Titanoboa"),
@@ -116,6 +136,7 @@ object RareDropsTracker {
     private val recentDroppedItems = enumMapOf<FishingRareDrop, SimpleTimeMark>()
 
     private var activeDrops = enumSetOf<FishingRareDrop>()
+    private var renderables = emptyList<Renderable>()
 
     @HandleEvent
     fun onSeaCreatureDeath(event: SeaCreatureEvent.Death) {
@@ -130,7 +151,8 @@ object RareDropsTracker {
     @HandleEvent
     fun onRareDrop(event: RareDropEvent) {
         val drop = FishingRareDrop.chatDrops[event.internalName] ?: return
-        sendMessage(drop)
+        val mf = if (event.dropStat == RareDropStat.MAGIC_FIND) event.magicFind else null
+        sendMessage(drop, mf)
     }
 
     @HandleEvent
@@ -145,7 +167,7 @@ object RareDropsTracker {
         if (recentDeaths.isEmpty() || recentDroppedItems.isEmpty()) return
         val intersect = recentDroppedItems.keys.intersect(recentDeaths.keys)
         for (drop in intersect) {
-            sendMessage(drop)
+            sendMessage(drop, null)
             recentDroppedItems.remove(drop)
             recentDeaths.remove(drop)
         }
@@ -156,51 +178,80 @@ object RareDropsTracker {
         if (event.repeatSeconds(5)) {
             activeDrops = FishingRareDrop.entries.filterTo(enumSetOf()) { it.isActive() }
         }
+        if (config.enabled) updateDisplay()
         if (recentDroppedItems.isNotEmpty()) recentDroppedItems.removeMaxTime(MAX_TIME)
         if (recentDeaths.isNotEmpty()) recentDeaths.removeMaxTime(MAX_TIME)
     }
 
-    private fun sendMessage(drop: FishingRareDrop) {
+    private fun sendMessage(drop: FishingRareDrop, magicFind: Int?) {
         val entry = drop.entry
         val (dropCount, creatureCount, lastDrop) = entry
+        val newDropCount = dropCount + 1
         val pluralized = StringUtils.pluralize(creatureCount, drop.displayMobName, drop.pluralMobName)
-        var message =
-            "Dropped ${(dropCount + 1).ordinal()} ${drop.itemName} §3after §b${creatureCount.addSeparators()} §3$pluralized"
-        if (entry.hasDropped) message += "(Last drop was ${lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 3)}"
+        val message = buildString {
+            append("Dropped §6§l$newDropCount${newDropCount.ordinal()} §r${drop.itemName} §3after §b${creatureCount.addSeparators()} §3$pluralized")
+            if (entry.hasDropped) append(
+                "§3(Last drop was ${
+                    lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 3)
+                } ago)",
+            )
+            if (magicFind != null) append("§b(mf: $magicFind✯)")
+        }
         if (config.enabled && config.sendChatMessage) NautilusChat.chat(message)
-        entry.onDrop()
+        entry.onDrop(magicFind)
+        updateDisplay()
     }
 
     @HandleEvent
     fun onWorldChange() {
         recentDroppedItems.clear()
         recentDeaths.clear()
+        renderables = emptyList()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!FeeshApi.isFishing || !config.enabled) return
-        val strings = activeDrops.map { it.getDisplay() }
-        config.position.renderStrings(strings, posLabel = "Rare Drops Tracker")
+
+        config.position.renderRenderables(renderables, posLabel = "Rare Drops Tracker")
     }
 
-    private fun FishingRareDrop.getDisplay(): String {
+    private fun FishingRareDrop.getDisplay(): Renderable {
         val message = buildString {
             append("§c$displayMobName §7since $itemName§7: §b${entry.seaCreaturesSince}")
-            entry.getAverage()?.let {
+            entry.getAverageCreatures()?.let {
                 append("§e($it)")
             }
             if (entry.hasDropped) {
                 append(" §b${entry.lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 2)}")
             }
         }
-        return message
+        val hover: List<String>
+        if (!checkChat) {
+            hover = listOf("§cCan't get magic find from this drop!")
+        } else {
+            val avgMf = entry.getAverageMagicFind()
+            if (avgMf == null) hover = listOf("§cNo magic find data available!")
+            else {
+                val lastMf = entry.lastMagicFind
+                hover = listOf(
+                    "§3Average magic find: §b${avgMf.roundTo(2)}",
+                    "§3Last magic find: §b$lastMf",
+                )
+            }
+        }
+        return Renderable.hoverTips(message, hover)
+    }
+
+    private fun updateDisplay() {
+        renderables = activeDrops.map { it.getDisplay() }
     }
 
     @HandleEvent
     fun onSeaCreature(event: SeaCreatureFishEvent) {
         val drop = FishingRareDrop.allMobs[event.seaCreature.name] ?: return
         drop.entry.addSeaCreature(event.doubleHook)
+        updateDisplay()
     }
 
     @HandleEvent
