@@ -7,18 +7,21 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.SeaCreatureData
+import com.github.itsempa.nautilus.data.VanquisherApi
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
+import com.github.itsempa.nautilus.events.VanquisherEvent
 import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
 import com.github.itsempa.nautilus.utils.NautilusUtils.getHeight
 import kotlin.time.Duration.Companion.seconds
 
-// TODO: also add support for Vanquishers
 @Module
 object InvincibilityTimer {
 
     private val config get() = Nautilus.feature.render.invincibility
 
     private val seaCreatures = mutableSetOf<SeaCreatureData>()
+    private val vanquishers = mutableSetOf<VanquisherApi.VanquisherData>()
     private val INVINCIBILITY = 5.seconds
 
     @HandleEvent
@@ -27,6 +30,12 @@ object InvincibilityTimer {
         if (!seaCreature.rarity.isAtLeast(LorenzRarity.LEGENDARY)) return
         seaCreatures.add(seaCreature)
     }
+
+    @HandleEvent
+    fun onVanquisherSpawn(event: VanquisherEvent.Spawn) = vanquishers.add(event.data)
+
+    @HandleEvent
+    fun onVanquisherDeSpawn(event: VanquisherEvent.DeSpawn) = vanquishers.add(event.data)
 
     @HandleEvent
     fun onSeaCreatureDeSpawn(event: SeaCreatureEvent.Remove) = seaCreatures.remove(event.seaCreature)
@@ -44,6 +53,18 @@ object InvincibilityTimer {
             event.drawString(pos, "§b${timeLeft.format(showMilliSeconds = true)}")
             if (!seaCreature.isOwn) continue
             event.drawString(pos.up(0.5), "§aOWN MOB")
+        }
+        for (vanquisher in vanquishers) {
+            val time = vanquisher.spawnTime + INVINCIBILITY
+            if (time.passedSince() > 1.seconds) continue
+            val mob = vanquisher.mob
+            val height = mob.baseEntity.height
+            val pos = vanquisher.mob.getLorenzVec().up(height + 1.5)
+            val timeLeft = time.timeUntil()
+            event.drawString(pos, "§b${timeLeft.format(showMilliSeconds = true)}")
+            if (!vanquisher.isOwn) continue
+            event.drawString(pos.up(0.5), "§aOWN MOB")
+
         }
     }
 

@@ -24,8 +24,4 @@ class CameraMoveConfig {
     @Accordion
     val sound: SoundConfig = SoundConfig()
 
-
-
-
-
 }

@@ -42,12 +42,16 @@ object RareDropsTracker {
         @Expose var count: Int = 0,
         @Expose var seaCreaturesSince: Int = 0,
         @Expose var lastDrop: SimpleTimeMark = SimpleTimeMark.farPast(),
+        @Expose var totalSeacreaturesCaught: Int = 0,
     ) {
         fun addSeaCreature(doubleHook: Boolean) {
             if (doubleHook) seaCreaturesSince += 2 else ++seaCreaturesSince
         }
 
+        fun getAverage(): Int = (count / totalSeacreaturesCaught).toInt()
+
         fun onDrop() {
+            totalSeacreaturesCaught += seaCreaturesSince
             ++count
             seaCreaturesSince = 0
             lastDrop = SimpleTimeMark.now()
@@ -57,6 +61,7 @@ object RareDropsTracker {
             count = 0
             seaCreaturesSince = 0
             lastDrop = SimpleTimeMark.farPast()
+            totalSeacreaturesCaught = 0
         }
 
         inline val hasDropped: Boolean get() = count != 0
@@ -66,19 +71,23 @@ object RareDropsTracker {
         val mobName: String,
         internalName: String? = null,
         val pluralMobName: String? = null,
+        displayMobName: String? = null,
         val checkChat: Boolean = true,
+        private val itemDisplayName: String? = null,
     ) {
         SCUTTLER_SHELL("Fiery Scuttler"),
-        FLASH("Thunder", "ULTIMATE_FLASH;1", checkChat = false),
-        RADIOACTIVE_VIAL("Lord Jawbus", pluralMobName = "Lord Jawbusses"),
+        FLASH("Thunder", "ULTIMATE_FLASH;1", checkChat = false, itemDisplayName = "§dFlash I"),
+        RADIOACTIVE_VIAL("Lord Jawbus", pluralMobName = "Jawbusses", displayMobName = "Jawbus"),
         BURNT_TEXTS("Ragnarok", checkChat = false),
         TIKI_MASK("Wiki Tiki"),
         TITANOBOA_SHED("Titanoboa"),
-        EPIC_BABY_YETI("Yeti", "BABY_YETI;3"),
-        LEG_BABY_YETI("Yeti", "BABY_YETI;4"),
+        EPIC_BABY_YETI("Yeti", "BABY_YETI;3", itemDisplayName = "§5Baby Yeti"),
+        LEG_BABY_YETI("Yeti", "BABY_YETI;4", itemDisplayName = "§6Baby Yeti"),
         ;
 
         val internalName = (internalName ?: name).toInternalName()
+        val itemName: String get() = itemDisplayName ?: internalName.repoItemName
+        val displayMobName = displayMobName ?: mobName
         val entry: RareDropEntry
             get() = storage.getOrPut(internalName, ::RareDropEntry)
 
@@ -152,12 +161,11 @@ object RareDropsTracker {
     }
 
     private fun sendMessage(drop: FishingRareDrop) {
-        val internalName = drop.internalName
         val entry = drop.entry
         val (dropCount, creatureCount, lastDrop) = entry
-        val pluralized = StringUtils.pluralize(creatureCount, drop.mobName, drop.pluralMobName)
+        val pluralized = StringUtils.pluralize(creatureCount, drop.displayMobName, drop.pluralMobName)
         var message =
-            "Dropped ${(dropCount + 1).ordinal()} ${internalName.repoItemName} §3after §b${creatureCount.addSeparators()} §3$pluralized"
+            "Dropped ${(dropCount + 1).ordinal()} ${drop.itemName} §3after §b${creatureCount.addSeparators()} §3$pluralized"
         if (entry.hasDropped) message += "(Last drop was ${lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 3)}"
         if (config.enabled && config.sendChatMessage) NautilusChat.chat(message)
         entry.onDrop()
@@ -177,11 +185,9 @@ object RareDropsTracker {
     }
 
     private fun FishingRareDrop.getDisplay(): String {
-        val (dropCount, creatureCount, lastDrop) = entry
-        val pluralized = StringUtils.pluralize(creatureCount, mobName, pluralMobName)
-        var message = "${internalName.repoItemName} §7(${dropCount}): §b${creatureCount} §c$pluralized §7since last one"
+        var message = "§c$displayMobName §7since $itemName§7: §b${entry.seaCreaturesSince} §e(${entry.getAverage()})"
         if (entry.hasDropped) {
-            message += "§b(${lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 2)})"
+            message += " §b${entry.lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 2)}"
         }
         return message
     }

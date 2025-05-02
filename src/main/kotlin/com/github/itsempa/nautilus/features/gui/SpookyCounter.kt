@@ -12,6 +12,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.FeeshApi
 import com.github.itsempa.nautilus.data.fishingevents.SpookyFestivalEvent
@@ -120,14 +123,14 @@ object SpookyCounter {
     }
 
     private fun updateDisplay() {
-        renderable = Renderable.verticalContainer(
+        renderable = VerticalContainerRenderable(
             listOf(
-                Renderable.string("§5§lSpooky Festival Counter"),
-                Renderable.horizontalContainer(
+                RenderableString("§5§lSpooky Festival Counter"),
+                HorizontalContainerRenderable(
                     buildList {
                         for ((mob, amount) in catchAmount) {
                             add(Renderable.itemStack(mob.item, 1.0))
-                            add(Renderable.string("§e$amount", 1.0))
+                            add(RenderableString("§e$amount", 1.0))
                             add(Renderable.placeholder(5, 0))
                         }
                     },

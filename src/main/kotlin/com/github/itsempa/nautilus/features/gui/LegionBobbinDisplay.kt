@@ -12,7 +12,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orZero
@@ -100,15 +101,15 @@ object LegionBobbinDisplay {
         if (!isEnabled()) return
         val renderables = buildList {
             if (!config.hideWithoutEnchant || wearingLegion) add(
-                Renderable.horizontalContainer(listOf(
-                    Renderable.string("§dLegion: "),
-                    Renderable.string("§b${armorLegionBuff * nearbyPlayers}% §7($nearbyPlayers)"),
+                HorizontalContainerRenderable(listOf(
+                    RenderableString("§dLegion: "),
+                    RenderableString("§b${armorLegionBuff * nearbyPlayers}% §7($nearbyPlayers)"),
                 )),
             )
             if (!config.hideWithoutEnchant || wearingBobbin) add(
-                Renderable.horizontalContainer(listOf(
-                    Renderable.string("§3Bobbin: "),
-                    Renderable.string("§b${armorBobbinBuff * nearbyBobbers}% §7($nearbyBobbers)"),
+                HorizontalContainerRenderable(listOf(
+                    RenderableString("§3Bobbin: "),
+                    RenderableString("§b${armorBobbinBuff * nearbyBobbers}% §7($nearbyBobbers)"),
                 )),
             )
         }
