@@ -15,12 +15,14 @@ plugins {
     id("com.google.devtools.ksp") version "2.0.20-1.0.25"
 }
 
-//Constants:
+// Constants:
 val modName: String by project
 val modVersion: String by project
 val modid: String by project
 val skyhanniVersion: String by project
 val baseGroup: String by project
+
+version = modVersion
 
 blossom {
     replaceToken("@MOD_VER@", modVersion)
@@ -222,6 +224,7 @@ tasks.shadowJar {
 
 tasks.jar {
     archiveClassifier.set("nodeps")
+    archiveBaseName.set(modName)
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
 tasks.assemble.get().dependsOn(tasks.remapJar)

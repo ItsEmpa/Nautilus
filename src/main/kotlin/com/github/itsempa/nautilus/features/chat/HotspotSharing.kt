@@ -72,8 +72,9 @@ object HotspotSharing {
             val isAlreadyDetected = coords.anyHotspotNearby()
             if (!isAlreadyDetected) recentHotspots[coords] = buff
             event.blockedReason = "NT_HOTSPOT"
-            NautilusChat.chat(
+            NautilusChat.hoverableChat(
                 "${event.author} §efound a hotspot with §c${buff.statName} §ebuff at §b${coords.asSimpleChatMessage()}!",
+                listOf(event.chatComponent.formattedText),
                 prefix = false
             )
             val currentWaypoint = waypoint

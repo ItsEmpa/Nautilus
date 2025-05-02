@@ -17,11 +17,13 @@ object NautilusHelpCommand {
         val category = command.category
         val color = category.color
         val description = command.description.splitLines(200).replace("§r", "§7")
+        val aliases = command.aliases
         val categoryDescription = category.description.replace("SkyHanni", Nautilus.MOD_NAME).splitLines(200).replace("§r", "§7")
 
         return TextHelper.text("§7 - $color${command.name}") {
             this.hover = TextHelper.multiline(
                 "§3/${command.name}",
+                if (aliases.isNotEmpty()) "§3Aliases: §7${command.aliases.joinToString { "/$it" }}" else null,
                 if (description.isNotEmpty()) description.prependIndent("  ") else null,
                 "",
                 "$color§l${category.categoryName}",
