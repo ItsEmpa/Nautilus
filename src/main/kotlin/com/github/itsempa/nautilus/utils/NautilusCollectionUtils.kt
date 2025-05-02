@@ -25,6 +25,12 @@ inline fun <reified K : Enum<K>, V> fullEnumMapOf(defaultValue: () -> V): EnumMa
     }.toEnumMap()
 }
 
+fun <T> MutableList<T>.removeFirstMatches(condition: (T) -> Boolean): T? {
+    val indexOf = indexOfFirst(condition)
+    if (indexOf == -1) return null
+    return removeAt(indexOf)
+}
+
 fun <K> MutableMap<K, SimpleTimeMark>.removeMaxTime(duration: Duration) = removeIf { it.value.passedSince() > duration }
 
 fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.removeIf(predicate)

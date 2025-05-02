@@ -301,17 +301,19 @@ object NautilusRepoManager {
     }
 
     private fun getCommitApiUrl(): String {
-        val (repoUser, repoName, repoBranch) = config.repoLocation
-        return "https://api.github.com/repos/$repoUser/$repoName/commits/$repoBranch"
+        with(config.repoLocation) {
+            return "https://api.github.com/repos/$user/$name/commits/$branch"
+        }
     }
 
     private fun getDownloadUrl(commitId: String?): String {
-        val (repoUser, repoName) = config.repoLocation
-        return "https://github.com/$repoUser/$repoName/archive/$commitId.zip"
+        with(config.repoLocation) {
+            return "https://github.com/$user/$name/archive/$commitId.zip"
+        }
     }
 
     @Throws(IOException::class)
-    fun writeJson(json: JsonObject?, file: File) {
+    private fun writeJson(json: JsonObject?, file: File) {
         file.createNewFile()
         BufferedWriter(
             OutputStreamWriter(
@@ -324,7 +326,7 @@ object NautilusRepoManager {
     /**
      * Modified from https://www.journaldev.com/960/java-unzip-file-example
      */
-    fun unzipIgnoreFirstFolder(zipFilePath: String, destinationDirectory: String) {
+    private fun unzipIgnoreFirstFolder(zipFilePath: String, destinationDirectory: String) {
         val dir = File(destinationDirectory)
         // create output directory if it doesn't exist
         if (!dir.exists()) dir.mkdirs()

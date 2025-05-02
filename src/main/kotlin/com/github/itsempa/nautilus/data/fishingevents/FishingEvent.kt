@@ -1,7 +1,6 @@
 package com.github.itsempa.nautilus.data.fishingevents
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
@@ -96,7 +95,7 @@ sealed class FishingEvent(val internalName: String) {
         @HandleEvent(eventTypes = [HypixelJoinEvent::class, MayorDataUpdateEvent::class])
         fun onForceUpdate() = events.forEach(FishingEvent::updateTimePeriodAndState)
 
-        @HandleEvent(SecondPassedEvent::class)
+        @HandleEvent
         fun onSecondPassed() = events.forEach(FishingEvent::onSecondPassed)
 
         @HandleEvent

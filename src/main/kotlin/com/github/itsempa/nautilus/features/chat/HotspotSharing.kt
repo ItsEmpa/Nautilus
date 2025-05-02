@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -99,7 +98,7 @@ object HotspotSharing {
     }
 
     @HandleEvent
-    fun onSecond(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         val (pos, _) = waypoint ?: return
         val lastSpot = HotspotApi.lastHotspotPos
         if (pos.distanceToPlayer() < 10 ||

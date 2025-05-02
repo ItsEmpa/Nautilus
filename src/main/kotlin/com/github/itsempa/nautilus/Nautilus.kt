@@ -40,8 +40,8 @@ object Nautilus {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
         ConfigManager // Load ConfigManager class to initialize config
-        NautilusRepoManager.initRepo()
         NautilusModules.modules.loadModules()
+        NautilusRepoManager.initRepo()
 
         NautilusCommandRegistrationEvent.post()
     }
@@ -78,8 +78,7 @@ object Nautilus {
 
     val SEM_VER = SemVersion.fromString(VERSION)
 
-    @JvmField
-    val modules: MutableList<Any> = mutableListOf()
+    private val modules: MutableList<Any> = mutableListOf()
 
     @JvmStatic
     val feature: Features get() = ConfigManager.managedConfig.instance

@@ -2,7 +2,6 @@ package com.github.itsempa.nautilus.data.categories
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.misc.IslandAreas
@@ -188,7 +187,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
 
         @HandleEvent
-        fun onSecondPassed(event: SecondPassedEvent) {
+        fun onSecondPassed() {
             val result = findCategories()
             if (result == null) {
                 activeCategory = null

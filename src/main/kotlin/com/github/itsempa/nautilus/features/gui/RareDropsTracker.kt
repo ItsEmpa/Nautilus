@@ -29,9 +29,8 @@ import com.github.itsempa.nautilus.features.render.LootshareRange
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusTimeUtils.customFormat
-import com.github.itsempa.nautilus.utils.enumMapOf
 import com.github.itsempa.nautilus.utils.enumSetOf
-import com.github.itsempa.nautilus.utils.removeMaxTime
+import com.github.itsempa.nautilus.utils.removeFirstMatches
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
 
@@ -132,8 +131,8 @@ object RareDropsTracker {
     }
 
     private val MAX_TIME = 15.seconds
-    private val recentDeaths = enumMapOf<FishingRareDrop, SimpleTimeMark>()
-    private val recentDroppedItems = enumMapOf<FishingRareDrop, SimpleTimeMark>()
+    private val recentDeaths = mutableListOf<Pair<FishingRareDrop, SimpleTimeMark>>()
+    private val recentDroppedItems = mutableListOf<Pair<FishingRareDrop, SimpleTimeMark>>()
 
     private var activeDrops = enumSetOf<FishingRareDrop>()
     private var renderables = emptyList<Renderable>()
@@ -144,7 +143,7 @@ object RareDropsTracker {
         val drop = FishingRareDrop.mobsToCheck[data.name] ?: return
         val canActuallyGetDrops = event.isOwn || (event.seenDeath && LootshareRange.isInRange(data.actualLastPos))
         if (!canActuallyGetDrops) return
-        recentDeaths[drop] = SimpleTimeMark.now()
+        recentDeaths.add(drop to SimpleTimeMark.now())
         handleMobDrop()
     }
 
@@ -159,19 +158,24 @@ object RareDropsTracker {
     fun onItemAdd(event: ItemAddEvent) {
         if (event.source != ItemAddManager.Source.ITEM_ADD) return
         val drop = FishingRareDrop.mobDeathDropsToCheck[event.internalName] ?: return
-        recentDroppedItems[drop] = SimpleTimeMark.now()
+        recentDeaths.add(drop to SimpleTimeMark.now())
         handleMobDrop()
     }
 
     private fun handleMobDrop() {
         if (recentDeaths.isEmpty() || recentDroppedItems.isEmpty()) return
-        val intersect = recentDroppedItems.keys.intersect(recentDeaths.keys)
-        for (drop in intersect) {
-            sendMessage(drop, null)
-            recentDroppedItems.remove(drop)
-            recentDeaths.remove(drop)
+        with(recentDroppedItems.iterator()) {
+            while (hasNext()) {
+                val (drop, _) = next()
+                val matchingDrop = recentDeaths.removeFirstMatches { it.first == drop }
+                if (matchingDrop != null) {
+                    sendMessage(drop, null)
+                    remove()
+                }
+            }
         }
     }
+
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -179,8 +183,8 @@ object RareDropsTracker {
             activeDrops = FishingRareDrop.entries.filterTo(enumSetOf()) { it.isActive() }
         }
         if (config.enabled) updateDisplay()
-        if (recentDroppedItems.isNotEmpty()) recentDroppedItems.removeMaxTime(MAX_TIME)
-        if (recentDeaths.isNotEmpty()) recentDeaths.removeMaxTime(MAX_TIME)
+        if (recentDroppedItems.isNotEmpty()) recentDroppedItems.removeIf { it.second.passedSince() > MAX_TIME }
+        if (recentDeaths.isNotEmpty()) recentDeaths.removeIf { it.second.passedSince() > MAX_TIME }
     }
 
     private fun sendMessage(drop: FishingRareDrop, magicFind: Int?) {
@@ -189,13 +193,14 @@ object RareDropsTracker {
         val newDropCount = dropCount + 1
         val pluralized = StringUtils.pluralize(creatureCount, drop.displayMobName, drop.pluralMobName)
         val message = buildString {
-            append("Dropped §6§l$newDropCount${newDropCount.ordinal()} §r${drop.itemName} §3after §b${creatureCount.addSeparators()} §3$pluralized")
-            if (entry.hasDropped) append(
-                "§3(Last drop was ${
-                    lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 3)
-                } ago)",
+            append(
+                "Dropped §6§l$newDropCount${newDropCount.ordinal()} §r${drop.itemName} " +
+                    "§3after §b${creatureCount.addSeparators()} §3$pluralized",
             )
-            if (magicFind != null) append("§b(mf: $magicFind✯)")
+            if (entry.hasDropped) append(
+                " §3(Last drop was ${lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 3)} ago)",
+            )
+            if (magicFind != null) append(" §b(mf: $magicFind✯)")
         }
         if (config.enabled && config.sendChatMessage) NautilusChat.chat(message)
         entry.onDrop(magicFind)

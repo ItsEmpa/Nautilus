@@ -3,7 +3,6 @@ package com.github.itsempa.nautilus.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -172,7 +171,7 @@ object HotspotApi {
     }
 
     @HandleEvent(onlyOnIslands = [IslandType.HUB, IslandType.SPIDER_DEN, IslandType.BACKWATER_BAYOU, IslandType.CRIMSON_ISLE])
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         _hotspots.removeIf {
             val isOld = it.lastUpdate.passedSince() > 2.seconds
             if (isOld) HotspotEvent.Removed(it).post()

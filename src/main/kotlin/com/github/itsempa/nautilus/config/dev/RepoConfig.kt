@@ -17,6 +17,11 @@ class RepoConfig {
         this.branch = NautilusRepoManager.DEFAULT_BRANCH
     }
 
+    @Transient
+    @ConfigOption(name = "Update Repo", desc = "Download the repository files again.")
+    @ConfigEditorButton(buttonText = "Update")
+    val update = Runnable(NautilusRepoManager::updateRepo)
+
     @Expose
     @ConfigOption(name = "Repository User", desc = "The Repository Branch, default ${NautilusRepoManager.DEFAULT_USER}")
     @ConfigEditorText
