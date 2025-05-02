@@ -48,7 +48,7 @@ object RareDropsTracker {
             if (doubleHook) seaCreaturesSince += 2 else ++seaCreaturesSince
         }
 
-        fun getAverage(): Int = (count / totalSeacreaturesCaught).toInt()
+        fun getAverage(): Int? = if (totalSeacreaturesCaught == 0) null else count / totalSeacreaturesCaught
 
         fun onDrop() {
             totalSeacreaturesCaught += seaCreaturesSince
@@ -185,9 +185,14 @@ object RareDropsTracker {
     }
 
     private fun FishingRareDrop.getDisplay(): String {
-        var message = "§c$displayMobName §7since $itemName§7: §b${entry.seaCreaturesSince} §e(${entry.getAverage()})"
-        if (entry.hasDropped) {
-            message += " §b${entry.lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 2)}"
+        val message = buildString {
+            append("§c$displayMobName §7since $itemName§7: §b${entry.seaCreaturesSince}")
+            entry.getAverage()?.let {
+                append("§e($it)")
+            }
+            if (entry.hasDropped) {
+                append(" §b${entry.lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 2)}")
+            }
         }
         return message
     }

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -103,13 +104,13 @@ object LegionBobbinDisplay {
             if (!config.hideWithoutEnchant || wearingLegion) add(
                 HorizontalContainerRenderable(listOf(
                     RenderableString("§dLegion: "),
-                    RenderableString("§b${armorLegionBuff * nearbyPlayers}% §7($nearbyPlayers)"),
+                    RenderableString("§b${(armorLegionBuff * nearbyPlayers).roundTo(2)}% §7($nearbyPlayers)"),
                 )),
             )
             if (!config.hideWithoutEnchant || wearingBobbin) add(
                 HorizontalContainerRenderable(listOf(
                     RenderableString("§3Bobbin: "),
-                    RenderableString("§b${armorBobbinBuff * nearbyBobbers}% §7($nearbyBobbers)"),
+                    RenderableString("§b${(armorBobbinBuff * nearbyBobbers).roundTo(2)}% §7($nearbyBobbers)"),
                 )),
             )
         }
