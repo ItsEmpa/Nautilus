@@ -10,6 +10,7 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.fullEnumMapOf
 
 @Module
@@ -39,21 +40,43 @@ object NautilusCommands {
     fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
         event.register("nautilus") {
             this.aliases = listOf("nt", "nautilusconfig", "ntconfig")
-            this.category = CommandCategory.MAIN
             this.description = "Opens the main ${Nautilus.MOD_NAME} config"
+            this.category = CommandCategory.MAIN
             callback(::getOpenMainMenu)
         }
-        event.register("nautiluscommands") {
-            this.aliases = listOf("ntcommands", "nautilushelp", "nthelp")
+        event.register("ntcommands") {
+            this.aliases = listOf("nautiluscommands", "nautilushelp", "nthelp")
             this.description = "Shows this list"
             this.category = CommandCategory.MAIN
             callback(NautilusHelpCommand::onCommand)
         }
-        event.register("nautilussaveconfig") {
-            this.aliases = listOf("ntsaveconfig")
+        event.register("ntsaveconfig") {
+            this.aliases = listOf("nautilussaveconfig")
             this.description = "Saves the config"
             this.category = CommandCategory.DEVELOPER_TEST
             callback { ConfigManager.save() }
+        }
+        event.register("ntdiscord") {
+            this.aliases = listOf("nautilusdiscord")
+            this.description = "Opens the Nautilus discord"
+            this.category = CommandCategory.USERS_BUG_FIX
+            callback {
+                NautilusChat.clickableLinkChat(
+                    "Click this to open an invite to the Nautilus Discord",
+                    Nautilus.DISCORD_INVITE,
+                )
+            }
+        }
+        event.register("ntgithub") {
+            this.aliases = listOf("nautilusgithub")
+            this.description = "Opens the Nautilus GitHub"
+            this.category = CommandCategory.USERS_BUG_FIX
+            callback {
+                NautilusChat.clickableLinkChat(
+                    "Click this to open the Nautilus GitHub",
+                    Nautilus.GITHUB,
+                )
+            }
         }
     }
 

@@ -16,6 +16,7 @@ object DebugCommand {
     @HandleEvent
     fun onCommand(event: NautilusCommandRegistrationEvent) {
         event.register("ntdebug") {
+            this.aliases = listOf("nautilusdebug")
             this.description = "Copies ${Nautilus.MOD_NAME} debug data in the clipboard."
             this.category = CommandCategory.DEVELOPER_DEBUG
             callback(::debugCommand)

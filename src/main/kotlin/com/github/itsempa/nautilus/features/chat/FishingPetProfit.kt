@@ -83,6 +83,7 @@ object FishingPetProfit {
     @HandleEvent
     fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
         event.register("ntfishingpetprofit") {
+            this.aliases = listOf("ntpetprofit", "ntbestpets")
             this.description = "Calculates the best fishing pet profits"
             this.category = CommandCategory.MAIN
             this.callback { calculatePrices() }

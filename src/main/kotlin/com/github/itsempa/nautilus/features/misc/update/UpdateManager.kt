@@ -83,8 +83,8 @@ object UpdateManager {
 
     @HandleEvent
     fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
-        event.register("nautilusupdate") {
-            this.aliases = listOf("ntupdate")
+        event.register("ntupdate") {
+            this.aliases = listOf("nautilusupdate")
             this.description = "Checks for updates"
             this.category = CommandCategory.MAIN
             callback { checkUpdate(true) }

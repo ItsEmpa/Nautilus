@@ -1,12 +1,10 @@
 package com.github.itsempa.nautilus.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
@@ -19,10 +17,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.FishCatchEvent
 import com.github.itsempa.nautilus.events.HotspotEvent
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
-import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusUtils.clearAnd
 import com.github.itsempa.nautilus.utils.NautilusUtils.expandToInclude
 import com.github.itsempa.nautilus.utils.NautilusUtils.getCenter
@@ -200,18 +196,6 @@ object HotspotApi {
         if (!isInHotspot(pos)) return
         lastHotspotFish = SimpleTimeMark.now()
         lastHotspotPos = pos
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
-        event.register("ntdebughotspot") {
-            this.description = "Copies Hotspot Debug Data to clipboard."
-            this.category = CommandCategory.DEVELOPER_DEBUG
-            callback {
-                NautilusChat.chat("Copied Hotspot data to clipboard.")
-                ClipboardUtils.copyToClipboard(_hotspots.toString())
-            }
-        }
     }
 
     @HandleEvent

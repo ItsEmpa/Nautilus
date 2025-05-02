@@ -25,8 +25,8 @@ class Features : Config() {
 
     override fun getSocials(): List<Social> {
         return listOf(
-            Social.forLink("Discord", discord, "https://discord.gg/KM3dKjbWqg"),
-            Social.forLink("GitHub", github, "https://github.com/ItsEmpa/Nautilus"),
+            Social.forLink("Discord", discord, Nautilus.DISCORD_INVITE),
+            Social.forLink("GitHub", github, Nautilus.GITHUB),
         )
     }
 

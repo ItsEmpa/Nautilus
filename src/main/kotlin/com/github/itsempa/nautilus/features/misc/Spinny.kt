@@ -1,6 +1,7 @@
 package com.github.itsempa.nautilus.features.misc
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import com.github.itsempa.nautilus.Nautilus
@@ -20,6 +21,7 @@ object Spinny {
         event.register("nautilusspin") {
             this.aliases = listOf("ntspin", "spin")
             this.description = "Spin the player!"
+            this.category = CommandCategory.USERS_ACTIVE
             callback(::command)
         }
     }
