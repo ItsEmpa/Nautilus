@@ -16,7 +16,7 @@ class HotspotSharingConfig {
     var enabled = true
 
     @Expose
-    @ConfigOption(name = "Hotspot Buffs", desc = "Chose what hotspot buffs to warn about and share, and the priority of them.")
+    @ConfigOption(name = "Hotspot Buffs", desc = "Choose what hotspot buffs to warn about and share, and the priority of them.")
     @ConfigEditorDraggableList
     val buffs: MutableList<HotspotApi.HotspotBuff> = HotspotApi.HotspotBuff.default
 
