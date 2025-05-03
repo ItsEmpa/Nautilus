@@ -61,6 +61,11 @@ class GuiConfig {
     val rareDropsTracker: RareDropsTrackerConfig = RareDropsTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "Hotspot Warning", desc = "")
+    @Accordion
+    var hotspotWarning: HotspotWarningConfig = HotspotWarningConfig()
+
+    @Expose
     @ConfigOption(name = "Spooky Counter", desc = "Shows the amount of mobs you have fished in the current spooky festival.")
     @ConfigEditorBoolean
     var spookyCounter: Boolean = true

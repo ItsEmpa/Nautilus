@@ -11,4 +11,7 @@ sealed class HotspotEvent(val hotspot: HotspotApi.Hotspot) : SkyHanniEvent() {
 
     class BuffFound(hotspot: HotspotApi.Hotspot) : HotspotEvent(hotspot)
     class Seen(hotspot: HotspotApi.Hotspot) : HotspotEvent(hotspot)
+
+    // This gets called when the player starts fishing at a hotspot
+    class StartFishing(hotspot: HotspotApi.Hotspot) : HotspotEvent(hotspot)
 }

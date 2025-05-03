@@ -74,25 +74,30 @@ object HotspotApi {
         var hasBeenSeen: Boolean = false
             private set
 
+        private var particleCount: Int = 0
+
         init {
             val now = SimpleTimeMark.now()
             lastUpdate = now
             startTime = now
-            updateBuff()
-            checkSeen()
+            tick()
         }
+
+        private var hasSentSpawn = false
 
         fun distance(pos: LorenzVec): Double = center.distanceIgnoreY(pos)
         fun isInside(pos: LorenzVec): Boolean = distance(pos) <= radius
         fun isInside(entity: Entity): Boolean = isInside(entity.getLorenzVec())
 
-        fun updateTime() {
-            lastUpdate = SimpleTimeMark.now()
-        }
-
         @Suppress("DEPRECATION")
         fun addParticle(pos: LorenzVec) {
-            updateTime()
+            ++particleCount
+            lastUpdate = SimpleTimeMark.now()
+            if (particleCount > 10 && !hasSentSpawn) {
+                hasSentSpawn = true
+                HotspotEvent.Detected(this).post()
+            }
+            if (startTime.passedSince() > 5.seconds) return
             aabb = aabb.expandToInclude(pos)
             center = aabb.getCenter()
             radius = distance(pos)
@@ -103,14 +108,14 @@ object HotspotApi {
             checkSeen()
         }
 
-        fun checkSeen() {
+        private fun checkSeen() {
             if (hasBeenSeen) return
             if (!center.up(2).canBeSeen()) return // TODO: use proper canBeSeen detection
             hasBeenSeen = true
             HotspotEvent.Seen(this).post()
         }
 
-        fun updateBuff() {
+        private fun updateBuff() {
             if (buff != null) return
             val possibleEntities = EntityUtils.getEntities<EntityArmorStand>().filter { isInside(it) }
             val baseEntity = possibleEntities.find { it.name == HOTSPOT_NAMETAG } ?: return
@@ -127,9 +132,16 @@ object HotspotApi {
 
     private val _hotspots = mutableListOf<Hotspot>()
     val hotspots: List<Hotspot> get() = _hotspots
+    var currentHotspot: Hotspot? = null
+        private set
 
     // TODO: make better detection, this is ass
-    fun isHotspotFishing(): Boolean = lastNearFishedHotspotTime.passedSince() < 4.minutes && lastHotspotFish.passedSince() < 2.minutes
+    //  this is slightly better now, but i still dont really like it a lot
+    fun isHotspotFishing(): Boolean {
+        val hotspot = currentHotspot
+        if (hotspot != null) return true
+        return lastNearFishedHotspotTime.passedSince() < 1.minutes
+    }
 
     private var lastNearFishedHotspotTime = SimpleTimeMark.farPast()
 
@@ -164,7 +176,6 @@ object HotspotApi {
         if (hotspot == null) {
             val newHotspot = Hotspot(pos)
             _hotspots.add(newHotspot)
-            HotspotEvent.Detected(newHotspot).post()
             return
         }
         hotspot.addParticle(pos)
@@ -174,16 +185,18 @@ object HotspotApi {
     fun onSecondPassed() {
         _hotspots.removeIf {
             val isOld = it.lastUpdate.passedSince() > 2.seconds
-            if (isOld) HotspotEvent.Removed(it).post()
+            if (isOld) {
+                if (currentHotspot == it) currentHotspot = null
+                HotspotEvent.Removed(it).post()
+            }
             isOld
         }
         if (isNearFishedHotspot()) lastNearFishedHotspotTime = SimpleTimeMark.now()
     }
 
     private fun isNearFishedHotspot(): Boolean {
-        val lastPos = lastHotspotPos ?: return false
-        if (!isInHotspot(lastPos)) return false
-        return lastPos.distanceToPlayer() < 30
+        val hotspot = currentHotspot ?: return false
+        return hotspot.center.distanceToPlayer() < 30
     }
 
     @HandleEvent(onlyOnIslands = [IslandType.HUB, IslandType.SPIDER_DEN, IslandType.BACKWATER_BAYOU, IslandType.CRIMSON_ISLE])
@@ -192,7 +205,12 @@ object HotspotApi {
     @HandleEvent(onlyOnIslands = [IslandType.HUB, IslandType.SPIDER_DEN, IslandType.BACKWATER_BAYOU, IslandType.CRIMSON_ISLE])
     fun onCatch(event: FishCatchEvent) {
         val pos = event.bobberPos
-        if (!isInHotspot(pos)) return
+        val hotspot = _hotspots.find { it.isInside(pos) } ?: return
+        if (currentHotspot != hotspot) {
+            currentHotspot = hotspot
+            HotspotEvent.StartFishing(hotspot).post()
+        }
+        lastNearFishedHotspotTime = SimpleTimeMark.now()
         lastHotspotFish = SimpleTimeMark.now()
         lastHotspotPos = pos
     }
@@ -211,6 +229,7 @@ object HotspotApi {
 
     @HandleEvent
     fun onWorldChange() {
+        currentHotspot = null
         lastHotspotPos = null
         _hotspots.clearAnd { hotspot ->
             HotspotEvent.Removed(hotspot).post()
