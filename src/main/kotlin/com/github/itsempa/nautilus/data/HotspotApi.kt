@@ -89,6 +89,8 @@ object HotspotApi {
         fun isInside(pos: LorenzVec): Boolean = distance(pos) <= radius
         fun isInside(entity: Entity): Boolean = isInside(entity.getLorenzVec())
 
+        fun isDetected() = hasSentSpawn
+
         @Suppress("DEPRECATION")
         fun addParticle(pos: LorenzVec) {
             ++particleCount
@@ -131,7 +133,7 @@ object HotspotApi {
     }
 
     private val _hotspots = mutableListOf<Hotspot>()
-    val hotspots: List<Hotspot> get() = _hotspots
+    val hotspots: Sequence<Hotspot> get() = _hotspots.asSequence().filter { it.isDetected() }
     var currentHotspot: Hotspot? = null
         private set
 
@@ -145,7 +147,7 @@ object HotspotApi {
 
     private var lastNearFishedHotspotTime = SimpleTimeMark.farPast()
 
-    fun isInHotspot(pos: LorenzVec) = _hotspots.any { it.isInside(pos) }
+    fun isInHotspot(pos: LorenzVec) = hotspots.any { it.isInside(pos) }
 
     var lastHotspotFish: SimpleTimeMark = SimpleTimeMark.farPast()
         private set
@@ -205,7 +207,7 @@ object HotspotApi {
     @HandleEvent(onlyOnIslands = [IslandType.HUB, IslandType.SPIDER_DEN, IslandType.BACKWATER_BAYOU, IslandType.CRIMSON_ISLE])
     fun onCatch(event: FishCatchEvent) {
         val pos = event.bobberPos
-        val hotspot = _hotspots.find { it.isInside(pos) } ?: return
+        val hotspot = hotspots.find { it.isInside(pos) } ?: return
         if (currentHotspot != hotspot) {
             currentHotspot = hotspot
             HotspotEvent.StartFishing(hotspot).post()
