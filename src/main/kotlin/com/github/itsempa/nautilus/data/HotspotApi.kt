@@ -7,13 +7,13 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import com.github.itsempa.nautilus.events.FishCatchEvent
 import com.github.itsempa.nautilus.events.HotspotEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
@@ -40,13 +40,13 @@ object HotspotApi {
         SEA_CREATURE_CHANCE(LorenzColor.DARK_AQUA, 5, 'α'),
         DOUBLE_HOOK_CHANCE(LorenzColor.DARK_BLUE, 2, '⚓'),
         FISHING_SPEED(LorenzColor.AQUA, 15, '☂'),
-        TROPHY_FISH_CHANCE(LorenzColor.GOLD, 5, '♔'), // TODO: confirm this icon
+        TROPHY_FISH_CHANCE(LorenzColor.GOLD, 5, '♔'),
         UNKNOWN(LorenzColor.BLACK, 0, '?')
         ;
 
         val statName: String = displayName ?: toFormattedName()
         val string: String = "+$amount$icon $statName"
-        val displayName: String = color.getChatColor() + string
+        private val displayName: String = color.getChatColor() + string
         override fun toString(): String = displayName
 
         companion object {
@@ -62,9 +62,7 @@ object HotspotApi {
             private set
         val startTime: SimpleTimeMark
 
-        @Deprecated("Intended only for internal use")
-        internal var aabb: AxisAlignedBB = firstParticle.axisAlignedTo(firstParticle)
-            private set
+        private var aabb: AxisAlignedBB = firstParticle.axisAlignedTo(firstParticle)
         var center: LorenzVec = firstParticle
             private set
         var radius: Double = 0.0
@@ -91,7 +89,9 @@ object HotspotApi {
 
         fun isDetected() = hasSentSpawn
 
-        @Suppress("DEPRECATION")
+        @Deprecated("Intended for internal use only")
+        internal fun getAABB() = aabb
+
         fun addParticle(pos: LorenzVec) {
             ++particleCount
             lastUpdate = SimpleTimeMark.now()
@@ -112,7 +112,7 @@ object HotspotApi {
 
         private fun checkSeen() {
             if (hasBeenSeen) return
-            if (!center.up(2).canBeSeen()) return // TODO: use proper canBeSeen detection
+            if (!FrustumUtils.isVisible(aabb)) return
             hasBeenSeen = true
             HotspotEvent.Seen(this).post()
         }
@@ -160,9 +160,11 @@ object HotspotApi {
             EnumParticleTypes.SMOKE_NORMAL -> {
                 speed == 0f && (count == 5 || count == 2)
             }
+
             EnumParticleTypes.REDSTONE -> {
                 count == 0 && speed == 1f
             }
+
             else -> false
         }
     }

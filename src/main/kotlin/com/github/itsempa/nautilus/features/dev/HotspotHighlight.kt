@@ -20,7 +20,7 @@ object HotspotHighlight {
             val color = Color.BLUE
             val center = hotspot.center
             @Suppress("DEPRECATION")
-            event.drawBoundingBox(hotspot.aabb, color, wireframe = true, throughBlocks = true)
+            event.drawBoundingBox(hotspot.getAABB(), color, wireframe = true, throughBlocks = true)
             event.drawString(center, HotspotApi.HOTSPOT_NAMETAG, seeThroughBlocks = true)
         }
     }
