@@ -31,6 +31,8 @@ fun <T> MutableList<T>.removeFirstMatches(condition: (T) -> Boolean): T? {
     return removeAt(indexOf)
 }
 
+fun <K, V> MutableMap<K, V>.replaceAll(value: V) = entries.forEach { it.setValue(value) }
+
 fun <K> MutableMap<K, SimpleTimeMark>.removeMaxTime(duration: Duration) = removeIf { it.value.passedSince() > duration }
 
 fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.removeIf(predicate)
