@@ -21,8 +21,8 @@ object ComboData {
 
     enum class ComboBuff(color: LorenzColor, private val icon: Char, chatName: String? = null) {
         MAGIC_FIND(LorenzColor.AQUA, '✯'),
-        COMBAT_WISDOM(LorenzColor.DARK_AQUA, '☯'),
         COINS(LorenzColor.GOLD, '⛁', chatName = "coins per kill"),
+        COMBAT_WISDOM(LorenzColor.DARK_AQUA, '☯'),
         ;
 
         fun format(amount: Int): String = "§8+$colorCode$amount$icon"
@@ -36,7 +36,7 @@ object ComboData {
     }
 
     private val comboPattern =
-        "§(?<color>.)§l\\+(?<combo>[\\d,.]+) Kill Combo(?: (?:§.)*\\+(?:§.)*(?<buffAmount>\\d+)\\S? (?:§.)*(?<buff>.+))?".toPattern()
+        "§(?<color>.)§l\\+(?<combo>[\\d,.]+) Kill Combo(?: (?:§.)*\\+(?:§.)*(?<buffAmount>\\d+)\\S? (?:§.)*(?:✯ )?(?<buff>.+))?".toPattern()
 
     private val comboEndPattern =
         "§cYour Kill Combo has expired! You reached a [\\d,.]+ Kill Combo!".toPattern()
