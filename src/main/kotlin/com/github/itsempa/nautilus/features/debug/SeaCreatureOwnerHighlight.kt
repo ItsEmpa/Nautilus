@@ -16,7 +16,7 @@ object SeaCreatureOwnerHighlight {
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onRenderOutline(event: RenderEntityOutlineEvent) {
-        if (event.type != RenderEntityOutlineEvent.Type.NO_XRAY || !config) return
+        if (event.type != RenderEntityOutlineEvent.Type.NO_XRAY || !isEnabled()) return
         event.queueEntitiesToOutline(::outlineEntity)
     }
 
@@ -25,5 +25,7 @@ object SeaCreatureOwnerHighlight {
         val color = if (seaCreature.isOwn) LorenzColor.LIGHT_PURPLE else LorenzColor.BLUE
         return color.toColor().rgb
     }
+
+    fun isEnabled(): Boolean = config
 
 }
