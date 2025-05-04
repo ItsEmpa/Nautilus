@@ -2,7 +2,7 @@ package com.github.itsempa.nautilus.features.chat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 
@@ -17,7 +17,7 @@ object RatCommand {
     """.trimIndent()
 
     @HandleEvent
-    fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
+    fun onCommandRegistration(event: BrigadierRegisterEvent) {
         event.register("nautilusrat") {
             this.aliases = listOf("ntrat", "rat")
             this.description = "BIG SCARY RAT!!!"
@@ -27,7 +27,6 @@ object RatCommand {
             }
         }
     }
-
 
 
 }

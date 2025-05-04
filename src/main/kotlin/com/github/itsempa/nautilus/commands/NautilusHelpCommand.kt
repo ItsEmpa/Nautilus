@@ -1,6 +1,5 @@
 package com.github.itsempa.nautilus.commands
 
-import at.hannibal2.skyhanni.config.commands.CommandBuilder
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.hover
@@ -13,10 +12,10 @@ object NautilusHelpCommand {
     private const val COMMANDS_PER_PAGE = 15
     private val HELP_ID = Nautilus.MOD_ID.hashCode()
 
-    private fun createCommandEntry(command: CommandBuilder): IChatComponent {
+    private fun createCommandEntry(command: CommandData): IChatComponent {
         val category = command.category
         val color = category.color
-        val description = command.description.splitLines(200).replace("§r", "§7")
+        val description = command.descriptor.splitLines(200).replace("§r", "§7")
         val aliases = command.aliases
         val categoryDescription = category.description.replace("SkyHanni", Nautilus.MOD_NAME).splitLines(200).replace("§r", "§7")
 
@@ -33,9 +32,9 @@ object NautilusHelpCommand {
         }
     }
 
-    private fun showPage(page: Int, search: String, commands: List<CommandBuilder>) {
+    private fun showPage(page: Int, search: String, commands: List<CommandData>) {
         val filtered = commands.filter {
-            it.name.contains(search, ignoreCase = true) || it.description.contains(search, ignoreCase = true)
+            it.name.contains(search, ignoreCase = true) || it.descriptor.contains(search, ignoreCase = true)
         }
 
         val title = "${Nautilus.MOD_NAME} Commands" + if (search.isNotBlank()) "Matching: \"$search\"" else ""
@@ -60,6 +59,6 @@ object NautilusHelpCommand {
             page = 1
             search = args.joinToString(" ")
         }
-        showPage(page, search, NautilusCommands.commandsList)
+        showPage(page, search, NautilusCommandRegistry.commands)
     }
 }

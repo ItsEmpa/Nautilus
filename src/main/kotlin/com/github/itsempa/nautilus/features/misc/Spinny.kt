@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import net.minecraft.client.renderer.GlStateManager
@@ -17,12 +17,12 @@ object Spinny {
     private val config get() = Nautilus.feature.misc.spin
 
     @HandleEvent
-    fun onCommandRegister(event: NautilusCommandRegistrationEvent) {
+    fun onCommandRegister(event: BrigadierRegisterEvent) {
         event.register("nautilusspin") {
             this.aliases = listOf("ntspin", "spin")
             this.description = "Spin the player!"
             this.category = CommandCategory.USERS_ACTIVE
-            callback(::command)
+            callbackArgs(::command)
         }
     }
 

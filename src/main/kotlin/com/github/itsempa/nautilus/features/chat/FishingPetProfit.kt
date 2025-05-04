@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 
@@ -81,7 +81,7 @@ object FishingPetProfit {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
+    fun onCommandRegistration(event: BrigadierRegisterEvent) {
         event.register("ntfishingpetprofit") {
             this.aliases = listOf("ntpetprofit", "ntbestpets")
             this.description = "Calculates the best fishing pet profits"

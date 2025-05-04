@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.config.Features
 import com.github.itsempa.nautilus.data.NautilusRepoManager
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.NautilusPreInitFinishedEvent
 import com.github.itsempa.nautilus.features.misc.update.SemVersion
 import com.github.itsempa.nautilus.mixins.transformers.skyhanni.AccessorSkyHanniEvents
 import com.github.itsempa.nautilus.modules.Module
@@ -43,7 +43,7 @@ object Nautilus {
         NautilusModules.modules.loadModules()
         NautilusRepoManager.initRepo()
 
-        NautilusCommandRegistrationEvent.post()
+        NautilusPreInitFinishedEvent.post()
     }
 
 

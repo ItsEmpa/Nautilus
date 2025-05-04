@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.ConfigManager
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusRepositoryReloadEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
@@ -81,12 +81,12 @@ object NautilusRepoManager {
     private var commitTime: SimpleTimeMark? = null
 
     @HandleEvent
-    fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
+    fun onCommandRegistration(event: BrigadierRegisterEvent) {
         event.register("nautilusupdaterepo") {
-            this.aliases = listOf("ntupdaterepo")
-            this.description = "Download the Nautilus repo again."
-            this.category = CommandCategory.USERS_BUG_FIX
-            this.callback { updateRepo() }
+            aliases = listOf("ntupdaterepo")
+            description = "Download the Nautilus repo again."
+            category = CommandCategory.USERS_BUG_FIX
+            callback { updateRepo() }
         }
     }
 

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.helpers.McClient
@@ -67,22 +67,25 @@ object UpdateManager {
     fun checkUpdate(forceUpdate: Boolean = false) {
         NautilusChat.chat("Checking for updates...")
         activePromise = context.checkUpdate("pre")
-            .thenAcceptAsync({
-                potentialUpdate = it
-                if (!it.isUpdateAvailable) return@thenAcceptAsync NautilusChat.chat("No updates found.")
-                updateState = UpdateState.AVAILABLE
-                val text = "Found a new update! (${Nautilus.VERSION} -> ${it.update.versionName})"
-                if (config.autoUpdates || forceUpdate) {
-                    NautilusChat.chat("$text Starting to download...")
-                    queueUpdate()
-                } else {
-                    NautilusChat.clickableChat("$text Click here to download.", onClick = ::queueUpdate)
-                }
-            }, DelayedRun.onThread)
+            .thenAcceptAsync(
+                {
+                    potentialUpdate = it
+                    if (!it.isUpdateAvailable) return@thenAcceptAsync NautilusChat.chat("No updates found.")
+                    updateState = UpdateState.AVAILABLE
+                    val text = "Found a new update! (${Nautilus.VERSION} -> ${it.update.versionName})"
+                    if (config.autoUpdates || forceUpdate) {
+                        NautilusChat.chat("$text Starting to download...")
+                        queueUpdate()
+                    } else {
+                        NautilusChat.clickableChat("$text Click here to download.", onClick = ::queueUpdate)
+                    }
+                },
+                DelayedRun.onThread,
+            )
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
+    fun onCommandRegistration(event: BrigadierRegisterEvent) {
         event.register("ntupdate") {
             this.aliases = listOf("nautilusupdate")
             this.description = "Checks for updates"
@@ -95,11 +98,14 @@ object UpdateManager {
         updateState = UpdateState.QUEUED
         activePromise = CompletableFuture.supplyAsync {
             potentialUpdate!!.prepareUpdate()
-        }.thenAcceptAsync({
-            updateState = UpdateState.DOWNLOADED
-            potentialUpdate!!.executePreparedUpdate()
-            NautilusChat.chat("Update complete! Restart your game to apply changes.")
-        }, DelayedRun.onThread)
+        }.thenAcceptAsync(
+            {
+                updateState = UpdateState.DOWNLOADED
+                potentialUpdate!!.executePreparedUpdate()
+                NautilusChat.chat("Update complete! Restart your game to apply changes.")
+            },
+            DelayedRun.onThread,
+        )
     }
 
 }

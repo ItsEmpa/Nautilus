@@ -93,6 +93,8 @@ dependencies {
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
+    shadowImpl("com.mojang:brigadier:1.0.18")
+
     compileOnly(libs.jbAnnotations)
     headlessLwjgl(libs.headlessLwjgl)
     shadowImpl(libs.libautoupdate) {

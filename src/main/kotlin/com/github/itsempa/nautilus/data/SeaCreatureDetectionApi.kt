@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.modules.Module
@@ -250,7 +250,7 @@ object SeaCreatureDetectionApi {
     }
 
     @HandleEvent
-    fun onCommand(event: NautilusCommandRegistrationEvent) {
+    fun onCommand(event: BrigadierRegisterEvent) {
         event.register("nautilusresetdata") {
             this.aliases = listOf("ntresetdata")
             this.description = "Resets Sea Creature Data"

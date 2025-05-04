@@ -67,7 +67,7 @@ object ComboData {
         comboEndPattern.matchMatcher(message) {
             val combo = group("combo").formatInt()
             ComboEndEvent(combo).post()
-            reset()
+            this@ComboData.reset()
         }
     }
 

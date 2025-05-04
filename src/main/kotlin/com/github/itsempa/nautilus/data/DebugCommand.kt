@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
@@ -14,12 +14,12 @@ import com.github.itsempa.nautilus.utils.NautilusChat
 object DebugCommand {
 
     @HandleEvent
-    fun onCommand(event: NautilusCommandRegistrationEvent) {
+    fun onCommand(event: BrigadierRegisterEvent) {
         event.register("ntdebug") {
             this.aliases = listOf("nautilusdebug")
             this.description = "Copies ${Nautilus.MOD_NAME} debug data in the clipboard."
             this.category = CommandCategory.DEVELOPER_DEBUG
-            callback(::debugCommand)
+            callbackArgs(::debugCommand)
         }
     }
 

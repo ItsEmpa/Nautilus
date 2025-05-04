@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.NautilusStorage
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.combo.ComboEndEvent
 import com.github.itsempa.nautilus.events.combo.ComboUpdateEvent
 import com.github.itsempa.nautilus.modules.Module
@@ -59,7 +59,7 @@ object BestCombo {
     }
 
     @HandleEvent
-    fun onCommand(event: NautilusCommandRegistrationEvent) {
+    fun onCommand(event: BrigadierRegisterEvent) {
         event.register("ntbestcombo") {
             this.description = "Shows what the longest combo you have gotten is."
             this.category = CommandCategory.USERS_ACTIVE

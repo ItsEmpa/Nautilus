@@ -7,48 +7,38 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.deps.moulconfig.gui.GuiScreenElementWrapper
 import com.github.itsempa.nautilus.Nautilus
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getString
 import com.github.itsempa.nautilus.config.ConfigManager
-import com.github.itsempa.nautilus.events.NautilusCommandRegistrationEvent
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
-import com.github.itsempa.nautilus.utils.fullEnumMapOf
 
 @Module
 object NautilusCommands {
 
-    private fun getOpenMainMenu(args: Array<String>) {
-        if (args.isNotEmpty()) {
-            if (args.first().lowercase() == "gui") {
-                GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
-            } else openConfigGui(args.joinToString(" "))
-        } else openConfigGui()
-    }
-
     val commandsList = mutableListOf<CommandBuilder>()
-
-    // Priority is set to the lowest so that all the commands have already been registered when this gets called
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onFinishCommandRegistration(event: NautilusCommandRegistrationEvent) {
-        val map = fullEnumMapOf<CommandCategory, MutableList<CommandBuilder>> { mutableListOf() }
-        for (command in commandsList) map[command.category]!!.add(command)
-        commandsList.clear()
-        map.values.forEach { list -> list.forEach { command -> commandsList.add(command) } }
-    }
 
     // Priority is set to the highest so that these commands always appear at the top
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onCommandRegistration(event: NautilusCommandRegistrationEvent) {
+    fun onCommandRegister(event: BrigadierRegisterEvent) {
         event.register("nautilus") {
             this.aliases = listOf("nt", "nautilusconfig", "ntconfig")
             this.description = "Opens the main ${Nautilus.MOD_NAME} config"
             this.category = CommandCategory.MAIN
-            callback(::getOpenMainMenu)
-        }
-        event.register("ntcommands") {
-            this.aliases = listOf("nautiluscommands", "nautilushelp", "nthelp")
-            this.description = "Shows this list"
-            this.category = CommandCategory.MAIN
-            callback(NautilusHelpCommand::onCommand)
+
+            then("gui") {
+                callback { GuiEditManager.openGuiPositionEditor(hotkeyReminder = true) }
+            }
+
+            then("search", BrigadierArguments.greedyString()) {
+                callback {
+                    val search = getString("search") ?: return@callback
+                    openConfigGui(search)
+                }
+            }
+
+            simpleCallback(::openConfigGui)
         }
         event.register("ntsaveconfig") {
             this.aliases = listOf("nautilussaveconfig")
@@ -77,6 +67,12 @@ object NautilusCommands {
                     Nautilus.GITHUB,
                 )
             }
+        }
+        event.register("ntcommands") {
+            this.aliases = listOf("nautiluscommands", "nautilushelp", "nthelp")
+            this.description = "Shows this list"
+            this.category = CommandCategory.MAIN
+            callbackArgs(NautilusHelpCommand::onCommand)
         }
     }
 
