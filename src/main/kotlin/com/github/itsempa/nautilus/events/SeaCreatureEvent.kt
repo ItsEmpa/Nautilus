@@ -3,13 +3,22 @@ package com.github.itsempa.nautilus.events
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import com.github.itsempa.nautilus.data.SeaCreatureData
 
-/** When a sea creature dies, both DeSpawn and Death events get called */
 sealed class SeaCreatureEvent(val seaCreature: SeaCreatureData) : SkyHanniEvent() {
 
+    /** Gets called when a Sea Creature is initially detected. */
     class Spawn(seaCreature: SeaCreatureData) : SeaCreatureEvent(seaCreature)
+
+    /** Gets called when a Sea Creature's mob disappears, no matter the cause. */
     class DeSpawn(seaCreature: SeaCreatureData) : SeaCreatureEvent(seaCreature)
+
+    /** Gets called when a Sea Creature is removed from the sea creature list entirely. */
     class Remove(seaCreature: SeaCreatureData) : SeaCreatureEvent(seaCreature)
+
+    /** Gets called when a Sea Creature dies. */
     class Death(seaCreature: SeaCreatureData, val seenDeath: Boolean) : SeaCreatureEvent(seaCreature)
+
+    /** Gets called when a Sea Creature is re-detected after despawning. */
+    class ReDetect(seaCreature: SeaCreatureData) : SeaCreatureEvent(seaCreature)
 
     inline val isOwn: Boolean get() = seaCreature.isOwn
     inline val isRare: Boolean get() = seaCreature.isRare

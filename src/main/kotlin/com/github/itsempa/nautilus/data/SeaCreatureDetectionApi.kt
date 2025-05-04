@@ -42,7 +42,7 @@ object SeaCreatureDetectionApi {
         if (cause == RemovalCause.EXPIRED && data != null && id != null) data.forceRemove()
     }
 
-    fun getSeaCreatures(): List<SeaCreatureData> = entityIdToData.values.toList()
+    fun getSeaCreatures(): Collection<SeaCreatureData> = entityIdToData.values
     private val seaCreatures = mutableMapOf<Mob, SeaCreatureData>()
 
     val Mob.seaCreature: SeaCreatureData? get() = seaCreatures[this]
@@ -68,6 +68,7 @@ object SeaCreatureDetectionApi {
         if (data != null) {
             seaCreatures[mob] = data
             data.mob = mob
+            SeaCreatureEvent.ReDetect(data).post()
             return
         }
 

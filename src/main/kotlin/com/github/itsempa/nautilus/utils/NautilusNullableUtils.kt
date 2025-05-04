@@ -1,5 +1,7 @@
 package com.github.itsempa.nautilus.utils
 
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+
 @Suppress("NOTHING_TO_INLINE")
 object NautilusNullableUtils {
     inline fun <reified T> Any.cast(): T = this as T
@@ -12,4 +14,5 @@ object NautilusNullableUtils {
 
     inline fun Boolean?.orFalse(): Boolean = this ?: false
     inline fun Boolean?.orTrue(): Boolean = this ?: true
+    inline fun SimpleTimeMark?.orFarPast(): SimpleTimeMark = this ?: SimpleTimeMark.farPast()
 }

@@ -66,6 +66,11 @@ class GuiConfig {
     var hotspotWarning: HotspotWarningConfig = HotspotWarningConfig()
 
     @Expose
+    @ConfigOption(name = "Better Fishing Timer", desc = "")
+    @Accordion
+    val fishingTimer: BetterFishingTimerConfig = BetterFishingTimerConfig()
+
+    @Expose
     @ConfigOption(name = "Spooky Counter", desc = "Shows the amount of mobs you have fished in the current spooky festival.")
     @ConfigEditorBoolean
     var spookyCounter: Boolean = true
