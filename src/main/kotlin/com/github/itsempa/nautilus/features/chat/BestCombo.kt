@@ -72,6 +72,14 @@ object BestCombo {
                 }
             }
         }
+        event.register("ntresetbestcombo") {
+            this.description = "Resets your best combo."
+            this.category = CommandCategory.USERS_RESET
+            callback {
+                bestCombo = 0
+                NautilusChat.chat("Your best combo has been reset.")
+            }
+        }
     }
 
 }
