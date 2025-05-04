@@ -18,7 +18,7 @@ object NautilusCommands {
 
     private fun getOpenMainMenu(args: Array<String>) {
         if (args.isNotEmpty()) {
-            if (args[0].lowercase() == "gui") {
+            if (args.first().lowercase() == "gui") {
                 GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             } else openConfigGui(args.joinToString(" "))
         } else openConfigGui()
