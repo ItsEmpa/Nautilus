@@ -45,6 +45,8 @@ object SeaCreatureDetectionApi {
     fun getSeaCreatures(): List<SeaCreatureData> = entityIdToData.values.toList()
     private val seaCreatures = mutableMapOf<Mob, SeaCreatureData>()
 
+    val Mob.seaCreature: SeaCreatureData? get() = seaCreatures[this]
+
     private var lastNameFished: String? = null
     private var mobsToFind = 0
     private var lastSeaCreatureFished = SimpleTimeMark.farPast()

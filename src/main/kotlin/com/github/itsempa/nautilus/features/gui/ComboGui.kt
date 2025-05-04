@@ -24,7 +24,7 @@ object ComboGui {
     }
 
     private fun update(combo: Int, colorCode: Char, buffs: Map<ComboData.ComboBuff, Int>): String {
-        return "§$colorCode+$combo ${buffs.entries.joinToString(" ") { (buff, amount) -> buff.format(amount) }}"
+        return "§$colorCode§l+$combo §r${buffs.entries.joinToString(" ") { (buff, amount) -> buff.format(amount) }}"
     }
 
     @HandleEvent(onlyOnSkyblock = true)
