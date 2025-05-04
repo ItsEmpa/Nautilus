@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import com.github.itsempa.nautilus.events.ComboUpdateEvent
+import com.github.itsempa.nautilus.events.combo.ComboEndEvent
+import com.github.itsempa.nautilus.events.combo.ComboUpdateEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.fullEnumMapOf
 import com.github.itsempa.nautilus.utils.replaceAll
@@ -39,7 +39,7 @@ object ComboData {
         "§(?<color>.)§l\\+(?<combo>[\\d,.]+) Kill Combo(?: (?:§.)*\\+(?:§.)*(?<buffAmount>\\d+)\\S? (?:§.)*(?:✯ )?(?<buff>.+))?".toPattern()
 
     private val comboEndPattern =
-        "§cYour Kill Combo has expired! You reached a [\\d,.]+ Kill Combo!".toPattern()
+        "§cYour Kill Combo has expired! You reached a (?<combo>[\\d,.]+) Kill Combo!".toPattern()
 
     var combo: Int = 0
         private set
@@ -64,12 +64,19 @@ object ComboData {
             post()
             return
         }
-        if (comboEndPattern.matches(message)) return reset()
+        comboEndPattern.matchMatcher(message) {
+            val combo = group("combo").formatInt()
+            ComboEndEvent(combo).post()
+            reset()
+        }
     }
 
     @HandleEvent
     fun onWorldChange() {
-        if (combo != 0) reset()
+        if (combo != 0) {
+            ComboEndEvent(combo).post()
+            reset()
+        }
     }
 
     private fun reset() {

@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.events
+package com.github.itsempa.nautilus.events.combo
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import com.github.itsempa.nautilus.data.ComboData

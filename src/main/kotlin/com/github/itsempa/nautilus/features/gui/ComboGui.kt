@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.ComboData
-import com.github.itsempa.nautilus.events.ComboUpdateEvent
+import com.github.itsempa.nautilus.events.combo.ComboUpdateEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.fullEnumMapOf
 

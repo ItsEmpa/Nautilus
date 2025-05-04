@@ -9,4 +9,7 @@ class ProfileStorage {
     @Expose
     val seaCreaturesSinceDrops: MutableMap<NeuInternalName, RareDropsTracker.RareDropEntry> = mutableMapOf()
 
+    @Expose
+    var bestCombo: Int = 0
+
 }
