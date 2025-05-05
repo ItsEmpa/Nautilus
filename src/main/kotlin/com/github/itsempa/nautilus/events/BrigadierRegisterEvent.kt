@@ -10,7 +10,7 @@ import com.mojang.brigadier.CommandDispatcher
 
 class BrigadierRegisterEvent(
     private val builders: MutableList<CommandData>,
-    private val dispatcher: CommandDispatcher<Any?>,
+    val dispatcher: CommandDispatcher<Any?>,
 ) : SkyHanniEvent() {
 
     val commands: List<CommandData> get() = builders

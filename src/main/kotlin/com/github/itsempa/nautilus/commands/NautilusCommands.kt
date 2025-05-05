@@ -1,8 +1,9 @@
+@file:Suppress("unused")
+
 package com.github.itsempa.nautilus.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandBuilder
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.deps.moulconfig.gui.GuiScreenElementWrapper
@@ -16,8 +17,6 @@ import com.github.itsempa.nautilus.utils.NautilusChat
 
 @Module
 object NautilusCommands {
-
-    val commandsList = mutableListOf<CommandBuilder>()
 
     // Priority is set to the highest so that these commands always appear at the top
     @HandleEvent(priority = HandleEvent.HIGHEST)

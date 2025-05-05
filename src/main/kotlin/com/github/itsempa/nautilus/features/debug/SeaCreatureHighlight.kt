@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.features.dev
+package com.github.itsempa.nautilus.features.debug
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent

@@ -10,5 +10,10 @@ interface CommandData {
     var category: CommandCategory
     val descriptor: String
 
+    fun getAllNames(): List<String> {
+        val allNames = mutableListOf(name)
+        allNames.addAll(aliases)
+        return allNames
+    }
     fun toCommand(dispatcher: CommandDispatcher<Any?>): ICommand
 }
