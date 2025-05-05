@@ -73,6 +73,9 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         return this
     }
 
+    fun thenCallback(vararg names: String, callback: ArgContext.() -> Unit) {
+        then(*names) { callback(callback) }
+    }
 
     fun <T> then(
         name: String,
@@ -91,6 +94,15 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         },
         action,
     )
+
+    fun <T> thenCallback(
+        name: String,
+        argument: ArgumentType<T>,
+        suggestions: Collection<String>,
+        callback: ArgContext.() -> Unit,
+    ) {
+        then(name, argument, suggestions) { callback(callback) }
+    }
 
     fun <T> then(
         name: String,
@@ -114,4 +126,12 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         return this
     }
 
+    fun <T> thenCallback(
+        name: String,
+        argument: ArgumentType<T>,
+        suggestions: SuggestionProvider<Any?>? = null,
+        callback: ArgContext.() -> Unit,
+    ) {
+        then(name, argument, suggestions) { callback(callback) }
+    }
 }

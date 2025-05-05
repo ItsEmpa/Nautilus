@@ -27,15 +27,13 @@ object NautilusCommands {
             this.description = "Opens the main ${Nautilus.MOD_NAME} config"
             this.category = CommandCategory.MAIN
 
-            then("gui") {
-                callback { GuiEditManager.openGuiPositionEditor(hotkeyReminder = true) }
+            thenCallback("gui") {
+                GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             }
 
-            then("search", BrigadierArguments.greedyString()) {
-                callback {
-                    val search = getString("search") ?: return@callback
-                    openConfigGui(search)
-                }
+            thenCallback("search", BrigadierArguments.greedyString()) {
+                val search = getString("search") ?: return@thenCallback
+                openConfigGui(search)
             }
 
             simpleCallback(::openConfigGui)
@@ -67,12 +65,6 @@ object NautilusCommands {
                     Nautilus.GITHUB,
                 )
             }
-        }
-        event.register("ntcommands") {
-            this.aliases = listOf("nautiluscommands", "nautilushelp", "nthelp")
-            this.description = "Shows this list"
-            this.category = CommandCategory.MAIN
-            callbackArgs(NautilusHelpCommand::onCommand)
         }
     }
 

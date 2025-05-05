@@ -2,9 +2,10 @@ package com.github.itsempa.nautilus.features.misc
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import com.github.itsempa.nautilus.Nautilus
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getInteger
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
@@ -22,27 +23,27 @@ object Spinny {
             this.aliases = listOf("ntspin", "spin")
             this.description = "Spin the player!"
             this.category = CommandCategory.USERS_ACTIVE
-            callbackArgs(::command)
+
+            thenCallback("toggle") {
+                toggle()
+            }
+            thenCallback("speed", BrigadierArguments.integer(-500, 500)) {
+                val number = getInteger("speed")
+                NautilusChat.chat("Set spin speed to $number!")
+                if (!config.enabled) config.enabled = true
+                config.spinSpeed = number
+            }
+            callback {
+                toggle()
+            }
         }
     }
 
-    private fun command(args: Array<String>) {
-        if (args.isEmpty()) {
-            val newValue = !config.enabled
-            config.enabled = newValue
-            val text = if (newValue) "§aenabled" else "§cdisabled"
-            NautilusChat.chat("Set spin to $text!")
-            return
-        } else {
-            val number = args.first().formatIntOrNull()?.coerceIn(-500..500)
-            if (number == null) {
-                NautilusChat.userError("Invalid number!")
-                return
-            }
-            NautilusChat.chat("Set spin speed to $number!")
-            if (!config.enabled) config.enabled = true
-            config.spinSpeed = number
-        }
+    private fun toggle() {
+        val newValue = !config.enabled
+        config.enabled = newValue
+        val text = if (newValue) "§aenabled" else "§cdisabled"
+        NautilusChat.chat("Set spin to $text!")
     }
 
     @JvmStatic

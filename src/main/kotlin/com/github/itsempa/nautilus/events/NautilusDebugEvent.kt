@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import com.github.itsempa.nautilus.utils.NautilusUtils
 
-class NautilusDebugEvent(private val list: MutableList<String>, private val search: String) : SkyHanniEvent() {
+class NautilusDebugEvent(private val list: MutableList<String>, private val search: String, private val all: Boolean) : SkyHanniEvent() {
 
     var empty = true
     private var currentTitle = ""
@@ -51,6 +51,18 @@ class NautilusDebugEvent(private val list: MutableList<String>, private val sear
     }
 
     private fun writeData(text: List<String>) {
+        fun addData() {
+            empty = false
+            list.add("")
+            list.add("== $currentTitle ==")
+            for (line in text) {
+                list.add(" $line")
+            }
+        }
+        if (all) {
+            addData()
+            return
+        }
         if (irrelevant && search.isEmpty()) return
         if (search.isNotEmpty()) {
             if (!search.equalsIgnoreColor("all")) {
@@ -59,11 +71,6 @@ class NautilusDebugEvent(private val list: MutableList<String>, private val sear
                 }
             }
         }
-        empty = false
-        list.add("")
-        list.add("== $currentTitle ==")
-        for (line in text) {
-            list.add(" $line")
-        }
+        addData()
     }
 }

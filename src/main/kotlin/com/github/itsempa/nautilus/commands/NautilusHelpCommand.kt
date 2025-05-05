@@ -1,12 +1,20 @@
 package com.github.itsempa.nautilus.commands
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.suggest
 import com.github.itsempa.nautilus.Nautilus
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getInteger
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getString
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
+import com.github.itsempa.nautilus.modules.Module
 import net.minecraft.util.IChatComponent
 
+@Module
 object NautilusHelpCommand {
 
     private const val COMMANDS_PER_PAGE = 15
@@ -32,7 +40,7 @@ object NautilusHelpCommand {
         }
     }
 
-    private fun showPage(page: Int, search: String, commands: List<CommandData>) {
+    private fun showPage(commands: List<CommandData>, page: Int = 1, search: String = "") {
         val filtered = commands.filter {
             it.name.contains(search, ignoreCase = true) || it.descriptor.contains(search, ignoreCase = true)
         }
@@ -49,16 +57,31 @@ object NautilusHelpCommand {
         ) { createCommandEntry(it) }
     }
 
-    fun onCommand(args: Array<String>) {
-        val page: Int
-        val search: String
-        if (args.firstOrNull() == "-p") {
-            page = args.getOrNull(1)?.toIntOrNull() ?: 1
-            search = args.drop(2).joinToString(" ")
-        } else {
-            page = 1
-            search = args.joinToString(" ")
+    @HandleEvent
+    fun onCommandRegister(event: BrigadierRegisterEvent) {
+        event.register("ntcommands") {
+            this.aliases = listOf("nautiluscommands", "nautilushelp", "nthelp")
+            this.description = "Shows this list"
+            this.category = CommandCategory.MAIN
+
+            then("-p page", BrigadierArguments.integer(min = 1)) {
+                thenCallback("search", BrigadierArguments.greedyString()) {
+                    val page = getInteger("page")
+                    val search = getString("search") ?: return@thenCallback
+                    showPage(event.commands, page, search)
+                }
+                callback {
+                    val page = getInteger("page")
+                    showPage(event.commands, page)
+                }
+            }
+            thenCallback("search", BrigadierArguments.greedyString()) {
+                val search = getString("search") ?: return@thenCallback
+                showPage(event.commands, search = search)
+            }
+            callback {
+                showPage(event.commands)
+            }
         }
-        showPage(page, search, NautilusCommandRegistry.commands)
     }
 }

@@ -3,8 +3,9 @@ package com.github.itsempa.nautilus.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import com.github.itsempa.nautilus.Nautilus
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getString
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
@@ -19,26 +20,33 @@ object DebugCommand {
             this.aliases = listOf("nautilusdebug")
             this.description = "Copies ${Nautilus.MOD_NAME} debug data in the clipboard."
             this.category = CommandCategory.DEVELOPER_DEBUG
-            callbackArgs(::debugCommand)
+
+            thenCallback("all") {
+                debugCommand("", true)
+            }
+            thenCallback("search", BrigadierArguments.greedyString()) {
+                val search = getString("search") ?: return@thenCallback
+                debugCommand(search, false)
+            }
+            callback {
+                debugCommand("", false)
+            }
         }
     }
 
-    private fun debugCommand(args: Array<String>) {
+    private fun debugCommand(search: String, all: Boolean) {
         val list = mutableListOf<String>()
         list.add("```")
         list.add("= Debug Information for ${Nautilus.MOD_NAME} ${Nautilus.VERSION} =")
         list.add("")
 
-        val search = args.joinToString(" ")
         list.add(
-            if (search.isNotEmpty()) {
-                if (search.equalsIgnoreColor("all")) {
-                    "search for everything:"
-                } else "search '$search':"
-            } else "no search specified, only showing interesting stuff:",
+            if (all) "search for everything:"
+            else if (search.isNotEmpty()) "search '$search':"
+            else "no search specified, only showing interesting stuff:"
         )
 
-        val event = NautilusDebugEvent(list, search)
+        val event = NautilusDebugEvent(list, search, all)
         event.post()
 
         if (event.empty) {
