@@ -130,7 +130,9 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
             }
 
             data object Jerry : FishingCategory("JERRY", true) {
-                override fun checkActive(): Boolean = JerrysWorkshopEvent.isActive
+                override fun checkActive(): Boolean {
+                    return JerrysWorkshopEvent.isActive && IslandType.WINTER.isInIsland()
+                }
             }
 
             data object FishingFestival : FishingCategory("FISHING_FESTIVAL", true) {

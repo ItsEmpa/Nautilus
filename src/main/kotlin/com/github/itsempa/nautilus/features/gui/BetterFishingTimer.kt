@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.SeaCreatureData
 import com.github.itsempa.nautilus.data.SeaCreatureDetectionApi
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orFarPast
@@ -84,7 +85,7 @@ object BetterFishingTimer {
     }
 
     private fun SeaCreatureData.handleSpawn() {
-        if (isOwn) --ownMobs else ++otherMobs
+        if (isOwn) ++ownMobs else ++otherMobs
         val oldest = oldestSeaCreature
         if (oldest == null || spawnTime < oldest.spawnTime) {
             oldestSeaCreature = this
@@ -120,7 +121,7 @@ object BetterFishingTimer {
         display = buildString {
             append("$timeColor$formatTime §8(")
             if (currentCap.hasPersonalCap) append("$personalCapColor$ownMobs§7/")
-            append("$globalCapColor$totalMobs§8)")
+            append("$globalCapColor$totalMobs §bsea creatures§8)")
         }
 
     }
@@ -150,6 +151,19 @@ object BetterFishingTimer {
         oldestTime = SimpleTimeMark.farPast()
         display = null
         lastWarning = SimpleTimeMark.farPast()
+    }
+
+    @HandleEvent
+    fun onDebug(event: NautilusDebugEvent) {
+        event.title("Better Fishing Timer")
+        event.addIrrelevant(
+            "ownMobs" to ownMobs,
+            "otherMobs" to otherMobs,
+            "oldestSeaCreature" to oldestSeaCreature,
+            "oldestTime" to oldestTime,
+            "lastWarning.passedSince()" to lastWarning.passedSince(),
+            "display" to display,
+        )
     }
 
     @HandleEvent

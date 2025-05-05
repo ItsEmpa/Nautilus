@@ -28,7 +28,8 @@ object RainTimer {
     fun onWidget(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.RAIN)) return
         if (event.isClear()) return reset()
-        val timeLeft = event.widget.matchMatcherFirstLine { group("time") } ?: return
+        val timeString = event.widget.matchMatcherFirstLine { group("time") } ?: return
+        val timeLeft = timeString.removeSuffix(" left").trim()
         val duration = TimeUtils.getDuration(timeLeft)
         val newTime = duration.fromNow()
         val diff = (newTime - time).absoluteValue
