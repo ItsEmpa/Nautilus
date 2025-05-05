@@ -1,5 +1,6 @@
-package com.github.itsempa.nautilus.commands.brigadier
+package com.github.itsempa.nautilus.commands.brigadier.arguments
 
+import com.github.itsempa.nautilus.commands.brigadier.ArgContext
 import com.mojang.brigadier.LiteralMessage
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
