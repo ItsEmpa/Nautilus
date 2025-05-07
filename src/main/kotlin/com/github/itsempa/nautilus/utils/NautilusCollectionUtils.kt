@@ -5,6 +5,8 @@ import java.util.EnumMap
 import java.util.EnumSet
 import kotlin.time.Duration
 
+inline fun <reified E : Enum<E>> enumSetOf(vararg elements: E): EnumSet<E> = EnumSet.copyOf(elements.toList())
+
 inline fun <reified E : Enum<E>> enumSetOf(): EnumSet<E> = EnumSet.noneOf(E::class.java)
 
 fun <E : Enum<E>> Set<E>.toEnumSet(): EnumSet<E> = EnumSet.copyOf(this)

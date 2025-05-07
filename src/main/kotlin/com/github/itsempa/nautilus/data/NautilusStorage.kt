@@ -16,7 +16,7 @@ object NautilusStorage {
     var profile: ProfileStorage = ProfileStorage()
         private set
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         profile = storage.profileStorage.getOrPut(event.name, ::ProfileStorage)
     }

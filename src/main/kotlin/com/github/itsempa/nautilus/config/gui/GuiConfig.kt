@@ -88,4 +88,17 @@ class GuiConfig {
     @ConfigLink(owner = GuiConfig::class, field = "comboGui")
     val comboGuiPos = Position(-300, 150)
 
+    @Expose
+    @ConfigOption(
+        name = "Cake Buff Timer",
+        desc = "Shows you when your cakes buffs will expire, and how many " +
+            "you have active if you dont have them all."
+    )
+    @ConfigEditorBoolean
+    var cakeBuffTimer: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = GuiConfig::class, field = "cakeBuffTimer")
+    val cakeBuffTimerPos = Position(-100, 200)
+
 }
