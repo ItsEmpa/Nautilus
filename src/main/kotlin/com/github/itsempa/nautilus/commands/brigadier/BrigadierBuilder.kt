@@ -2,20 +2,18 @@ package com.github.itsempa.nautilus.commands.brigadier
 
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import com.github.itsempa.nautilus.commands.CommandData
-import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getString
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierUtils.toSuggestionProvider
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
-import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.command.ICommand
 
 typealias LiteralCommandBuilder = BrigadierBuilder<LiteralArgumentBuilder<Any?>>
 typealias ArgumentCommandBuilder<T> = BrigadierBuilder<RequiredArgumentBuilder<Any?, T>>
-typealias ArgContext = CommandContext<*>
 
 class BaseBrigadierBuilder(override val name: String) : CommandData, BrigadierBuilder<LiteralArgumentBuilder<Any?>>(
     LiteralArgumentBuilder.literal<Any?>(name),
@@ -35,37 +33,33 @@ class BaseBrigadierBuilder(override val name: String) : CommandData, BrigadierBu
 open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     val builder: ArgumentBuilder<Any?, B>,
 ) {
-    fun callback(callback: ArgContext.() -> Unit) {
+
+    fun callback(block: ArgContext.() -> Unit) {
         this.builder.executes {
-            callback(it)
+            block(ArgContext(it))
             1
         }
     }
 
-    fun simpleCallback(callback: () -> Unit) {
+    fun simpleCallback(block: () -> Unit) {
         this.builder.executes {
-            callback()
+            block()
             1
         }
     }
 
-    @Deprecated("Use callback function instead")
-    fun callbackArgs(callback: (Array<String>) -> Unit) {
-        then("allArgs", BrigadierArguments.greedyString()) {
-            callback {
-                val string = getString("allArgs") ?: return@callback
-                val args = string.split(" ").toTypedArray()
-                callback(args)
-            }
+    fun legacyCallbackArgs(block: (Array<String>) -> Unit) {
+        argCallback("allArgs", BrigadierArguments.greedyString()) { allArgs ->
+            block(allArgs.split(" ").toTypedArray())
         }
-        callback { callback(emptyArray<String>()) }
+        callback { block(emptyArray()) }
     }
 
-    fun then(vararg names: String, action: LiteralCommandBuilder.() -> Unit): BrigadierBuilder<B> {
+    fun literal(vararg names: String, action: LiteralCommandBuilder.() -> Unit): BrigadierBuilder<B> {
         for (name in names) {
             if (name.contains(" ")) {
                 val builder = BrigadierBuilder(LiteralArgumentBuilder.literal(name.substringBefore(" ")))
-                builder.then(name.substringAfter(" "), action = action)
+                builder.literal(name.substringAfter(" "), action = action)
                 this.builder.then(builder.builder)
                 continue
             }
@@ -76,38 +70,29 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         return this
     }
 
-    fun thenCallback(vararg names: String, callback: ArgContext.() -> Unit) {
-        then(*names) { callback(callback) }
-    }
-
-    fun <T> then(
+    inline fun <reified T> arg(
         name: String,
         argument: ArgumentType<T>,
         suggestions: Collection<String>,
-        action: ArgumentCommandBuilder<T>.() -> Unit,
-    ): BrigadierBuilder<B> = then(
-        name,
-        argument,
-        { _, builder ->
-            val string = builder.remainingLowerCase
-            for (s in suggestions) {
-                if (s.startsWith(string)) builder.suggest(s)
-            }
-            builder.buildFuture()
-        },
-        action,
-    )
+        crossinline action: ArgumentCommandBuilder<T>.(BrigadierArgument<T>) -> Unit,
+    ): BrigadierBuilder<B> = arg(name, argument, suggestions.toSuggestionProvider(), action)
 
-    fun <T> thenCallback(
+    inline fun <reified T> arg(
         name: String,
         argument: ArgumentType<T>,
-        suggestions: Collection<String>,
-        callback: ArgContext.() -> Unit,
-    ) {
-        then(name, argument, suggestions) { callback(callback) }
+        suggestions: SuggestionProvider<Any?>? = null,
+        crossinline action: ArgumentCommandBuilder<T>.(BrigadierArgument<T>) -> Unit,
+    ): BrigadierBuilder<B> {
+        if (!name.contains("  ")) {
+            return internalArg(name, argument, suggestions) { action(BrigadierArgument(name, T::class.java)) }
+        }
+        val split = name.split(" ")
+        val beforeArg = split.subList(0, split.size - 1).joinToString(" ")
+        val argName = split.last()
+        return internalArg(beforeArg, argument, suggestions) { action(BrigadierArgument(argName, T::class.java)) }
     }
 
-    fun <T> then(
+    fun <T> internalArg(
         name: String,
         argument: ArgumentType<T>,
         suggestions: SuggestionProvider<Any?>? = null,
@@ -115,7 +100,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     ): BrigadierBuilder<B> {
         if (name.contains(" ")) {
             val builder = BrigadierBuilder(LiteralArgumentBuilder.literal(name.substringBefore(" ")))
-            builder.then(name.substringAfter(" "), argument, suggestions, action)
+            builder.internalArg(name.substringAfter(" "), argument, suggestions, action)
             this.builder.then(builder.builder)
             return this
         }
@@ -129,12 +114,24 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         return this
     }
 
-    fun <T> thenCallback(
+    fun literalCallback(
+        vararg names: String,
+        block: ArgContext.() -> Unit,
+    ) = literal(*names) { callback(block) }
+
+    inline fun <reified T> argCallback(
+        name: String,
+        argument: ArgumentType<T>,
+        suggestions: Collection<String>,
+        crossinline block: ArgContext.(T) -> Unit,
+    ) = arg(name, argument, suggestions) { callback { block(getArg(it)) } }
+
+    inline fun <reified T> argCallback(
         name: String,
         argument: ArgumentType<T>,
         suggestions: SuggestionProvider<Any?>? = null,
-        callback: ArgContext.() -> Unit,
-    ) {
-        then(name, argument, suggestions) { callback(callback) }
-    }
+        crossinline callback: ArgContext.(T) -> Unit,
+    ) = arg(name, argument, suggestions) { callback { callback(getArg(it)) } }
+
+
 }

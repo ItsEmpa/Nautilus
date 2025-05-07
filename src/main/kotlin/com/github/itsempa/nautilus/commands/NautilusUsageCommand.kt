@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.commands.brigadier.BaseBrigadierBuilder
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
-import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getString
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
@@ -36,15 +35,14 @@ object NautilusUsageCommand {
             this.description = "Shows the usage of a command."
             this.category = CommandCategory.MAIN
 
-            thenCallback("command", BrigadierArguments.string(), commandNameSuggestions) {
-                val commandName = getString("command") ?: return@thenCallback
+            argCallback("command", BrigadierArguments.string(), commandNameSuggestions) { commandName ->
                 val command = event.commands.find { commandName in it.getAllNames() } ?: run {
                     NautilusChat.userError("Command '$commandName' not found.")
-                    return@thenCallback
+                    return@argCallback
                 }
                 val brigadier = command as? BaseBrigadierBuilder ?: run {
                     NautilusChat.userError("Command '$commandName' doest not have usage.")
-                    return@thenCallback
+                    return@argCallback
                 }
                 brigadier.sendHelpMessage(event.dispatcher)
             }

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.deps.moulconfig.gui.GuiScreenElementWrapper
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
-import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getString
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
@@ -26,12 +25,11 @@ object NautilusCommands {
             this.description = "Opens the main ${Nautilus.MOD_NAME} config"
             this.category = CommandCategory.MAIN
 
-            thenCallback("gui") {
+            literalCallback("gui") {
                 GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             }
 
-            thenCallback("search", BrigadierArguments.greedyString()) {
-                val search = getString("search") ?: return@thenCallback
+            argCallback("search", BrigadierArguments.greedyString()) { search ->
                 openConfigGui(search)
             }
 

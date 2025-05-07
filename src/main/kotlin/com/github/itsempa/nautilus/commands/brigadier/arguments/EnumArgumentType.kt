@@ -1,6 +1,5 @@
 package com.github.itsempa.nautilus.commands.brigadier.arguments
 
-import com.github.itsempa.nautilus.commands.brigadier.ArgContext
 import com.mojang.brigadier.LiteralMessage
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
@@ -53,10 +52,6 @@ class EnumArgumentType<E : Enum<E>> private constructor(
 
         inline fun <reified E : Enum<E>> custom(noinline toString: (E) -> String): EnumArgumentType<E> {
             return create(E::class.java, toString)
-        }
-
-        inline fun <reified E : Enum<E>> ArgContext.getEnum(name: String): E {
-            return getArgument(name, E::class.java)
         }
     }
 }

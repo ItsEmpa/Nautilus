@@ -1,7 +1,6 @@
 package com.github.itsempa.nautilus.commands.brigadier.arguments
 
 import at.hannibal2.skyhanni.utils.LorenzVec
-import com.github.itsempa.nautilus.commands.brigadier.ArgContext
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
 
@@ -37,9 +36,5 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
 
         /** Accepts any number as input */
         fun double(): LorenzVecArgumentType = Double
-
-        fun ArgContext.getLorenzVec(name: String): LorenzVec {
-            return getArgument(name, LorenzVec::class.java)
-        }
     }
 }

@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.suggest
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
-import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getInteger
-import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getString
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
 import net.minecraft.util.IChatComponent
@@ -64,19 +62,17 @@ object NautilusHelpCommand {
             this.description = "Shows this list"
             this.category = CommandCategory.MAIN
 
-            then("-p page", BrigadierArguments.integer(min = 1)) {
-                thenCallback("search", BrigadierArguments.greedyString()) {
-                    val page = getInteger("page")
-                    val search = getString("search") ?: return@thenCallback
+            arg("-p page", BrigadierArguments.integer(min = 1)) { pageArg ->
+                argCallback("search", BrigadierArguments.greedyString()) { search ->
+                    val page = get(pageArg)
                     showPage(event.commands, page, search)
                 }
                 callback {
-                    val page = getInteger("page")
+                    val page = get(pageArg)
                     showPage(event.commands, page)
                 }
             }
-            thenCallback("search", BrigadierArguments.greedyString()) {
-                val search = getString("search") ?: return@thenCallback
+            argCallback("search", BrigadierArguments.greedyString()) { search ->
                 showPage(event.commands, search = search)
             }
             callback {

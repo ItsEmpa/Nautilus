@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
-import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getInteger
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
@@ -24,14 +23,13 @@ object Spinny {
             this.description = "Spin the player!"
             this.category = CommandCategory.USERS_ACTIVE
 
-            thenCallback("toggle") {
+            literalCallback("toggle") {
                 toggle()
             }
-            thenCallback("speed", BrigadierArguments.integer(-500, 500)) {
-                val number = getInteger("speed")
-                NautilusChat.chat("Set spin speed to $number!")
+            argCallback("speed", BrigadierArguments.integer(-500, 500)) { speed ->
+                NautilusChat.chat("Set spin speed to $speed!")
                 if (!config.enabled) config.enabled = true
-                config.spinSpeed = number
+                config.spinSpeed = speed
             }
             callback {
                 toggle()

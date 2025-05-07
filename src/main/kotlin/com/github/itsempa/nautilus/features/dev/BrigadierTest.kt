@@ -2,7 +2,6 @@ package com.github.itsempa.nautilus.features.dev
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import com.github.itsempa.nautilus.commands.brigadier.arguments.LorenzVecArgumentType
-import com.github.itsempa.nautilus.commands.brigadier.arguments.LorenzVecArgumentType.Companion.getLorenzVec
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
@@ -16,13 +15,11 @@ object BrigadierTest {
             aliases = listOf("ntbd")
             description = "brigadier test command"
 
-            thenCallback("restricted pos", LorenzVecArgumentType.int()) {
-                val exactLorenzVec = getLorenzVec("pos")
-                NautilusChat.chat("Integer Vec: $exactLorenzVec")
+            argCallback("restricted pos", LorenzVecArgumentType.int()) { vec ->
+                NautilusChat.chat("Integer Vec: $vec")
             }
-            thenCallback("precise pos", LorenzVecArgumentType.double()) {
-                val exactLorenzVec = getLorenzVec("pos")
-                NautilusChat.chat("Double Vec: $exactLorenzVec")
+            argCallback("precise pos", LorenzVecArgumentType.double()) { vec ->
+                NautilusChat.chat("Double Vec: $vec")
             }
         }
     }

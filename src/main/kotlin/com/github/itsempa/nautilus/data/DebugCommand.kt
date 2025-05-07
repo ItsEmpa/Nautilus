@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.OSUtils
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
-import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments.getString
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
@@ -21,11 +20,10 @@ object DebugCommand {
             this.description = "Copies ${Nautilus.MOD_NAME} debug data in the clipboard."
             this.category = CommandCategory.DEVELOPER_DEBUG
 
-            thenCallback("all") {
+            literalCallback("all") {
                 debugCommand("", true)
             }
-            thenCallback("search", BrigadierArguments.greedyString()) {
-                val search = getString("search") ?: return@thenCallback
+            argCallback("search", BrigadierArguments.greedyString()) { search ->
                 debugCommand(search, false)
             }
             callback {
@@ -43,7 +41,7 @@ object DebugCommand {
         list.add(
             if (all) "search for everything:"
             else if (search.isNotEmpty()) "search '$search':"
-            else "no search specified, only showing interesting stuff:"
+            else "no search specified, only showing interesting stuff:",
         )
 
         val event = NautilusDebugEvent(list, search, all)
