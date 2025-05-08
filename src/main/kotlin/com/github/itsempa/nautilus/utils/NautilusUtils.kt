@@ -102,6 +102,17 @@ object NautilusUtils {
         }
     }
 
+    fun String.hasWhitespace(): Boolean = any { it.isWhitespace() }
+
+    fun String.splitLastWhitespace(): Pair<String, String> {
+        val lastWhitespaceIndex = lastIndexOf(" ")
+        return if (lastWhitespaceIndex == -1) {
+            "" to this
+        } else {
+            substring(0, lastWhitespaceIndex) to substring(lastWhitespaceIndex + 1)
+        }
+    }
+
     fun LorenzVec.getBlockAABB() = boundingToOffset(1.0, 1.0, 1.0)
     fun <K, V> MutableMap<K, V>.clearAnd(predicate: (Map.Entry<K, V>) -> Unit) = entries.clearAnd(predicate)
 
