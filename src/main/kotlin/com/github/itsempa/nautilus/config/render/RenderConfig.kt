@@ -27,5 +27,10 @@ class RenderConfig {
     @ConfigEditorText
     val lootshareMobs = "Lord Jawbus, Thunder".asProperty()
 
+    @Expose
+    @ConfigOption(name = "Fix Lava Bobbers", desc = "Makes bobbers not sink in lava.")
+    @ConfigEditorBoolean
+    var fixLavaBobbers = true
+
 
 }
