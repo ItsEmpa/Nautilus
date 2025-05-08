@@ -103,13 +103,13 @@ object LegionBobbinDisplay {
             if (!config.hideWithoutEnchant || wearingLegion) add(
                 HorizontalContainerRenderable(listOf(
                     RenderableString("§dLegion: "),
-                    RenderableString("§b${(armorLegionBuff * nearbyPlayers).roundTo(2)}% §7($nearbyPlayers)"),
+                    RenderableString("§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)"),
                 )),
             )
             if (!config.hideWithoutEnchant || wearingBobbin) add(
                 HorizontalContainerRenderable(listOf(
                     RenderableString("§3Bobbin: "),
-                    RenderableString("§b${(armorBobbinBuff * nearbyBobbers).roundTo(2)}% §7($nearbyBobbers)"),
+                    RenderableString("§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)"),
                 )),
             )
         }
