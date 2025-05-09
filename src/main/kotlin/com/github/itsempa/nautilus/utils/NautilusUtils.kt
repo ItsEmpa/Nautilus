@@ -57,7 +57,7 @@ object NautilusUtils {
         (minY + maxY) / 2,
         (minZ + maxZ) / 2,
     )
-    
+
     fun SimpleTimeMark.isInPastOrAlmost(maxError: Duration): Boolean {
         val passedSince = passedSince()
         return passedSince.isPositive() || passedSince.absoluteValue <= maxError

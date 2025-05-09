@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import com.github.itsempa.nautilus.events.KillEvent
 import com.github.itsempa.nautilus.events.combo.ComboEndEvent
 import com.github.itsempa.nautilus.events.combo.ComboUpdateEvent
 import com.github.itsempa.nautilus.modules.Module
@@ -44,6 +45,9 @@ object ComboData {
     var combo: Int = 0
         private set
 
+    var lastComboMessage: Int = 0
+        private set
+
     var lastUpdateTime: SimpleTimeMark = SimpleTimeMark.farPast()
         private set
 
@@ -60,8 +64,9 @@ object ComboData {
             lastUpdateTime = SimpleTimeMark.now()
             currentColor = group("color").single()
             combo = group("combo").formatInt()
+            lastComboMessage = combo
             handleComboBuff()
-            post()
+            post(true)
             return
         }
         comboEndPattern.matchMatcher(message) {
@@ -69,6 +74,15 @@ object ComboData {
             ComboEndEvent(combo).post()
             this@ComboData.reset()
         }
+    }
+
+    @HandleEvent
+    fun onKill(event: KillEvent) {
+        val newComboAmount = combo + event.kills
+        val nextComboMessage = nextComboMessage(combo)
+        if (nextComboMessage <= newComboAmount) return
+        combo = newComboAmount
+        post(true)
     }
 
     @HandleEvent
@@ -83,16 +97,22 @@ object ComboData {
         lastUpdateTime = SimpleTimeMark.now()
         currentColor = 'f'
         combo = 0
+        lastComboMessage = 0
         currentBuffs.replaceAll(0)
-        post()
+        post(true)
     }
 
-    private fun post() = ComboUpdateEvent(combo, currentColor, currentBuffs).post()
+    private fun post(fromChat: Boolean = false) = ComboUpdateEvent(combo, currentColor, currentBuffs, fromChat).post()
 
     private fun Matcher.handleComboBuff() {
         val buffName = groupOrNull("buff") ?: return
         val buff = ComboBuff.getByName(buffName) ?: return
         val buffAmount = groupOrNull("buffAmount")?.formatInt() ?: return
         currentBuffs.addOrPut(buff, buffAmount)
+    }
+
+    fun nextComboMessage(number: Int): Int {
+        val divisor = if (number < 30) 5 else 25
+        return (number / divisor) * divisor + divisor
     }
 }

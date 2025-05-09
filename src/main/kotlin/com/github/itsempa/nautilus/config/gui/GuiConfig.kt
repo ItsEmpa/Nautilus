@@ -80,13 +80,9 @@ class GuiConfig {
     val spookyCounterPos = Position(-300, 100)
 
     @Expose
-    @ConfigOption(name = "Combo Gui", desc = "Shows a simple gui with the current combo and current combo buffs.")
-    @ConfigEditorBoolean
-    var comboGui: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = GuiConfig::class, field = "comboGui")
-    val comboGuiPos = Position(-300, 150)
+    @ConfigOption(name = "Combo Gui", desc = "")
+    @Accordion
+    var combo: ComboGuiConfig = ComboGuiConfig()
 
     @Expose
     @ConfigOption(
