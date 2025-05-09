@@ -16,14 +16,14 @@ import org.lwjgl.input.Mouse
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
 
-    private val button = GuiElementButton("", -1) { }
+    private val button = GuiElementButton()
 
-    override fun render(context: RenderContext?, x: Int, y: Int, width: Int) {
+    override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
         val fr = McClient.self.fontRendererObj
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(x.toFloat() + 10, y.toFloat(), 1F)
-        val width = width - 20
+        val adjustedWith = width - 20
         val nextVersion = UpdateManager.getNextVersion()
 
         button.text = when (UpdateManager.updateState) {
@@ -32,20 +32,20 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             UpdateState.DOWNLOADED -> "Downloaded"
             UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
-        button.render(getButtonPosition(width), 10)
+        button.render(context, getButtonPosition(adjustedWith), 10)
 
         if (UpdateManager.updateState == UpdateState.DOWNLOADED) {
             TextRenderUtils.drawStringCentered(
                 "${GREEN}The update will be installed after your next restart.",
                 fr,
-                width / 2F,
+                adjustedWith / 2F,
                 40F,
                 true,
                 -1
             )
         }
 
-        val widthRemaining = width - button.width - 10
+        val widthRemaining = adjustedWith - button.width - 10
 
         GlStateManager.scale(2F, 2F, 1F)
         val currentVersion = Nautilus.VERSION

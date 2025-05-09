@@ -82,7 +82,7 @@ object ComboData {
         val nextComboMessage = nextComboMessage(combo)
         if (nextComboMessage <= newComboAmount) return
         combo = newComboAmount
-        post(true)
+        post(false)
     }
 
     @HandleEvent
@@ -102,7 +102,7 @@ object ComboData {
         post(true)
     }
 
-    private fun post(fromChat: Boolean = false) = ComboUpdateEvent(combo, currentColor, currentBuffs, fromChat).post()
+    private fun post(fromChat: Boolean) = ComboUpdateEvent(combo, currentColor, currentBuffs, fromChat).post()
 
     private fun Matcher.handleComboBuff() {
         val buffName = groupOrNull("buff") ?: return
