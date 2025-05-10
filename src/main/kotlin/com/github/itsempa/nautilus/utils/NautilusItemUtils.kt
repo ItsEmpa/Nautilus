@@ -12,6 +12,8 @@ object NautilusItemUtils {
         val string = getItemUuid() ?: return null
         return UUID.fromString(string)
     }
+    val ItemStack.uuid: UUID?
+        get() = getItemUuid()?.let { UUID.fromString(it) }
 
     fun ItemStack.getBookOfStats(): Int? = getAttributeInt("stats_book")
 

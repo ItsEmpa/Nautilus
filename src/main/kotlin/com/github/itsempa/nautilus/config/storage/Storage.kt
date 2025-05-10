@@ -11,6 +11,6 @@ class Storage {
 
     // TODO: use this to get changelog between versions on startup
     @Expose
-    val lastUsedVersion: SemVersion = Nautilus.SEM_VER
+    var lastUsedVersion: SemVersion = Nautilus.SEM_VER
 
 }

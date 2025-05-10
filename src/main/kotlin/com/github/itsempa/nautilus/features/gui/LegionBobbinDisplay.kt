@@ -16,11 +16,12 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.utils.NautilusItemUtils.uuid
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orZero
 import com.github.itsempa.nautilus.utils.helpers.McPlayer
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.projectile.EntityFishHook
-import net.minecraft.item.ItemStack
+import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 @Module
@@ -49,7 +50,7 @@ object LegionBobbinDisplay {
         val bobbin: Int,
     )
 
-    private val armorDataCache = TimeLimitedCache<ItemStack, ArmorData>(5.seconds)
+    private val armorDataCache = TimeLimitedCache<UUID, ArmorData>(5.seconds)
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
@@ -83,7 +84,8 @@ object LegionBobbinDisplay {
         var newBobbinBuff = 0.0
         for (piece in armor) {
             if (piece == null) continue
-            val data = armorDataCache.getOrPut(piece) {
+            val uuid = piece.uuid ?: continue
+            val data = armorDataCache.getOrPut(uuid) {
                 val enchants = piece.getHypixelEnchantments() ?: return@getOrPut ArmorData(0, 0)
                 val legion = enchants["ultimate_legion"].orZero()
                 val bobbin = enchants["ultimate_bobbin_time"].orZero()

@@ -172,7 +172,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
 
         val TYPE_ADAPTER = NullableStringTypeAdapter(
             FishingCategory::internalName,
-            FishingCategory::getCategoryByInternalName,
+            ::getCategoryByInternalName,
         )
 
         fun getCategoryByInternalName(name: String): FishingCategory? = categories[name]

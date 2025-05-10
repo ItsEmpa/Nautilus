@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.SizeLimitedCache
 import com.github.itsempa.nautilus.events.KillEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusItemUtils.getBookOfStats
-import com.github.itsempa.nautilus.utils.NautilusItemUtils.getUUID
+import com.github.itsempa.nautilus.utils.NautilusItemUtils.uuid
 import java.util.UUID
 
 @Module
@@ -27,7 +27,7 @@ object KillData {
     @HandleEvent
     fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
         val stack = event.itemStack
-        val uuid = stack.getUUID() ?: return
+        val uuid = stack.uuid ?: return
         val kills = stack.getBookOfStats() ?: return
         val data = itemCache.getOrNull(uuid)
         if (data == null) {

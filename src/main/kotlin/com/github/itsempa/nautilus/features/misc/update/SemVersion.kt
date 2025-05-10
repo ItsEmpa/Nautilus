@@ -27,7 +27,10 @@ data class SemVersion(val major: Int, val minor: Int, val patch: Int) : Comparab
         return semVer < this
     }
 
+    operator fun rangeTo(other: SemVersion): VersionRange = VersionRange(this, other)
+
     companion object {
+
         fun fromString(version: String): SemVersion {
             val parts = version.split('.')
             return SemVersion(
@@ -39,4 +42,10 @@ data class SemVersion(val major: Int, val minor: Int, val patch: Int) : Comparab
 
         val TYPE_ADAPTER = SimpleStringTypeAdapter(SemVersion::asString, ::fromString)
     }
+}
+
+// Creates a Range of versions that don't include the start one but include the end one
+data class VersionRange(val startExclusive: SemVersion, val endInclusive: SemVersion) {
+    operator fun contains(version: SemVersion): Boolean = version > startExclusive && version <= endInclusive
+    fun isEmpty(): Boolean = startExclusive > endInclusive
 }
