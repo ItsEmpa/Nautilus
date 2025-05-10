@@ -24,7 +24,7 @@ data class SemVersion(val major: Int, val minor: Int, val patch: Int) : Comparab
     override fun isOlderThan(element: JsonElement?): Boolean {
         val version = element?.asString ?: return true
         val semVer = fromString(version)
-        return semVer < this
+        return this < semVer
     }
 
     operator fun rangeTo(other: SemVersion): VersionRange = VersionRange(this, other)
