@@ -47,9 +47,14 @@ class EnumArgumentType<E : Enum<E>> private constructor(
             return EnumArgumentType(clazz, toString)
         }
         inline fun <reified E : Enum<E>> name(): EnumArgumentType<E> {
+            return create(E::class.java) { it.name }
+        }
+
+        inline fun <reified E : Enum<E>> lowercase(): EnumArgumentType<E> {
             return create(E::class.java) { it.name.lowercase() }
         }
 
+        /** The string representation of the enum should not change during runtime. */
         inline fun <reified E : Enum<E>> custom(noinline toString: (E) -> String): EnumArgumentType<E> {
             return create(E::class.java, toString)
         }
