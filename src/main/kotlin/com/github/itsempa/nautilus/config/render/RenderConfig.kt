@@ -22,6 +22,10 @@ class RenderConfig {
     @ConfigEditorBoolean
     var lootshareRange = false
 
+    @ConfigOption(name = "", desc = ".")
+    @ConfigEditorButton(buttonText = "")
+    val : Runnable = Runnable {  }
+
     @Expose
     @ConfigOption(name = "Lootshare Mobs", desc = "The name of the sea creatures to show the lootshare range for, separated by commas.")
     @ConfigEditorText

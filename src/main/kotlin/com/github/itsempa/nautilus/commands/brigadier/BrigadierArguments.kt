@@ -23,8 +23,8 @@ object BrigadierArguments {
 
     fun bool(): BoolArgumentType = BoolArgumentType.bool()
 
-    fun string(): StringArgumentType = StringArgumentType.string()
+    fun quotedString(): StringArgumentType = StringArgumentType.string()
     fun greedyString(): StringArgumentType = StringArgumentType.greedyString()
-    fun word(): StringArgumentType = StringArgumentType.word()
+    fun string(): StringArgumentType = StringArgumentType.word()
 
 }
