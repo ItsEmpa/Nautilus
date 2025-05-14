@@ -45,7 +45,7 @@ object ConfigManager {
 
     fun save() = managedConfig.saveToFile()
 
-    fun getEditor() = managedConfig.getEditor()
+    val editor by lazy(managedConfig::getEditor)
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {

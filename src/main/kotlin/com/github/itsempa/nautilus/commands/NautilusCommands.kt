@@ -66,7 +66,7 @@ object NautilusCommands {
     }
 
     private fun openConfigGui(search: String? = null) {
-        val editor = ConfigManager.getEditor()
+        val editor = ConfigManager.editor
 
         search?.let { editor.search(search) }
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
