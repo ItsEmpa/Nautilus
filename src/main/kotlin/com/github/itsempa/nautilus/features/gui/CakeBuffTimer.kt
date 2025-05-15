@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.NautilusStorage
+import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
 import kotlin.time.Duration.Companion.days
 
@@ -101,6 +102,16 @@ object CakeBuffTimer {
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.cakeBuffTimer) return
         config.cakeBuffTimerPos.renderString(display, posLabel = "Cake  Buff Timer")
+    }
+
+    @HandleEvent
+    fun onDebug(event: NautilusDebugEvent) {
+        event.title("Cake Buff Timer")
+        event.addIrrelevant(
+            "storage" to storage.entries,
+            "display" to display,
+            "activeBuffs" to storage.filter { it.value.isInFuture() },
+        )
     }
 
 }
