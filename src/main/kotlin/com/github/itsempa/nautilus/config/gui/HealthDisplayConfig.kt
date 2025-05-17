@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorBoolean
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorSlider
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorText
+import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigLink
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigOption
 import com.github.itsempa.nautilus.utils.NautilusUtils.asProperty
 import com.google.gson.annotations.Expose
@@ -25,5 +26,6 @@ class HealthDisplayConfig {
     var limit = 5
 
     @Expose
-    val pos = Position(200, 200)
+    @ConfigLink(owner = HealthDisplayConfig::class, field = "enabled")
+    val pos = Position(200, 200, centerX = true)
 }

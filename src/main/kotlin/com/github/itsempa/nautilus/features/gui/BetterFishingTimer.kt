@@ -101,7 +101,7 @@ object BetterFishingTimer {
     }
 
     private fun update() {
-        if (totalMobs == 0 && !oldestTime.isFarPast()) return reset()
+        if (totalMobs == 0 && display != null) return reset()
         if (!isEnabled()) return
         val timeSince = oldestTime.passedSince()
 
