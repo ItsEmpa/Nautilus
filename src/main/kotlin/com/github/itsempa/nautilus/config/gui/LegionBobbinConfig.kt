@@ -19,6 +19,11 @@ class LegionBobbinConfig {
     var hideWithoutEnchant: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Always Show Max", desc = "Always show the buffs as if you were wearing max Legion/Bobbin' Time.")
+    @ConfigEditorBoolean
+    var alwaysShowMax: Boolean = false
+
+    @Expose
     @ConfigLink(owner = LegionBobbinConfig::class, field = "enabled")
     val position: Position = Position(100, 100)
 
