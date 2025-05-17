@@ -16,6 +16,7 @@ import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.fullEnumMapOf
 import com.github.itsempa.nautilus.utils.replaceAll
 import java.util.regex.Matcher
+import kotlin.time.Duration.Companion.seconds
 
 @Module
 object ComboData {
@@ -91,6 +92,14 @@ object ComboData {
             ComboEndEvent(combo).post()
             reset()
         }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onSecondPassed() {
+        if (lastUpdateTime.passedSince() < 10.seconds) return
+        if (combo == 0 || combo > 5) return
+        ComboEndEvent(combo).post()
+        reset()
     }
 
     private fun reset() {
