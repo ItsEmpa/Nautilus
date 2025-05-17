@@ -153,12 +153,9 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         var extraCategories: Set<FishingCategory> = emptySet()
             private set
 
+        // TODO: improve active system for categories
         val anyActiveCategories: Set<FishingCategory>
-            get() {
-                val activeCategory = activeCategory
-                return if (activeCategory == null) extraCategories
-                else extraCategories + activeCategory
-            }
+            get() = categories.values.filterTo(mutableSetOf()) { it.checkTreeActive() }
 
         init {
             val list = getSealedObjects<FishingCategory>()
