@@ -72,8 +72,7 @@ object ComboData {
         }
         comboEndPattern.matchMatcher(message) {
             val combo = group("combo").formatInt()
-            ComboEndEvent(combo).post()
-            this@ComboData.reset()
+            postEnd(combo, true)
         }
     }
 
@@ -88,27 +87,28 @@ object ComboData {
 
     @HandleEvent
     fun onWorldChange() {
-        if (combo != 0) {
-            ComboEndEvent(combo).post()
-            reset()
-        }
+        if (combo != 0) postEnd(combo, false)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed() {
         if (lastUpdateTime.passedSince() < 10.seconds) return
         if (combo == 0 || combo > 5) return
-        ComboEndEvent(combo).post()
-        reset()
+        postEnd(combo, false)
     }
 
-    private fun reset() {
+    private fun reset(fromChat: Boolean) {
         lastUpdateTime = SimpleTimeMark.now()
         currentColor = 'f'
         combo = 0
         lastComboMessage = 0
         currentBuffs.replaceAll(0)
-        post(true)
+        post(fromChat)
+    }
+
+    private fun postEnd(combo: Int, fromChat: Boolean) {
+        ComboEndEvent(combo).post()
+        reset(fromChat)
     }
 
     private fun post(fromChat: Boolean) = ComboUpdateEvent(combo, currentColor, currentBuffs, fromChat).post()
