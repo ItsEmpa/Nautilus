@@ -58,7 +58,7 @@ object MobHealthDisplay {
             for ((seaCreature, health) in healthMap) {
                 if (health == -1) continue
                 val mob = seaCreature.mob ?: continue
-                val color = if (seaCreature.isOwn) "§a" else "§b"
+                val color = if (seaCreature.isOwn) "§a" else "§c"
                 add("$color${seaCreature.name} ${formatHealth(mob)}")
                 if (size >= config.limit) break
             }

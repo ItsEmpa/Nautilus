@@ -59,7 +59,7 @@ object InvincibilityTimer {
             if (time.passedSince() > 1.seconds) continue
             val mob = vanquisher.mob
             val height = mob.baseEntity.height
-            val pos = vanquisher.mob.getLorenzVec().up(height + 1.5)
+            val pos = vanquisher.mob.getLorenzVec().up(height - 1) // TODO: confirm that this looks correct
             val timeLeft = time.timeUntil()
             event.drawString(pos, "§b${timeLeft.format(showMilliSeconds = true)}")
             if (!vanquisher.isOwn) continue
