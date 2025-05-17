@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusPreInitFinishedEvent
 import com.github.itsempa.nautilus.modules.Module
-import com.github.itsempa.nautilus.utils.fullEnumMapOf
+import com.github.itsempa.nautilus.utils.enumMapOf
 import com.mojang.brigadier.CommandDispatcher
 import net.minecraftforge.client.ClientCommandHandler
 
@@ -21,8 +21,8 @@ object NautilusCommandRegistry {
         BrigadierRegisterEvent(builders, dispatcher).post()
 
         // Reorder the commands by category
-        val map = fullEnumMapOf<CommandCategory, MutableList<CommandData>>(::ArrayList)
-        for (command in builders) map[command.category]!!.add(command)
+        val map = enumMapOf<CommandCategory, MutableList<CommandData>>()
+        for (command in builders) map.getOrPut(command.category, ::ArrayList).add(command)
         builders.clear()
         map.values.forEach { list -> list.forEach { command -> builders.add(command) } }
     }

@@ -17,11 +17,6 @@ inline fun <reified E : Enum<E>, V> fullEnumMapOf(defaultValue: V): EnumMap<E, V
         for (enum in enumValues<E>()) put(enum, defaultValue)
     }
 
-inline fun <reified E : Enum<E>, V> fullEnumMapOf(defaultValue: () -> V): EnumMap<E, V> =
-    enumMapOf<E, V>().apply {
-        for (enum in enumValues<E>()) put(enum, defaultValue())
-    }
-
 inline fun <reified E : Enum<E>, V> fullEnumMapOf(defaultValue: (E) -> V): EnumMap<E, V> =
     enumMapOf<E, V>().apply {
         for (enum in enumValues<E>()) put(enum, defaultValue(enum))
