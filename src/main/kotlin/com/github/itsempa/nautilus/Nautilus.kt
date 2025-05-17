@@ -73,6 +73,8 @@ object Nautilus {
     const val MOD_ID = "@MOD_ID@"
     const val VERSION = "@MOD_VER@"
     const val MOD_NAME = "@MOD_NAME@"
+
+    const val PATH = "com.github.itsempa.nautilus"
     const val DISCORD_INVITE = "https://discord.gg/KM3dKjbWqg"
     const val GITHUB = "https://github.com/ItsEmpa/Nautilus"
 
