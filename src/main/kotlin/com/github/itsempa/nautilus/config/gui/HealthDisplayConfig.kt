@@ -26,6 +26,11 @@ class HealthDisplayConfig {
     var limit = 5
 
     @Expose
+    @ConfigOption(name = "Red Percentage", desc = "Percentage of health at which a mob's health should be shown in red.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 25f, minStep = 1f)
+    var redPercentage: Float = 5f
+
+    @Expose
     @ConfigLink(owner = HealthDisplayConfig::class, field = "enabled")
     val pos = Position(200, 200, centerX = true)
 }
