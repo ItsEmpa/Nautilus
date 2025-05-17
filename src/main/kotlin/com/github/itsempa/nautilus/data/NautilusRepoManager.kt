@@ -12,7 +12,6 @@ import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusRepositoryReloadEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
-import com.github.itsempa.nautilus.utils.NautilusUtils
 import com.github.itsempa.nautilus.utils.tryCatch
 import com.github.itsempa.nautilus.utils.tryOrNull
 import com.google.gson.Gson
@@ -97,7 +96,7 @@ object NautilusRepoManager {
             fetchRepository(command = true)
             reloadRepository("Repo updated successfully.")
             if (unsuccessfulConstants.isNotEmpty()) {
-                NautilusUtils.logErrorWithData(
+                NautilusErrorManager.logErrorWithData(
                     IllegalStateException("Repo update failed"),
                     "Error updating reading Sh Repo",
                     "unsuccessfulConstants" to unsuccessfulConstants,
@@ -156,7 +155,7 @@ object NautilusRepoManager {
                         latestRepoCommitTime = Instant.parse(formattedDate).toEpochMilli().asTimeMark()
                     }
             } catch (e: Exception) {
-                NautilusUtils.logErrorWithData(
+                NautilusErrorManager.logErrorWithData(
                     e,
                     "Error while loading data from repo",
                     "command" to command,
@@ -232,7 +231,7 @@ object NautilusRepoManager {
                     )
                 }
             } catch (e: IOException) {
-                NautilusUtils.logErrorWithData(
+                NautilusErrorManager.logErrorWithData(
                     e,
                     "Failed to download Nautilus Repo",
                     "url" to url,
@@ -252,7 +251,7 @@ object NautilusRepoManager {
             commitTime = latestRepoCommitTime
 
         } catch (e: Exception) {
-            NautilusUtils.logErrorWithData(
+            NautilusErrorManager.logErrorWithData(
                 e,
                 "Failed to download Nautilus Repository",
                 "command" to command,
@@ -366,7 +365,7 @@ object NautilusRepoManager {
             zis.close()
             fis.close()
         } catch (e: IOException) {
-            NautilusUtils.logErrorWithData(
+            NautilusErrorManager.logErrorWithData(
                 e,
                 "unzipIgnoreFirstFolder failed",
                 "zipFilePath" to zipFilePath,

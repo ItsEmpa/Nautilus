@@ -1,7 +1,7 @@
 package com.github.itsempa.nautilus.commands.brigadier
 
+import com.github.itsempa.nautilus.data.NautilusErrorManager
 import com.github.itsempa.nautilus.utils.NautilusChat
-import com.github.itsempa.nautilus.utils.NautilusUtils
 import com.github.itsempa.nautilus.utils.tryOrDefault
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -38,7 +38,7 @@ class BrigadierCommand(
         } catch (e: CommandSyntaxException) {
             NautilusChat.userError(e.message ?: "Error when parsing command.")
         } catch (e: Exception) {
-            NautilusUtils.logErrorWithData(e, "Failed to execute command")
+            NautilusErrorManager.logErrorWithData(e, "Failed to execute command")
         }
     }
 

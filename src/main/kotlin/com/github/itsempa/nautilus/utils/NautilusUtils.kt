@@ -1,14 +1,12 @@
 package com.github.itsempa.nautilus.utils
 
 import at.hannibal2.skyhanni.deps.moulconfig.observer.Property
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import com.github.itsempa.nautilus.Nautilus
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Rotations
 import kotlin.math.abs
@@ -17,23 +15,6 @@ import kotlin.time.Duration.Companion.minutes
 
 // TODO: separate some functions into other util objects
 object NautilusUtils {
-    // TODO: replace with own custom error manager
-    fun logErrorWithData(
-        throwable: Throwable,
-        message: String,
-        vararg extraData: Pair<String, Any?>,
-        ignoreErrorCache: Boolean = false,
-        noStackTrace: Boolean = false,
-    ) {
-        ErrorManager.logErrorWithData(
-            throwable,
-            "§c${Nautilus.MOD_NAME.uppercase()} ERROR!! $message. Please report this to Empa.",
-            extraData = extraData,
-            ignoreErrorCache = ignoreErrorCache,
-            noStackTrace = noStackTrace,
-            betaOnly = false,
-        )
-    }
 
     fun AxisAlignedBB.getHeight() = abs(maxY - minY)
     fun AxisAlignedBB.getWidth() = max(abs(maxX - minX), abs(maxZ - minZ))

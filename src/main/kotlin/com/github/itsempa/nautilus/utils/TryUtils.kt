@@ -2,6 +2,7 @@
 
 package com.github.itsempa.nautilus.utils
 
+import com.github.itsempa.nautilus.data.NautilusErrorManager
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -46,7 +47,7 @@ inline fun tryError(message: String, func: () -> Unit) {
     try {
         func()
     } catch (e: Throwable) {
-        NautilusUtils.logErrorWithData(e, message)
+        NautilusErrorManager.logErrorWithData(e, message)
     }
 }
 
@@ -58,7 +59,7 @@ inline fun tryError(lazyMessage: (Throwable) -> String, func: () -> Unit) {
     try {
         func()
     } catch (e: Throwable) {
-        NautilusUtils.logErrorWithData(e, lazyMessage(e))
+        NautilusErrorManager.logErrorWithData(e, lazyMessage(e))
     }
 }
 
@@ -70,7 +71,7 @@ inline fun <T> tryThrowError(message: String, func: () -> T): T {
     return try {
         func()
     } catch (e: Throwable) {
-        NautilusUtils.logErrorWithData(e, message)
+        NautilusErrorManager.logErrorWithData(e, message)
         throw e
     }
 }
@@ -84,7 +85,7 @@ inline fun <T> tryThrowError(lazyMessage: (Throwable) -> String, func: () -> T):
     return try {
         func()
     } catch (e: Throwable) {
-        NautilusUtils.logErrorWithData(e, lazyMessage(e))
+        NautilusErrorManager.logErrorWithData(e, lazyMessage(e))
         throw e
     }
 }
@@ -98,7 +99,7 @@ inline fun <T : Any> errorIfNull(value: T?, lazyMessage: () -> Any): T {
     if (value == null) {
         val message = lazyMessage().toString()
         val e = IllegalStateException(message)
-        NautilusUtils.logErrorWithData(e, message)
+        NautilusErrorManager.logErrorWithData(e, message)
         throw e
     } else {
         return value

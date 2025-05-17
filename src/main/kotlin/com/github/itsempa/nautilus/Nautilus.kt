@@ -5,13 +5,13 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.utils.DelayedRun
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.config.Features
+import com.github.itsempa.nautilus.data.NautilusErrorManager
 import com.github.itsempa.nautilus.data.NautilusRepoManager
 import com.github.itsempa.nautilus.events.NautilusPreInitFinishedEvent
 import com.github.itsempa.nautilus.features.misc.update.SemVersion
 import com.github.itsempa.nautilus.mixins.transformers.skyhanni.AccessorSkyHanniEvents
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.modules.NautilusModules
-import com.github.itsempa.nautilus.utils.NautilusUtils
 import com.github.itsempa.nautilus.utils.tryError
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +60,7 @@ object Nautilus {
             modules.add(obj)
         }.onFailure {
             DelayedRun.runNextTick {
-                NautilusUtils.logErrorWithData(
+                NautilusErrorManager.logErrorWithData(
                     it,
                     "Something went wrong while initializing events.",
                     "module" to obj.javaClass.simpleName,
@@ -73,6 +73,8 @@ object Nautilus {
     const val MOD_ID = "@MOD_ID@"
     const val VERSION = "@MOD_VER@"
     const val MOD_NAME = "@MOD_NAME@"
+
+    const val CLASS_PATH = "com.github.itsempa.nautilus"
     const val DISCORD_INVITE = "https://discord.gg/KM3dKjbWqg"
     const val GITHUB = "https://github.com/ItsEmpa/Nautilus"
 
