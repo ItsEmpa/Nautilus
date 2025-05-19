@@ -2,7 +2,6 @@ package com.github.itsempa.nautilus.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.storage.ProfileStorage
 import com.github.itsempa.nautilus.config.storage.Storage
@@ -26,13 +25,6 @@ object NautilusStorage {
         NautilusChat.debug("Joined profile ${event.name}")
         profile = storage.profileStorage.getOrPut(event.name, ::ProfileStorage)
         profileName = event.name
-    }
-
-    @HandleEvent
-    fun onDisconnect(event: ClientDisconnectEvent) {
-        NautilusChat.debug("Disconnected from server")
-        profile = ProfileStorage()
-        profileName = null
     }
 
     @HandleEvent
