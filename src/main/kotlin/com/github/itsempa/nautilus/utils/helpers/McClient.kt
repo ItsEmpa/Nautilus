@@ -9,9 +9,19 @@ import net.minecraft.client.settings.GameSettings
 object McClient {
 
     val self: Minecraft get() = Minecraft.getMinecraft()
-    val world: WorldClient? get() = self.theWorld
+    val wordNull: WorldClient? get() = self.theWorld
+    val world: WorldClient get() = wordNull!!
 
     val settings get(): GameSettings = self.gameSettings
     val textureManager: TextureManager get() = self.textureManager
+
+    /** Runs [action] in the main thread. */
+    fun run(action: () -> Unit) {
+        if (self.isCallingFromMinecraftThread) {
+            action()
+        } else {
+            self.addScheduledTask(action)
+        }
+    }
 
 }

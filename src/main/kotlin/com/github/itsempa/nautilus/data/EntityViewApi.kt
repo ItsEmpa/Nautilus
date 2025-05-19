@@ -122,7 +122,7 @@ object EntityViewApi {
     }
 
     private fun cleanupUnusedQueries() {
-        val theWorld = McClient.world ?: return
+        val theWorld = McClient.world
         val loaded: Set<UUID> = theWorld.loadedEntityList.mapTo(mutableSetOf()) { it.uniqueID }
 
         queries.removeIf { (uuid, query) ->

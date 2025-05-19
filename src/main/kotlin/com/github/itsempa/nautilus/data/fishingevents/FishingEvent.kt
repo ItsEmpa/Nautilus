@@ -1,6 +1,7 @@
 package com.github.itsempa.nautilus.data.fishingevents
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
@@ -102,6 +103,7 @@ sealed class FishingEvent(val internalName: String) {
         @HandleEvent
         fun onCommand(event: BrigadierRegisterEvent) {
             event.register("ntfishingevent") {
+                this.category = CommandCategory.DEVELOPER_DEBUG
                 literalCallback("forceupdate") {
                     events.forEach(FishingEvent::updateTimePeriodAndState)
                 }

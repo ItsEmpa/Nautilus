@@ -32,5 +32,15 @@ class RenderConfig {
     @ConfigEditorBoolean
     var fixLavaBobbers = true
 
+    @Expose
+    @ConfigOption(name = "Hotspot Highlight", desc = "Highlight hotspots.")
+    @ConfigEditorBoolean
+    var hotspotHighlight: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Hide Hotspot Particles", desc = "Hides the particles created by hotspots.")
+    @ConfigEditorBoolean
+    var hideHotspotParticles: Boolean = true
+
 
 }

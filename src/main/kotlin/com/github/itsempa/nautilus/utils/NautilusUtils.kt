@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Rotations
 import kotlin.math.abs
+import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
@@ -96,6 +97,8 @@ object NautilusUtils {
 
     fun LorenzVec.getBlockAABB() = boundingToOffset(1.0, 1.0, 1.0)
     fun <K, V> MutableMap<K, V>.clearAnd(predicate: (Map.Entry<K, V>) -> Unit) = entries.clearAnd(predicate)
+
+    fun Double.roundToHalf() = (this * 2).roundToInt() / 2.0
 
     inline val Int.thousands get(): Int = this * 1_000
     inline val Int.millions get(): Int = this * 1_000_000
