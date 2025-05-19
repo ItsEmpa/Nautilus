@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -156,16 +157,10 @@ object HotspotApi {
         private set
 
     private fun ReceiveParticleEvent.isHotspotParticle(): Boolean {
-        return when (type) {
-            EnumParticleTypes.SMOKE_NORMAL -> {
-                speed == 0f && (count == 5 || count == 2)
-            }
-
-            EnumParticleTypes.REDSTONE -> {
-                count == 0 && speed == 1f
-            }
-
-            else -> false
+        return if (IslandType.CRIMSON_ISLE.isInIsland()) {
+            type == EnumParticleTypes.SMOKE_NORMAL && speed == 0f && count == 5
+        } else {
+            type == EnumParticleTypes.REDSTONE && speed == 1f && count == 0
         }
     }
 
