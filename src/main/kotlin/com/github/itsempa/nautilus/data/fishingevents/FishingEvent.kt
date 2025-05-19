@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.FishingEventUpdate
 import com.github.itsempa.nautilus.events.MayorDataUpdateEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
@@ -99,6 +100,15 @@ sealed class FishingEvent(val internalName: String) {
         fun onSecondPassed() = events.forEach(FishingEvent::onSecondPassed)
 
         @HandleEvent
+        fun onCommand(event: BrigadierRegisterEvent) {
+            event.register("ntfishingevent") {
+                literalCallback("forceupdate") {
+                    events.forEach(FishingEvent::updateTimePeriodAndState)
+                }
+            }
+        }
+
+        @HandleEvent
         fun onDebug(event: NautilusDebugEvent) {
             event.title("FishingEvents")
             event.addIrrelevant(
@@ -107,6 +117,7 @@ sealed class FishingEvent(val internalName: String) {
                         appendLine(it.internalName)
                         appendLine(" - timePeriod: ${it.timePeriod?.formatString()}")
                         appendLine(" - nextUpdate: in ${it.nextUpdate.timeUntil()} ")
+                        appendLine(" - isActive: ${it.isActive}")
                         appendLine()
                     }
                 }

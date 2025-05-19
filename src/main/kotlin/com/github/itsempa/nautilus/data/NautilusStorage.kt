@@ -8,6 +8,7 @@ import com.github.itsempa.nautilus.config.storage.ProfileStorage
 import com.github.itsempa.nautilus.config.storage.Storage
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.utils.NautilusChat
 
 @Module
 object NautilusStorage {
@@ -22,12 +23,14 @@ object NautilusStorage {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
+        NautilusChat.debug("Joined profile ${event.name}")
         profile = storage.profileStorage.getOrPut(event.name, ::ProfileStorage)
         profileName = event.name
     }
 
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
+        NautilusChat.debug("Disconnected from server")
         profile = ProfileStorage()
         profileName = null
     }
