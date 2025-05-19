@@ -103,6 +103,7 @@ sealed class FishingEvent(val internalName: String) {
         @HandleEvent
         fun onCommand(event: BrigadierRegisterEvent) {
             event.register("ntfishingevent") {
+                this.description = "Forcefully updates all fishing events."
                 this.category = CommandCategory.DEVELOPER_DEBUG
                 literalCallback("forceupdate") {
                     events.forEach(FishingEvent::updateTimePeriodAndState)

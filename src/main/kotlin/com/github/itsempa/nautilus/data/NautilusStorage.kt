@@ -1,10 +1,12 @@
 package com.github.itsempa.nautilus.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.storage.ProfileStorage
 import com.github.itsempa.nautilus.config.storage.Storage
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
@@ -25,6 +27,18 @@ object NautilusStorage {
         NautilusChat.debug("Joined profile ${event.name}")
         profile = storage.profileStorage.getOrPut(event.name, ::ProfileStorage)
         profileName = event.name
+    }
+
+    @HandleEvent
+    fun onCommand(event: BrigadierRegisterEvent) {
+        event.register("ntprofile") {
+            description = "Shows what profile data is currently loaded"
+            category = CommandCategory.DEVELOPER_DEBUG
+
+            callback {
+                NautilusChat.chat("Current profile: $profileName")
+            }
+        }
     }
 
     @HandleEvent
