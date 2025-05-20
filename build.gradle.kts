@@ -8,11 +8,11 @@ plugins {
     id("gg.essential.loom") version "0.10.0.5"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    kotlin("jvm") version "2.0.0"
-    kotlin("plugin.serialization") version "1.8.0"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.serialization") version "2.1.20"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
     id("net.kyori.blossom") version "1.3.2"
-    id("com.google.devtools.ksp") version "2.0.20-1.0.25"
+    id("com.google.devtools.ksp") version "2.1.20-2.0.0"
 }
 
 // Constants:
@@ -68,6 +68,8 @@ repositories {
     maven("https://repo.nea.moe/releases")
     maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
     maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
+
+    maven("https://maven.teamresourceful.com/repository/maven-public/")
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -101,6 +103,10 @@ dependencies {
         exclude(module = "gson")
     }
 
+    implementation(kotlin("stdlib-jdk8"))
+    ksp(libs.ktmodules)
+    compileOnly(libs.ktmodules)
+
     compileOnly(ksp(project("annotations"))!!)
 
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
@@ -122,13 +128,15 @@ dependencies {
 }
 
 ksp {
+    arg("meowdding.modules.project_name", project.name)
+    arg("meowdding.modules.package", "com.github.itsempa.nautilus.test.modules")
     arg("symbolProcessor", "com.example.modules.ModuleProvider")
 }
 
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.0"
+            //languageVersion = "2.0"
             enableLanguageFeature("BreakContinueInInlineLambdas")
         }
     }
