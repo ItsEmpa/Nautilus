@@ -5,25 +5,22 @@ import at.hannibal2.skyhanni.deps.moulconfig.common.RenderContext
 import at.hannibal2.skyhanni.deps.moulconfig.gui.GuiOptionEditor
 import at.hannibal2.skyhanni.deps.moulconfig.gui.KeyboardEvent
 import at.hannibal2.skyhanni.deps.moulconfig.gui.MouseEvent
-import at.hannibal2.skyhanni.deps.moulconfig.internal.TextRenderUtils
 import at.hannibal2.skyhanni.deps.moulconfig.processor.ProcessedOption
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.utils.helpers.McClient
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.EnumChatFormatting.GREEN
 import net.minecraft.util.EnumChatFormatting.RED
 import org.lwjgl.input.Mouse
 
-class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
+class NautilusGuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
 
     private val button = GuiElementButton()
 
     override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
-        val fr = McClient.self.fontRendererObj
+        val fr = context.minecraft.defaultFontRenderer
 
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(x.toFloat() + 10, y.toFloat(), 1F)
-        val adjustedWith = width - 20
+        context.pushMatrix()
+        context.translate(x.toFloat() + 10, y.toFloat(), 1F)
+        val adjustedWidth = width - 20
         val nextVersion = UpdateManager.getNextVersion()
 
         button.text = when (UpdateManager.updateState) {
@@ -32,25 +29,28 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             UpdateState.DOWNLOADED -> "Downloaded"
             UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
-        button.render(context, getButtonPosition(adjustedWith), 10)
+        button.width = button.getWidth(context)
+        button.render(context, getButtonPosition(adjustedWidth), 10)
 
         if (UpdateManager.updateState == UpdateState.DOWNLOADED) {
-            TextRenderUtils.drawStringCentered(
-                "${GREEN}The update will be installed after your next restart.",
+            val updateText = "${GREEN}The update will be installed after your next restart."
+            context.drawStringCenteredScaledMaxWidth(
+                updateText,
                 fr,
-                adjustedWith / 2F,
-                40F,
+                adjustedWidth / 2F,
+                40f,
                 true,
-                -1
+                x - fr.getStringWidth(updateText) / 2,
+                -1,
             )
         }
 
-        val widthRemaining = adjustedWith - button.width - 10
+        val widthRemaining = adjustedWidth - button.width - 10
 
-        GlStateManager.scale(2F, 2F, 1F)
+        context.scale(2F, 2F, 1F)
         val currentVersion = Nautilus.VERSION
         val sameVersion = currentVersion.equals(nextVersion, true)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(
+        context.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateState.NONE) GREEN else RED}$currentVersion" +
                 if (nextVersion != null && !sameVersion) "➜ ${GREEN}${nextVersion}" else "",
             fr,
@@ -58,10 +58,10 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             10F,
             true,
             widthRemaining / 2,
-            -1
+            -1,
         )
 
-        GlStateManager.popMatrix()
+        context.popMatrix()
     }
 
     private fun getButtonPosition(width: Int) = width - button.width
@@ -69,11 +69,15 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
     // TODO: try to use the MouseEvent
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int, mouseEvent: MouseEvent): Boolean {
-        val width = width - 20
-        if (Mouse.getEventButtonState() && (mouseX - getButtonPosition(width) - x) in (0..button.width) && (mouseY - 10 - y) in (0..button.height)) {
+        val adjustedWidth = width - 20
+        if (
+            Mouse.getEventButtonState() &&
+            (mouseX - getButtonPosition(adjustedWidth) - x) in (0..button.width) &&
+            (mouseY - 10 - y) in (0..button.height)
+        ) {
             when (UpdateManager.updateState) {
                 UpdateState.AVAILABLE, UpdateState.NONE -> UpdateManager.checkUpdate()
-                else -> {}
+                else -> { /* Empty */ }
             }
             return true
         }
