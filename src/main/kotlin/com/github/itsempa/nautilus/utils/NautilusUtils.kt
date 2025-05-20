@@ -61,14 +61,6 @@ object NautilusUtils {
 
     fun Rotations.isZero(): Boolean = this == ZERO_ROTATIONS
 
-    fun <T> MutableCollection<T>.clearAnd(predicate: (T) -> Unit) {
-        val it = iterator()
-        while (it.hasNext()) {
-            predicate(it.next())
-            it.remove()
-        }
-    }
-
     fun LorenzVec.asChatMessage(): String = "x: ${x.toInt()} y: ${y.toInt()} z: ${z.toInt()}"
 
     fun LorenzVec.asSimpleChatMessage(): String = "${x.toInt()} ${y.toInt()} ${z.toInt()}"
@@ -96,7 +88,6 @@ object NautilusUtils {
     }
 
     fun LorenzVec.getBlockAABB() = boundingToOffset(1.0, 1.0, 1.0)
-    fun <K, V> MutableMap<K, V>.clearAnd(predicate: (Map.Entry<K, V>) -> Unit) = entries.clearAnd(predicate)
 
     fun Double.roundToHalf() = (this * 2).roundToInt() / 2.0
 

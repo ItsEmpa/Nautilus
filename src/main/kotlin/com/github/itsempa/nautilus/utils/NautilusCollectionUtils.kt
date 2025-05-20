@@ -15,6 +15,16 @@ fun <T> MutableList<T>.removeRange(range: IntRange) {
     for (i in last downTo first) removeAt(i)
 }
 
+fun <T> MutableCollection<T>.clearAnd(predicate: (T) -> Unit) {
+    val it = iterator()
+    while (it.hasNext()) {
+        predicate(it.next())
+        it.remove()
+    }
+}
+
+fun <K, V> MutableMap<K, V>.clearAnd(predicate: (Map.Entry<K, V>) -> Unit) = entries.clearAnd(predicate)
+
 fun <K, V> MutableMap<K, V>.replaceAll(value: V) = entries.forEach { it.setValue(value) }
 
 fun <K> MutableMap<K, SimpleTimeMark>.removeMaxTime(duration: Duration) = removeIf { it.value.passedSince() > duration }

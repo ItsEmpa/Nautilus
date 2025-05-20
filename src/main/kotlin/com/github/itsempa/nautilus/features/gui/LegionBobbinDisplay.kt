@@ -23,6 +23,7 @@ import com.github.itsempa.nautilus.utils.helpers.McPlayer
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.projectile.EntityFishHook
 import java.util.UUID
+import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.seconds
 
 @Module
@@ -55,6 +56,8 @@ object LegionBobbinDisplay {
 
     private val armorDataCache = TimeLimitedCache<UUID, ArmorData>(5.seconds)
 
+    private var display: List<Renderable>? = null
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(2) || !isEnabled()) return
@@ -75,8 +78,8 @@ object LegionBobbinDisplay {
                 }
             }
         }
-        nearbyBobbers = bobbers.coerceAtMost(BOBBERS_LIMIT)
-        nearbyPlayers = players.coerceAtMost(LEGION_LIMIT)
+        modifyValue(::nearbyBobbers, bobbers.coerceAtMost(BOBBERS_LIMIT))
+        modifyValue(::nearbyPlayers, players.coerceAtMost(LEGION_LIMIT))
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -97,15 +100,21 @@ object LegionBobbinDisplay {
             newLegionBuff += data.legion * LEGION_MULT
             newBobbinBuff += data.bobbin * BOBBIN_MULT
         }
-        armorLegionBuff = newLegionBuff
-        armorBobbinBuff = newBobbinBuff
+        modifyValue(::armorLegionBuff, newLegionBuff)
+        modifyValue(::armorBobbinBuff, newBobbinBuff)
     }
 
-    // TODO: cache renderable creation
+    // Modifies the passed property with the new value, and if the value is different it resets the display
+    private fun <T> modifyValue(property: KMutableProperty0<T>, newValue: T) {
+        if (property.get() == newValue) return
+        property.set(newValue)
+        display = null
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        val renderables = createRenderable()
+        val renderables = display ?: createRenderable().also { display = it }
         config.position.renderRenderables(renderables, posLabel = "Legion Bobbin Display")
     }
 
@@ -159,34 +168,32 @@ object LegionBobbinDisplay {
     }
 
     private fun formatInfo(
-        isWearing: Boolean,
-        isBold: Boolean,
+        isActive: Boolean,
+        isBest: Boolean,
         nearby: Int,
         buff: Double,
         color: String,
         title: String,
     ): Pair<String, String> {
 
-        val baseColor = if (isWearing) color else "§7§o"
-        val boldCode = if (isBold) "§l" else ""
+        val boldCode = if (isActive) "§l" else ""
+        val suffix = if (isBest) " §6$boldCode✦" else ""
 
         val legionTitle = buildString {
-            append(baseColor)
+            append(color)
             append(boldCode)
             append("$title: ")
         }
 
-        val numberColor = if (isWearing) "§b" else "§7§o"
-        val parenthesisColor = if (isWearing) "§7" else ""
-
         val legionFormat = buildString {
-            append(numberColor)
+            append("§b")
             append(boldCode)
             append(nearby)
             append(" ")
-            append(parenthesisColor)
+            append("§7")
             append(boldCode)
             append("(${buff.roundTo(2)}%)")
+            append(suffix)
         }
 
         return legionTitle to legionFormat

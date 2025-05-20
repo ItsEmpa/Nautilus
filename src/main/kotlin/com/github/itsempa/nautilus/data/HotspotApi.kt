@@ -19,8 +19,8 @@ import com.github.itsempa.nautilus.events.HotspotEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.features.render.HotspotHighlight
 import com.github.itsempa.nautilus.modules.Module
-import com.github.itsempa.nautilus.utils.NautilusUtils.clearAnd
 import com.github.itsempa.nautilus.utils.NautilusUtils.roundToHalf
+import com.github.itsempa.nautilus.utils.clearAnd
 import net.minecraft.block.BlockLiquid
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
