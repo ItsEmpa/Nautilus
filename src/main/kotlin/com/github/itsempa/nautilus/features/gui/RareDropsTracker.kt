@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SizeLimitedSet
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.github.itsempa.nautilus.Nautilus
@@ -34,6 +35,7 @@ import com.github.itsempa.nautilus.utils.removeFirstMatches
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("UnstableApiUsage")
 @Module
 object RareDropsTracker {
 
@@ -134,6 +136,9 @@ object RareDropsTracker {
     private val recentDeaths = mutableListOf<Pair<FishingRareDrop, SimpleTimeMark>>()
     private val recentDroppedItems = mutableListOf<Pair<FishingRareDrop, SimpleTimeMark>>()
 
+    private val debugRecentDeaths = SizeLimitedSet<Pair<FishingRareDrop, SimpleTimeMark>>(10)
+    private val debugDroppedItems = SizeLimitedSet<Pair<FishingRareDrop, SimpleTimeMark>>(10)
+
     private var activeDrops = enumSetOf<FishingRareDrop>()
     private var renderables = emptyList<Renderable>()
 
@@ -143,7 +148,9 @@ object RareDropsTracker {
         val drop = FishingRareDrop.mobsToCheck[data.name] ?: return
         val canActuallyGetDrops = event.isOwn || (event.seenDeath && LootshareRange.isInRange(data.actualLastPos))
         if (!canActuallyGetDrops) return
-        recentDeaths.add(drop to SimpleTimeMark.now())
+        val pair = drop to SimpleTimeMark.now()
+        recentDeaths.add(pair)
+        debugRecentDeaths.add(pair)
         handleMobDrop()
     }
 
@@ -158,7 +165,10 @@ object RareDropsTracker {
     fun onItemAdd(event: ItemAddEvent) {
         if (event.source != ItemAddManager.Source.ITEM_ADD) return
         val drop = FishingRareDrop.mobDeathDropsToCheck[event.internalName] ?: return
-        recentDeaths.add(drop to SimpleTimeMark.now())
+        val pair = drop to SimpleTimeMark.now()
+        recentDroppedItems.add(pair)
+        debugDroppedItems.add(pair)
+
         handleMobDrop()
     }
 
@@ -266,6 +276,8 @@ object RareDropsTracker {
             "recentDeaths" to recentDeaths,
             "recentDroppedItems" to recentDroppedItems,
             "activeDrops" to activeDrops,
+            "debugRecentDeaths" to debugRecentDeaths,
+            "debugDroppedItems" to debugDroppedItems,
         )
     }
 }
