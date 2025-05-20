@@ -86,12 +86,13 @@ object FishingReelApi {
 
     @HandleEvent
     fun onDebug(event: NautilusDebugEvent) {
-        event.title("Fishing Reel Api")
-        event.addIrrelevant(
-            "lastBobberLocation" to lastBobberLocation,
-            "foundPlingSound" to foundPlingSound,
-            "foundCatchSound" to foundCatchSound,
-            "catchesSinceMove" to catchesSinceMove,
-        )
+        event.title("Fishing Reel Api") {
+            addIrrelevant(
+                "lastBobberLocation" to lastBobberLocation,
+                "foundPlingSound" to foundPlingSound,
+                "foundCatchSound" to foundCatchSound,
+                "catchesSinceMove" to catchesSinceMove,
+            )
+        }
     }
 }

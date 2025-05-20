@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -154,7 +153,7 @@ object HotspotApi {
         private set
 
     private fun ReceiveParticleEvent.isHotspotParticle(): Boolean {
-        return if (IslandType.CRIMSON_ISLE.isInIsland()) {
+        return if (IslandType.CRIMSON_ISLE.isCurrent()) {
             type == EnumParticleTypes.SMOKE_NORMAL && speed == 0f && (count == 5 || count == 2)
         } else {
             type == EnumParticleTypes.REDSTONE && speed == 1f && count == 0
@@ -249,14 +248,15 @@ object HotspotApi {
 
     @HandleEvent
     fun onDebug(event: NautilusDebugEvent) {
-        event.title("HotspotApi")
-        event.addIrrelevant(
-            "hotspots" to _hotspots,
-            "isHotspotFishing" to isHotspotFishing(),
-            "lastNearFishedHotspotTime" to lastNearFishedHotspotTime,
-            "lastHotspotFish" to lastHotspotFish,
-            "lastHotspotPos" to lastHotspotPos,
-        )
+        event.title("HotspotApi") {
+            addIrrelevant(
+                "hotspots" to _hotspots,
+                "isHotspotFishing" to isHotspotFishing(),
+                "lastNearFishedHotspotTime" to lastNearFishedHotspotTime,
+                "lastHotspotFish" to lastHotspotFish,
+                "lastHotspotPos" to lastHotspotPos,
+            )
+        }
     }
 
     @HandleEvent

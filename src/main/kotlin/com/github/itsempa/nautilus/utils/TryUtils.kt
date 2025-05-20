@@ -29,6 +29,17 @@ inline fun <T> tryOrDefault(default: T, func: () -> T): T {
     }
 }
 
+inline fun <T> tryOrDefault(default: () -> T, func: () -> T): T {
+    contract {
+        callsInPlace(func, InvocationKind.AT_MOST_ONCE)
+    }
+    return try {
+        func()
+    } catch (_: Throwable) {
+        default()
+    }
+}
+
 inline fun tryCatch(func: () -> Unit) {
     contract {
         callsInPlace(func, InvocationKind.AT_MOST_ONCE)

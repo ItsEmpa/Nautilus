@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import com.github.itsempa.nautilus.data.NautilusErrorManager
 
+// TODO: improve so it only actually creates the data that is necessary
 class NautilusDebugEvent(private val list: MutableList<String>, private val search: String, private val all: Boolean) : SkyHanniEvent() {
 
     var empty = true
@@ -22,6 +23,13 @@ class NautilusDebugEvent(private val list: MutableList<String>, private val sear
         }
 
         currentTitle = title
+    }
+
+    fun title(title: String, block: NautilusDebugEvent.() -> Unit) {
+        title(title)
+        block(this)
+        currentTitle = ""
+        irrelevant = false
     }
 
     fun addIrrelevant(vararg data: Pair<String, Any?>) {

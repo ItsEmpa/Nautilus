@@ -67,6 +67,10 @@ object NautilusErrorManager {
         "at at.hannibal2.skyhanni.api.event.SkyHanniEvent.post",
         "at at.hannibal2.skyhanni.api.event.EventHandler.post",
         "at net.minecraft.launchwrapper.",
+
+        "at com.github.itsempa.nautilus.commands.brigadier.BrigadierCommand",
+        "at com.github.itsempa.nautilus.data.NautilusErrorManager.logError",
+        "at com.github.itsempa.nautilus.data.NautilusErrorManager.nautilusError",
     )
 
     private val skipErrorEntry = emptyMap<String, List<String>>()
@@ -103,7 +107,7 @@ object NautilusErrorManager {
         NautilusChat.chat(
             errorMessage?.let {
                 OSUtils.copyToClipboard(it)
-                "$name copied into the clipboard, please report it on the SkyHanni discord!"
+                "$name copied into the clipboard, please report it on the Nautilus discord!"
             } ?: "Error id not found!",
         )
     }

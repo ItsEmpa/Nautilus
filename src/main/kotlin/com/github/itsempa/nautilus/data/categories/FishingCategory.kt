@@ -4,8 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
-import at.hannibal2.skyhanni.features.misc.IslandAreas
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
 import com.github.itsempa.nautilus.data.CrystalHollowsArea
 import com.github.itsempa.nautilus.data.HotspotApi
@@ -48,7 +47,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         override fun checkActive(): Boolean = lastWater == false
 
         data object CrimsonIsle : FishingCategory("CRIMSON_ISLE") {
-            override fun checkActive(): Boolean = IslandType.CRIMSON_ISLE.isInIsland()
+            override fun checkActive(): Boolean = IslandType.CRIMSON_ISLE.isCurrent()
 
             data object TrophyFish : FishingCategory("TROPHY_FISH") {
                 override fun checkActive(): Boolean = FishingApi.wearingTrophyArmor
@@ -64,7 +63,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
 
         data object CrystalHollows : FishingCategory("CH_LAVA") {
-            override fun checkActive(): Boolean = IslandType.CRYSTAL_HOLLOWS.isInIsland()
+            override fun checkActive(): Boolean = IslandType.CRYSTAL_HOLLOWS.isCurrent()
 
             data object MagmaCore : FishingCategory("MAGMA_CORE") {
                 override fun checkActive(): Boolean = CrystalHollowsArea.MAGMA_FIELDS.inArea()
@@ -80,7 +79,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         override fun checkActive(): Boolean = lastWater == true
 
         data object CrystalHollows : FishingCategory("CH_WATER") {
-            override fun checkActive(): Boolean = IslandType.CRYSTAL_HOLLOWS.isInIsland()
+            override fun checkActive(): Boolean = IslandType.CRYSTAL_HOLLOWS.isCurrent()
 
             data object Worm : FishingCategory("CH_WATER_WORM") {
                 override fun checkActive(): Boolean = CrystalHollowsArea.GOBLIN_HOLDOUT.inArea()
@@ -96,7 +95,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
 
         data object DwarvenMines : FishingCategory("DW_WATER") {
-            override fun checkActive(): Boolean = IslandType.DWARVEN_MINES.isInIsland()
+            override fun checkActive(): Boolean = IslandType.DWARVEN_MINES.isCurrent()
 
             data object Grubbers : FishingCategory("DW_WATER_GRUBBERS") {
                 override fun checkActive(): Boolean = true
@@ -105,19 +104,19 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
 
         // TODO: figure out what to do with this
         data object Park : FishingCategory("PARK") {
-            override fun checkActive(): Boolean = IslandType.THE_PARK.isInIsland()
+            override fun checkActive(): Boolean = IslandType.THE_PARK.isCurrent()
 
             data object InkFishing : FishingCategory("INK_FISHING") {
-                override fun checkActive(): Boolean = IslandAreas.currentAreaName == "Birch Park"
+                override fun checkActive(): Boolean = SkyBlockUtils.graphArea == "Birch Park"
             }
         }
 
         data object Bayou : FishingCategory("BAYOU") {
-            override fun checkActive(): Boolean = IslandType.BACKWATER_BAYOU.isInIsland()
+            override fun checkActive(): Boolean = IslandType.BACKWATER_BAYOU.isCurrent()
         }
 
         data object Oasis : FishingCategory("OASIS") {
-            override fun checkActive(): Boolean = IslandType.THE_FARMING_ISLANDS.isInIsland()
+            override fun checkActive(): Boolean = IslandType.THE_FARMING_ISLANDS.isCurrent()
         }
 
         data object Hotspot : FishingCategory("WATER_HOTSPOT", extraCategory = true) {
@@ -131,7 +130,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
 
             data object Jerry : FishingCategory("JERRY", true) {
                 override fun checkActive(): Boolean {
-                    return JerrysWorkshopEvent.isActive && IslandType.WINTER.isInIsland()
+                    return JerrysWorkshopEvent.isActive && IslandType.WINTER.isCurrent()
                 }
             }
 
