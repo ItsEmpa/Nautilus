@@ -7,10 +7,10 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.commands.brigadier.BaseBrigadierBuilder
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.suggestion.SuggestionProvider
+import me.owdding.ktmodules.Module
 
 @Module
 object NautilusUsageCommand {

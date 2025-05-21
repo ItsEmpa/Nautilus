@@ -1,6 +1,5 @@
 import org.apache.commons.lang3.SystemUtils
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.ByteArrayOutputStream
 
 plugins {
     idea
@@ -19,7 +18,7 @@ plugins {
 val modName: String by project
 val modVersion: String by project
 val modid: String by project
-val skyhanniVersion: String by project
+val skyhanniVersion: String get() = libs.versions.skyhanni.get()
 val baseGroup: String by project
 
 version = modVersion
@@ -28,16 +27,7 @@ blossom {
     replaceToken("@MOD_VER@", modVersion)
     replaceToken("@MOD_NAME@", modName)
     replaceToken("@MOD_ID@", modid)
-}
-
-val gitHash by lazy {
-    val baos = ByteArrayOutputStream()
-    exec {
-        standardOutput = baos
-        commandLine("git", "rev-parse", "--short", "HEAD")
-        isIgnoreExitValue = true
-    }
-    baos.toByteArray().decodeToString().trim()
+    replaceToken("@SKYHANNI_VER@", skyhanniVersion)
 }
 
 // Toolchains:
@@ -54,6 +44,7 @@ sourceSets.main {
 // Dependencies:
 
 repositories {
+    maven("https://maven.teamresourceful.com/repository/maven-public/")
     mavenCentral()
     mavenLocal()
 
@@ -67,9 +58,6 @@ repositories {
     }
     maven("https://repo.nea.moe/releases")
     maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
-    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
-
-    maven("https://maven.teamresourceful.com/repository/maven-public/")
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -104,10 +92,8 @@ dependencies {
     }
 
     implementation(kotlin("stdlib-jdk8"))
-    ksp(libs.ktmodules)
-    compileOnly(libs.ktmodules)
-
-    compileOnly(ksp(project("annotations"))!!)
+    compileOnly(libs.meowdding.ktmodules)
+    ksp(libs.meowdding.ktmodules)
 
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
@@ -129,8 +115,7 @@ dependencies {
 
 ksp {
     arg("meowdding.modules.project_name", project.name)
-    arg("meowdding.modules.package", "com.github.itsempa.nautilus.test.modules")
-    arg("symbolProcessor", "com.example.modules.ModuleProvider")
+    arg("meowdding.modules.package", "com.github.itsempa.nautilus.modules")
 }
 
 kotlin {

@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.HotspotApi
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusRenderUtils.drawCircle
+import me.owdding.ktmodules.Module
 
-@Module(devOnly = true)
+@Module
 object HotspotHighlight {
 
     private val config get() = Nautilus.feature.render

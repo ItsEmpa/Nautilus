@@ -12,9 +12,9 @@ import com.github.itsempa.nautilus.data.fishingevents.FishingFestivalEvent
 import com.github.itsempa.nautilus.data.fishingevents.JerrysWorkshopEvent
 import com.github.itsempa.nautilus.data.fishingevents.SpookyFestivalEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orTrue
 import com.github.itsempa.nautilus.utils.getSealedObjects
+import me.owdding.ktmodules.Module
 import kotlin.reflect.KClass
 
 @Suppress("unused")

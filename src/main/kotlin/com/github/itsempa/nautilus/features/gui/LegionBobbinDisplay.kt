@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusItemUtils.uuid
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orZero
 import com.github.itsempa.nautilus.utils.helpers.McPlayer
+import me.owdding.ktmodules.Module
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.projectile.EntityFishHook
 import java.util.UUID

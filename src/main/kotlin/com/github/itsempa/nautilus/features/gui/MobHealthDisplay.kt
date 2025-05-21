@@ -11,8 +11,8 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.SeaCreatureData
 import com.github.itsempa.nautilus.data.SeaCreatureDetectionApi
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusUtils.toSet
+import me.owdding.ktmodules.Module
 
 @Module
 object MobHealthDisplay {

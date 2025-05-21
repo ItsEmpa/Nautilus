@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import com.github.itsempa.nautilus.events.KillEvent
 import com.github.itsempa.nautilus.events.combo.ComboEndEvent
 import com.github.itsempa.nautilus.events.combo.ComboUpdateEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.fullEnumMapOf
 import com.github.itsempa.nautilus.utils.replaceAll
+import me.owdding.ktmodules.Module
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 

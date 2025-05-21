@@ -8,8 +8,8 @@ import com.github.itsempa.nautilus.config.storage.ProfileStorage
 import com.github.itsempa.nautilus.config.storage.Storage
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
+import me.owdding.ktmodules.Module
 
 @Module
 object NautilusStorage {

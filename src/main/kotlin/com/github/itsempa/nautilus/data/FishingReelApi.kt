@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.FishCatchEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.ResettingValue
 import com.github.itsempa.nautilus.utils.helpers.McPlayer
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.seconds
 
 @Module

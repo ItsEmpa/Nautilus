@@ -1,7 +1,7 @@
 package com.github.itsempa.nautilus.data
 
 import at.hannibal2.skyhanni.features.fishing.FishingApi
-import com.github.itsempa.nautilus.modules.Module
+import me.owdding.ktmodules.Module
 
 @Module
 object FeeshApi {

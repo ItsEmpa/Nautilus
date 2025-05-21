@@ -3,6 +3,7 @@ package com.github.itsempa.nautilus.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.test.command.ErrorManager.CachedError
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -162,7 +163,6 @@ object NautilusErrorManager {
         if (!condition()) return false
 
         Error(message, throwable).printStackTrace()
-        if (!McPlayer.exists) return false
 
         val fullStackTrace: String
         val stackTrace: String
@@ -183,13 +183,17 @@ object NautilusErrorManager {
             "```\n${Nautilus.MOD_NAME} ${Nautilus.VERSION}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
         val finalMessage = buildFinalMessage(message)
-        NautilusChat.clickableChat(
-            "§c[${Nautilus.MOD_NAME}-${Nautilus.VERSION}]: $finalMessage Click here to copy the error into the clipboard.",
-            "§eClick to copy!",
-            prefix = false,
-        ) {
-            copyError(randomId)
+        fun send() {
+            NautilusChat.clickableChat(
+                "§c[${Nautilus.MOD_NAME}-${Nautilus.VERSION}]: $finalMessage Click here to copy the error into the clipboard.",
+                "§eClick to copy!",
+                prefix = false,
+            ) {
+                copyError(randomId)
+            }
         }
+        if (McPlayer.exists) send()
+        else DelayedRun.runNextTick(::send)
         return true
     }
 

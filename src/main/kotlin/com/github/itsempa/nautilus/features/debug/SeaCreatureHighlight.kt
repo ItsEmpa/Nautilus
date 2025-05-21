@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import com.github.itsempa.nautilus.data.SeaCreatureData
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
-import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.modules.DevModule
 import com.github.itsempa.nautilus.utils.NautilusRenderUtils.drawBoundingBox
 import java.awt.Color
 
-@Module(devOnly = true)
+@DevModule
 object SeaCreatureHighlight {
 
     private val seaCreatures = mutableSetOf<SeaCreatureData>()

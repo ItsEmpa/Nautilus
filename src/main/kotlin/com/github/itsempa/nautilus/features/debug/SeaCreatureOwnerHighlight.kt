@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.SeaCreatureDetectionApi.seaCreature
-import com.github.itsempa.nautilus.modules.Module
+import me.owdding.ktmodules.Module
 import net.minecraft.entity.Entity
 
 @Module

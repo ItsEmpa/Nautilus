@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.NautilusStorage
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
-import com.github.itsempa.nautilus.modules.Module
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.days
 
 @Module

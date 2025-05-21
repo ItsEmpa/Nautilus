@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusPreInitFinishedEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.enumMapOf
 import com.mojang.brigadier.CommandDispatcher
+import me.owdding.ktmodules.Module
 import net.minecraftforge.client.ClientCommandHandler
 
 @Module

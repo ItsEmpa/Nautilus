@@ -27,12 +27,12 @@ import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.RareDropEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.features.render.LootshareRange
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusTimeUtils.customFormat
 import com.github.itsempa.nautilus.utils.enumSetOf
 import com.github.itsempa.nautilus.utils.removeFirstMatches
 import com.google.gson.annotations.Expose
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("UnstableApiUsage")

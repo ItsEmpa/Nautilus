@@ -10,12 +10,12 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusRepositoryReloadEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.tryCatch
 import com.github.itsempa.nautilus.utils.tryOrNull
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import me.owdding.ktmodules.Module
 import org.apache.commons.io.FileUtils
 import java.io.BufferedReader
 import java.io.BufferedWriter

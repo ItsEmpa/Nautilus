@@ -62,6 +62,17 @@ inline fun tryError(message: String, func: () -> Unit) {
     }
 }
 
+inline fun tryError(message: String, vararg extraData: Pair<String, Any?>, ignoreErrorCache: Boolean = false, func: () -> Unit) {
+    contract {
+        callsInPlace(func, InvocationKind.AT_MOST_ONCE)
+    }
+    try {
+        func()
+    } catch (e: Throwable) {
+        NautilusErrorManager.logErrorWithData(e, message, *extraData, ignoreErrorCache = ignoreErrorCache)
+    }
+}
+
 inline fun tryError(lazyMessage: (Throwable) -> String, func: () -> Unit) {
     contract {
         callsInPlace(func, InvocationKind.AT_MOST_ONCE)

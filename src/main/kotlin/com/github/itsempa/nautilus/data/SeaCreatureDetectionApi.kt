@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.entityId
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.hasDied
@@ -28,6 +27,7 @@ import com.github.itsempa.nautilus.utils.NautilusEntityUtils.spawnTime
 import com.github.itsempa.nautilus.utils.helpers.McPlayer
 import com.github.itsempa.nautilus.utils.removeIf
 import com.google.common.cache.RemovalCause
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 

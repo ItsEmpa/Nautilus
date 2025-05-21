@@ -20,9 +20,9 @@ import com.github.itsempa.nautilus.data.FeeshApi
 import com.github.itsempa.nautilus.data.fishingevents.SpookyFestivalEvent
 import com.github.itsempa.nautilus.events.FishingEventUpdate
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.fullEnumMapOf
+import me.owdding.ktmodules.Module
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 

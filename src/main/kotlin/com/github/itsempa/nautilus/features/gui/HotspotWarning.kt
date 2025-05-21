@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.TitleManager
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.HotspotApi
 import com.github.itsempa.nautilus.events.HotspotEvent
-import com.github.itsempa.nautilus.modules.Module
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.seconds
 
 @Module

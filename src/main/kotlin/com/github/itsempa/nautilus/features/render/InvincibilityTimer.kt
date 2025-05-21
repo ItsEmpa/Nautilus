@@ -10,9 +10,9 @@ import com.github.itsempa.nautilus.data.SeaCreatureData
 import com.github.itsempa.nautilus.data.VanquisherApi
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.events.VanquisherEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
 import com.github.itsempa.nautilus.utils.NautilusUtils.getHeight
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.seconds
 
 @Module

@@ -9,13 +9,13 @@ import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.FishingEventUpdate
 import com.github.itsempa.nautilus.events.MayorDataUpdateEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orFalse
 import com.github.itsempa.nautilus.utils.TimePeriod
 import com.github.itsempa.nautilus.utils.TimePeriod.Companion.getCurrentOrNext
 import com.github.itsempa.nautilus.utils.getSealedObjects
 import com.github.itsempa.nautilus.utils.minBy
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration
 
 sealed class FishingEvent(val internalName: String) {
