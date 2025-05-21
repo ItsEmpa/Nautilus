@@ -9,8 +9,8 @@ import net.minecraft.client.settings.GameSettings
 object McClient {
 
     val self: Minecraft get() = Minecraft.getMinecraft()
-    val wordNull: WorldClient? get() = self.theWorld
-    val world: WorldClient get() = wordNull!!
+    val worldNull: WorldClient? get() = self.theWorld
+    val world: WorldClient get() = worldNull!!
 
     val settings get(): GameSettings = self.gameSettings
     val textureManager: TextureManager get() = self.textureManager
