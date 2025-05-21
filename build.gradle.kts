@@ -91,7 +91,9 @@ dependencies {
         exclude(module = "gson")
     }
 
-    implementation(kotlin("stdlib-jdk8"))
+    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    shadowImpl(kotlin("stdlib-jdk8"))
+    shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     compileOnly(libs.meowdding.ktmodules)
     ksp(libs.meowdding.ktmodules)
 
@@ -124,9 +126,6 @@ kotlin {
             //languageVersion = "2.0"
             enableLanguageFeature("BreakContinueInInlineLambdas")
         }
-    }
-    sourceSets.main {
-        kotlin.srcDirs("build/generated/ksp/main/kotlin")
     }
 }
 
