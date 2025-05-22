@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.data
+package com.github.itsempa.nautilus.data.core
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.DelayedRun

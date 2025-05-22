@@ -2,7 +2,7 @@ package com.github.itsempa.nautilus.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
-import com.github.itsempa.nautilus.data.NautilusErrorManager
+import com.github.itsempa.nautilus.data.core.NautilusErrorManager
 
 // TODO: improve so it only actually creates the data that is necessary
 class NautilusDebugEvent(private val list: MutableList<String>, private val search: String, private val all: Boolean) : SkyHanniEvent() {

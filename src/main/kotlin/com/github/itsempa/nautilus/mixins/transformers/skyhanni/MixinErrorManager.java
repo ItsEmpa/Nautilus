@@ -1,7 +1,7 @@
 package com.github.itsempa.nautilus.mixins.transformers.skyhanni;
 
 import at.hannibal2.skyhanni.test.command.ErrorManager;
-import com.github.itsempa.nautilus.data.NautilusErrorManager;
+import com.github.itsempa.nautilus.data.core.NautilusErrorManager;
 import kotlin.Pair;
 import kotlin.jvm.functions.Function0;
 import org.spongepowered.asm.mixin.Mixin;

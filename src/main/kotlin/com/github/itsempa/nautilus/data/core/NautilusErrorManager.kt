@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.data
+package com.github.itsempa.nautilus.data.core
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -70,8 +70,8 @@ object NautilusErrorManager {
         "at net.minecraft.launchwrapper.",
 
         "at com.github.itsempa.nautilus.commands.brigadier.BrigadierCommand",
-        "at com.github.itsempa.nautilus.data.NautilusErrorManager.logError",
-        "at com.github.itsempa.nautilus.data.NautilusErrorManager.nautilusError",
+        "at com.github.itsempa.nautilus.data.core.NautilusErrorManager.logError",
+        "at com.github.itsempa.nautilus.data.core.NautilusErrorManager.nautilusError",
     )
 
     private val skipErrorEntry = emptyMap<String, List<String>>()

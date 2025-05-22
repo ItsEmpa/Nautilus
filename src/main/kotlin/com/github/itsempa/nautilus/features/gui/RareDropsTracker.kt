@@ -19,9 +19,9 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.FeeshApi
-import com.github.itsempa.nautilus.data.NautilusStorage
 import com.github.itsempa.nautilus.data.RareDropStat
 import com.github.itsempa.nautilus.data.categories.FishingCategory
+import com.github.itsempa.nautilus.data.core.NautilusStorage
 import com.github.itsempa.nautilus.data.repo.FishingCategoriesMobs.getMobs
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.RareDropEvent

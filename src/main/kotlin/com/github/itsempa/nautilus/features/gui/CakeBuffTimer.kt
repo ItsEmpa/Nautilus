@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.data.NautilusStorage
+import com.github.itsempa.nautilus.data.core.NautilusStorage
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.days

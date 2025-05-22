@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.config.Features
-import com.github.itsempa.nautilus.data.NautilusRepoManager
-import com.github.itsempa.nautilus.data.SkyHanniVersionCheck
+import com.github.itsempa.nautilus.data.core.NautilusRepoManager
+import com.github.itsempa.nautilus.data.core.SkyHanniVersionCheck
 import com.github.itsempa.nautilus.events.NautilusPreInitFinishedEvent
 import com.github.itsempa.nautilus.features.misc.update.SemVersion
 import com.github.itsempa.nautilus.mixins.transformers.skyhanni.AccessorSkyHanniEvents

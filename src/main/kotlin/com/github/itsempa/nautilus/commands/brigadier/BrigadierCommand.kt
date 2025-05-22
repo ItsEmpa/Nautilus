@@ -1,6 +1,6 @@
 package com.github.itsempa.nautilus.commands.brigadier
 
-import com.github.itsempa.nautilus.data.NautilusErrorManager
+import com.github.itsempa.nautilus.data.core.NautilusErrorManager
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.tryOrDefault
 import com.mojang.brigadier.CommandDispatcher

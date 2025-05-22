@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.data
+package com.github.itsempa.nautilus.data.core
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
