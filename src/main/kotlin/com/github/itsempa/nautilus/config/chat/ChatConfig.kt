@@ -13,6 +13,11 @@ class ChatConfig {
     val hotspotSharing: HotspotSharingConfig = HotspotSharingConfig()
 
     @Expose
+    @ConfigOption(name = "Sea Creature Warning", desc = "")
+    @Accordion
+    val seaCreatureWarning: SeaCreatureWarningConfig = SeaCreatureWarningConfig()
+
+    @Expose
     @ConfigOption(name = "Best Combo", desc = "Show in chat a message when you beat your PB for longest combo.")
     @ConfigEditorBoolean
     var bestCombo: Boolean = true

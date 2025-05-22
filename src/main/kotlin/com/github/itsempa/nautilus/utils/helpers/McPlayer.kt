@@ -13,6 +13,7 @@ object McPlayer {
     val selfNull: EntityPlayerSP? get() = McClient.self.thePlayer
     val exists: Boolean get() = selfNull != null
 
+    val name: String get() = self.name
     val isSneaking: Boolean get() = self.isSneaking
     val heldItem: ItemStack? get() = self.heldItem
     val pos: LorenzVec get() = self.position.toLorenzVec()
