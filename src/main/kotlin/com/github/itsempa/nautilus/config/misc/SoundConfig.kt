@@ -11,10 +11,13 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.utils.NautilusUtils.asProperty
 import com.google.gson.annotations.Expose
+import kotlinx.coroutines.delay
 import me.owdding.ktmodules.Module
 import net.minecraft.client.audio.ISound
+import kotlin.time.Duration.Companion.milliseconds
 
 @Suppress("CanBePrimaryConstructorProperty")
 class SoundConfig(
@@ -23,6 +26,7 @@ class SoundConfig(
     volume: Float = 50f,
     pitch: Float = 1f,
     repeat: Int = 1,
+    repeatDuration: Int = 50
 ) {
 
     @Expose
@@ -48,7 +52,12 @@ class SoundConfig(
     @Expose
     @ConfigOption(name = "Repeat Sound", desc = "Play the sound this amount of times every time it is played.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
-    private val repeat: Int = repeat
+    private var repeat: Int = repeat
+
+    @Expose
+    @ConfigOption(name = "Repeat Duration", desc = "Amount of milliseconds between each sound played, in milliseconds.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 500f, minStep = 1f)
+    private var repeatDuration: Int = repeatDuration
 
     @Transient
     @ConfigOption(name = "Test Sound", desc = "Test the sound")
@@ -69,7 +78,17 @@ class SoundConfig(
     }
 
     fun playSound(bypass: Boolean = false) {
-        if (bypass || enabled) repeat(repeat) { sound.playSound() }
+        if (!bypass && !enabled) return
+        if (repeat <= 1) sound.playSound()
+        else {
+            val duration = repeatDuration.milliseconds
+            Nautilus.launchCoroutine {
+                repeat(repeat) {
+                    sound.playSound()
+                    delay(duration)
+                }
+            }
+        }
     }
 
     @Module
