@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.SeaCreature
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -30,23 +32,23 @@ object SeaCreatureWarning {
 
     private val config get() = Nautilus.feature.chat.seaCreatureWarning
 
-    private val pattern = "\\[Nautilus] (?<seaCreature>.+) (?<dh>x2)? (?<pos>.+)".toPattern()
+    private val pattern = "\\[Nautilus] (?<seaCreature>.+) (?<dh>\\(x2\\))? (?<pos>.+)".toPattern()
 
     private val waypoint = TemporaryWaypoint(5.minutes, 10.0)
     private var text: List<String>? = null
 
     @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!config.enabled) return
+        if (!isEnabled()) return
         val seaCreature = event.seaCreature
         val doubleHook = event.doubleHook
-        /*if (seaCreature.rare) */showWarning(seaCreature, doubleHook, null)
+        if (seaCreature.rare) showWarning(seaCreature, doubleHook, null)
         if (config.partyMessage) sendChatMessage(seaCreature, doubleHook)
     }
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!config.enabled) return
+        if (!isEnabled()) return
         val pos = waypoint.getPos()?.up() ?: return
         val list = text ?: return
         var yOffset = 0f
@@ -60,18 +62,20 @@ object SeaCreatureWarning {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: PartyChatEvent) {
-        if (!config.otherSeaCreatures) return
+        if (!config.otherSeaCreatures.get()) return
         pattern.matchMatcher(event.message) {
             val seaCreature = SeaCreatureManager.allFishingMobs[group("seaCreature")] ?: return
             val doubleHook = hasGroup("dh")
             val pos = group("pos").asLorenzVec() ?: return
             event.blockedReason = "NT_SEA_CREATURE"
-            showWarning(seaCreature, doubleHook, event.cleanedAuthor)
+            val cleanedAuthor = event.cleanedAuthor
+            val isOwn = cleanedAuthor == McPlayer.name
+            if (!isOwn) showWarning(seaCreature, doubleHook, cleanedAuthor)
             waypoint.setPos(pos)
             val seaCreatureText = "${seaCreature.displayName}§e${if (doubleHook) " (x2)" else ""}"
             text = listOfNotNull(
                 seaCreatureText,
-                if (event.cleanedAuthor == McPlayer.name) null else "§a${event.cleanedAuthor}",
+                if (isOwn) null else "§a${cleanedAuthor}",
             )
             NautilusChat.hoverableChat(
                 "${event.author} §ecaught $seaCreatureText at §b${pos.asSimpleChatMessage()}!",
@@ -100,6 +104,21 @@ object SeaCreatureWarning {
         TitleManager.sendTitle(title, subtitle, duration = 2.seconds)
         config.sound.playSound()
     }
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.enabled.onToggle {
+            if (!isEnabled()) waypoint.reset()
+        }
+        config.otherSeaCreatures.onToggle {
+            if (config.otherSeaCreatures.get()) return@onToggle
+            val list = text ?: return@onToggle
+            // if the list has a size of 2, it means that the owner of the sea creature is someone else
+            if (list.size == 2) waypoint.reset()
+        }
+    }
+
+    private fun isEnabled() = config.enabled.get()
 
 
 }
