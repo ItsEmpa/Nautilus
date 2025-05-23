@@ -91,9 +91,7 @@ dependencies {
         exclude(module = "gson")
     }
 
-    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-    shadowImpl(kotlin("stdlib-jdk8"))
-    shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    implementation(kotlin("stdlib-jdk8"))
     compileOnly(libs.meowdding.ktmodules)
     ksp(libs.meowdding.ktmodules)
 
