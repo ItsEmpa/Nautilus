@@ -13,12 +13,12 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.utils.NautilusItemUtils.uuid
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orZero
 import com.github.itsempa.nautilus.utils.helpers.McPlayer
+import com.github.itsempa.nautilus.utils.safe.SafeUtils
 import me.owdding.ktmodules.Module
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.projectile.EntityFishHook
@@ -135,12 +135,12 @@ object LegionBobbinDisplay {
 
         return listOf(
             HorizontalContainerRenderable(listOf(
-                RenderableString(legionTitle),
-                RenderableString(legionText),
+                SafeUtils.stringRenderable(legionTitle),
+                SafeUtils.stringRenderable(legionText),
             )),
             HorizontalContainerRenderable(listOf(
-                RenderableString(bobbinTitle),
-                RenderableString(bobbinText),
+                SafeUtils.stringRenderable(bobbinTitle),
+                SafeUtils.stringRenderable(bobbinText),
             )),
         )
 
@@ -151,16 +151,16 @@ object LegionBobbinDisplay {
             if (!config.hideWithoutEnchant || wearingLegion) add(
                 HorizontalContainerRenderable(
                     listOf(
-                        RenderableString("§dLegion: "),
-                        RenderableString("§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)"),
+                        SafeUtils.stringRenderable("§dLegion: "),
+                        SafeUtils.stringRenderable("§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)"),
                     ),
                 ),
             )
             if (!config.hideWithoutEnchant || wearingBobbin) add(
                 HorizontalContainerRenderable(
                     listOf(
-                        RenderableString("§3Bobbin: "),
-                        RenderableString("§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)"),
+                        SafeUtils.stringRenderable("§3Bobbin: "),
+                        SafeUtils.stringRenderable("§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)"),
                     ),
                 ),
             )
