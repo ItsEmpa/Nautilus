@@ -22,4 +22,12 @@ class ChatConfig {
     @ConfigEditorBoolean
     var bestCombo: Boolean = true
 
+    @Expose
+    @ConfigOption(
+        name = "Sea Creature Kill Timer",
+        desc = "Sends a chat message that shows how much time it took to kill a specific sea creature."
+    )
+    @ConfigEditorBoolean
+    var seaCreatureKillTimer: Boolean = true
+
 }

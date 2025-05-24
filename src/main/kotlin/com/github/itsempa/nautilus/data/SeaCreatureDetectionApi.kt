@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
@@ -37,6 +36,8 @@ import kotlin.time.Duration.Companion.seconds
 object SeaCreatureDetectionApi {
 
     val DESPAWN_TIME = 6.minutes
+
+    private const val MAX_WAIT_DEATH_DISTANCE = 25.0
 
     private val entityIdToData = TimeLimitedCache<Int, SeaCreatureData>(DESPAWN_TIME) { id, data, cause ->
         if (cause == RemovalCause.EXPIRED && data != null && id != null) data.forceRemove()
@@ -210,15 +211,14 @@ object SeaCreatureDetectionApi {
     // This should hopefully make it so that if a sea creature dies while the player isn't in the area and the despawn timer
     // isn't up yet, it will be assumed that it died
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!event.repeatSeconds(5)) return
+    fun onSecondPassed() {
         val playerPos = McPlayer.pos
         for ((_, data) in entityIdToData) {
             if (data.isLoaded()) continue
             val lastPos = data.actualLastPos
-            if (lastPos.distance(playerPos) > 20) continue
-            val timeUntil = data.despawnTime.timeUntil()
-            if (timeUntil < 10.seconds) continue
+            if (lastPos.distance(playerPos) > MAX_WAIT_DEATH_DISTANCE) continue
+            val timeAroundPos = PlayerPosData.timeAtPos(lastPos, MAX_WAIT_DEATH_DISTANCE) ?: continue
+            if (timeAroundPos < 5.seconds) continue
             data.sendDeath(false)
         }
     }
