@@ -39,7 +39,9 @@ object Nautilus {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
         SkyHanniVersionCheck.checkSkyHanniLoaded()
-        ConfigManager // Load ConfigManager class to initialize config
+        tryError("Something went wrong while initializing the config!") {
+            ConfigManager // Load ConfigManager class to initialize config
+        }
 
         tryError("Something went wrong while initializing modules!") {
             NautilusModules.init(::loadModule)
@@ -49,6 +51,7 @@ object Nautilus {
                 NautilusDevModules.init(::loadModule)
             }
         }
+        // TODO: figure out why this errors on startup
         NautilusRepoManager.initRepo()
 
         NautilusPreInitFinishedEvent.post()
