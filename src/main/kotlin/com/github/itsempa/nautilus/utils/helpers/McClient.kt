@@ -1,5 +1,6 @@
 package com.github.itsempa.nautilus.utils.helpers
 
+import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.client.renderer.texture.TextureManager
@@ -22,6 +23,11 @@ object McClient {
         } else {
             self.addScheduledTask(action)
         }
+    }
+
+    fun runOnWorld(action: () -> Unit) {
+        if (McPlayer.exists) action()
+        else DelayedRun.runNextTick(action)
     }
 
 }

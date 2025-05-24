@@ -23,6 +23,8 @@ fun <T> MutableCollection<T>.clearAnd(predicate: (T) -> Unit) {
     }
 }
 
+fun <T> Iterable<T>.anyIntersects(other: Iterable<T>): Boolean = any { it in other }
+
 fun <K, V> MutableMap<K, V>.clearAnd(predicate: (Map.Entry<K, V>) -> Unit) = entries.clearAnd(predicate)
 
 fun <K, V> MutableMap<K, V>.replaceAll(value: V) = entries.forEach { it.setValue(value) }

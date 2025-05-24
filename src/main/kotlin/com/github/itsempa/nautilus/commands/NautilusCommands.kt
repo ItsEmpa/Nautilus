@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package com.github.itsempa.nautilus.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -17,8 +15,7 @@ import me.owdding.ktmodules.Module
 @Module
 object NautilusCommands {
 
-    // Priority is set to the highest so that these commands always appear at the top
-    @HandleEvent(priority = HandleEvent.HIGHEST)
+    @HandleEvent
     fun onCommandRegister(event: BrigadierRegisterEvent) {
         event.register("nautilus") {
             this.aliases = listOf("nt", "nautilusconfig", "ntconfig")

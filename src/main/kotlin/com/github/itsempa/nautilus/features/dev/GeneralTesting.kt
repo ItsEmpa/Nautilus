@@ -16,8 +16,8 @@ object GeneralTesting {
     @HandleEvent
     fun onCommand(event: BrigadierRegisterEvent) {
         event.register("nttimetest") {
-            category = CommandCategory.DEVELOPER_TEST
             description = "Test time formatting."
+            category = CommandCategory.DEVELOPER_TEST
 
             argCallback("time", BrigadierArguments.greedyString()) { string ->
                 val duration = TimeUtils.getDuration(string)
