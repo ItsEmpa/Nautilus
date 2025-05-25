@@ -19,7 +19,11 @@ class LegionBobbinConfig {
     var hideWithoutEnchant: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Always Show Max", desc = "Always show the buffs as if you were wearing max Legion/Bobbin' Time.")
+    @ConfigOption(
+        name = "Always Show Max",
+        desc = "Always show the buffs as if you were wearing max Legion/Bobbin' Time.\n" +
+            "The current buff is indicated by bolding, and the best one with a gold star."
+    )
     @ConfigEditorBoolean
     var alwaysShowMax: Boolean = false
 

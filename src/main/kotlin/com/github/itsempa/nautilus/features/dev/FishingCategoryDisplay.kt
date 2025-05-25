@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import com.github.itsempa.nautilus.data.categories.FishingCategory
-import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.modules.DevModule
 
-@Module(devOnly = true)
+@DevModule
 object FishingCategoryDisplay {
 
     private val pos = Position(100, 200)
@@ -19,7 +19,7 @@ object FishingCategoryDisplay {
                 "Current Category: ${FishingCategory.activeCategory?.internalName ?: "None"}",
                 "Extra Categories: ${FishingCategory.extraCategories.map { it.internalName }.ifEmpty { "None" }}",
             ),
-            posLabel = "Fishing Categories"
+            posLabel = "Fishing Categories",
         )
     }
 

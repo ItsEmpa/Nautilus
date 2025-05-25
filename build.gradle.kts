@@ -1,6 +1,5 @@
 import org.apache.commons.lang3.SystemUtils
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.ByteArrayOutputStream
 
 plugins {
     idea
@@ -8,18 +7,18 @@ plugins {
     id("gg.essential.loom") version "0.10.0.5"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    kotlin("jvm") version "2.0.0"
-    kotlin("plugin.serialization") version "1.8.0"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.serialization") version "2.1.20"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
     id("net.kyori.blossom") version "1.3.2"
-    id("com.google.devtools.ksp") version "2.0.20-1.0.25"
+    id("com.google.devtools.ksp") version "2.1.20-2.0.0"
 }
 
 // Constants:
 val modName: String by project
 val modVersion: String by project
 val modid: String by project
-val skyhanniVersion: String by project
+val skyhanniVersion: String get() = libs.versions.skyhanni.get()
 val baseGroup: String by project
 
 version = modVersion
@@ -28,16 +27,7 @@ blossom {
     replaceToken("@MOD_VER@", modVersion)
     replaceToken("@MOD_NAME@", modName)
     replaceToken("@MOD_ID@", modid)
-}
-
-val gitHash by lazy {
-    val baos = ByteArrayOutputStream()
-    exec {
-        standardOutput = baos
-        commandLine("git", "rev-parse", "--short", "HEAD")
-        isIgnoreExitValue = true
-    }
-    baos.toByteArray().decodeToString().trim()
+    replaceToken("@SKYHANNI_VER@", skyhanniVersion)
 }
 
 // Toolchains:
@@ -54,6 +44,7 @@ sourceSets.main {
 // Dependencies:
 
 repositories {
+    maven("https://maven.teamresourceful.com/repository/maven-public/")
     mavenCentral()
     mavenLocal()
 
@@ -67,7 +58,6 @@ repositories {
     }
     maven("https://repo.nea.moe/releases")
     maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
-    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -101,7 +91,9 @@ dependencies {
         exclude(module = "gson")
     }
 
-    compileOnly(ksp(project("annotations"))!!)
+    implementation(kotlin("stdlib-jdk8"))
+    compileOnly(libs.meowdding.ktmodules)
+    ksp(libs.meowdding.ktmodules)
 
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
@@ -122,7 +114,8 @@ dependencies {
 }
 
 ksp {
-    arg("symbolProcessor", "com.example.modules.ModuleProvider")
+    arg("meowdding.modules.project_name", project.name)
+    arg("meowdding.modules.package", "com.github.itsempa.nautilus.modules")
 }
 
 kotlin {
@@ -131,9 +124,6 @@ kotlin {
             languageVersion = "2.0"
             enableLanguageFeature("BreakContinueInInlineLambdas")
         }
-    }
-    sourceSets.main {
-        kotlin.srcDirs("build/generated/ksp/main/kotlin")
     }
 }
 

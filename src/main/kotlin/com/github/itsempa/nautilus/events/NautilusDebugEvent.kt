@@ -2,8 +2,9 @@ package com.github.itsempa.nautilus.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
-import com.github.itsempa.nautilus.utils.NautilusUtils
+import com.github.itsempa.nautilus.data.core.NautilusErrorManager
 
+// TODO: improve so it only actually creates the data that is necessary
 class NautilusDebugEvent(private val list: MutableList<String>, private val search: String, private val all: Boolean) : SkyHanniEvent() {
 
     var empty = true
@@ -13,7 +14,7 @@ class NautilusDebugEvent(private val list: MutableList<String>, private val sear
     fun title(title: String) {
         if (currentTitle != "") {
             val msg = "NautilusDebugEvent duplicate titles and no data in between"
-            NautilusUtils.logErrorWithData(
+            NautilusErrorManager.logErrorWithData(
                 IllegalStateException(msg),
                 msg,
                 "current title" to currentTitle,
@@ -22,6 +23,13 @@ class NautilusDebugEvent(private val list: MutableList<String>, private val sear
         }
 
         currentTitle = title
+    }
+
+    fun title(title: String, block: NautilusDebugEvent.() -> Unit) {
+        title(title)
+        block(this)
+        currentTitle = ""
+        irrelevant = false
     }
 
     fun addIrrelevant(vararg data: Pair<String, Any?>) {

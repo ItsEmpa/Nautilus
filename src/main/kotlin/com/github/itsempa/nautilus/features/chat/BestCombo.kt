@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.data.NautilusStorage
+import com.github.itsempa.nautilus.data.core.NautilusStorage
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.combo.ComboEndEvent
 import com.github.itsempa.nautilus.events.combo.ComboUpdateEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
+import me.owdding.ktmodules.Module
 
 @Module
 object BestCombo {

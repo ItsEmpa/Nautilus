@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasBookOfStats
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.removeRange
+import me.owdding.ktmodules.Module
 
 @Module
 object HideBookOfStats {

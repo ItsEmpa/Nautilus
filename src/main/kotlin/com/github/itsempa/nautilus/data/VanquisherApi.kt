@@ -18,9 +18,9 @@ import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.VanquisherEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.hasDied
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.spawnTime
+import me.owdding.ktmodules.Module
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.minutes

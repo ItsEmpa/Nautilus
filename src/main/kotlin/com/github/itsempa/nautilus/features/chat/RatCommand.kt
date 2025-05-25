@@ -3,8 +3,8 @@ package com.github.itsempa.nautilus.features.chat
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
+import me.owdding.ktmodules.Module
 
 @Module
 object RatCommand {

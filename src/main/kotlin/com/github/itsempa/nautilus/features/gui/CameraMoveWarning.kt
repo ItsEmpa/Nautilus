@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.TitleManager
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.events.FishCatchEvent
-import com.github.itsempa.nautilus.modules.Module
+import me.owdding.ktmodules.Module
 
 @Module
 object CameraMoveWarning {

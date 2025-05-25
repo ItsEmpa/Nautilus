@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.helpers.McClient
+import me.owdding.ktmodules.Module
 import moe.nea.libautoupdate.GithubReleaseUpdateSource
 import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext

@@ -24,7 +24,6 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.HotspotApi
 import com.github.itsempa.nautilus.events.HotspotEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusRenderUtils.drawBoundingBox
 import com.github.itsempa.nautilus.utils.NautilusUtils.asChatMessage
@@ -33,6 +32,7 @@ import com.github.itsempa.nautilus.utils.NautilusUtils.asSimpleChatMessage
 import com.github.itsempa.nautilus.utils.NautilusUtils.getBlockAABB
 import com.github.itsempa.nautilus.utils.errorIfNull
 import com.github.itsempa.nautilus.utils.helpers.McPlayer
+import me.owdding.ktmodules.Module
 import net.minecraft.util.IChatComponent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds

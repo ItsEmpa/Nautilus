@@ -3,12 +3,12 @@ package com.github.itsempa.nautilus.data.fishingevents
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusUtils.skyblockDays
 import com.github.itsempa.nautilus.utils.NautilusUtils.skyblockYears
 import com.github.itsempa.nautilus.utils.TimePeriod
 import com.github.itsempa.nautilus.utils.TimePeriod.Companion.getCurrentOrNext
 import com.github.itsempa.nautilus.utils.TimePeriod.Companion.until
+import me.owdding.ktmodules.Module
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.Month

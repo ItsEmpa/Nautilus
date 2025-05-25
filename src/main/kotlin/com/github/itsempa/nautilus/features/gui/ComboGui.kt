@@ -10,7 +10,7 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.ComboData
 import com.github.itsempa.nautilus.data.KillData
 import com.github.itsempa.nautilus.events.combo.ComboUpdateEvent
-import com.github.itsempa.nautilus.modules.Module
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 

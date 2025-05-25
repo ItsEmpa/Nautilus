@@ -12,13 +12,13 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.categories.FishingCategory
 import com.github.itsempa.nautilus.data.fishingevents.FishingEvent
 import com.github.itsempa.nautilus.features.misc.update.ConfigVersionDisplay
-import com.github.itsempa.nautilus.features.misc.update.GuiOptionEditorUpdateCheck
+import com.github.itsempa.nautilus.features.misc.update.NautilusGuiOptionEditorUpdateCheck
 import com.github.itsempa.nautilus.features.misc.update.SemVersion
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.TimePeriod
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
+import me.owdding.ktmodules.Module
 import java.io.File
 
 @Module
@@ -30,7 +30,7 @@ object ConfigManager {
 
     val managedConfig = ManagedConfig.create(File(directory, "config.json"), Features::class.java) {
         customProcessor(ConfigVersionDisplay::class.java) { processor, _ ->
-            GuiOptionEditorUpdateCheck(processor)
+            NautilusGuiOptionEditorUpdateCheck(processor)
         }
         jsonMapper {
             gsonBuilder.setPrettyPrinting()

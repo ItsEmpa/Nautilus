@@ -13,8 +13,8 @@ import com.github.itsempa.nautilus.data.SeaCreatureData
 import com.github.itsempa.nautilus.data.SeaCreatureDetectionApi
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orFarPast
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 

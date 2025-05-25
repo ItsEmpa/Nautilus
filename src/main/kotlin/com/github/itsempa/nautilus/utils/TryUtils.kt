@@ -2,6 +2,7 @@
 
 package com.github.itsempa.nautilus.utils
 
+import com.github.itsempa.nautilus.data.core.NautilusErrorManager
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -28,6 +29,17 @@ inline fun <T> tryOrDefault(default: T, func: () -> T): T {
     }
 }
 
+inline fun <T> tryOrDefault(default: () -> T, func: () -> T): T {
+    contract {
+        callsInPlace(func, InvocationKind.AT_MOST_ONCE)
+    }
+    return try {
+        func()
+    } catch (_: Throwable) {
+        default()
+    }
+}
+
 inline fun tryCatch(func: () -> Unit) {
     contract {
         callsInPlace(func, InvocationKind.AT_MOST_ONCE)
@@ -46,7 +58,18 @@ inline fun tryError(message: String, func: () -> Unit) {
     try {
         func()
     } catch (e: Throwable) {
-        NautilusUtils.logErrorWithData(e, message)
+        NautilusErrorManager.logErrorWithData(e, message)
+    }
+}
+
+inline fun tryError(message: String, vararg extraData: Pair<String, Any?>, ignoreErrorCache: Boolean = false, func: () -> Unit) {
+    contract {
+        callsInPlace(func, InvocationKind.AT_MOST_ONCE)
+    }
+    try {
+        func()
+    } catch (e: Throwable) {
+        NautilusErrorManager.logErrorWithData(e, message, *extraData, ignoreErrorCache = ignoreErrorCache)
     }
 }
 
@@ -58,7 +81,7 @@ inline fun tryError(lazyMessage: (Throwable) -> String, func: () -> Unit) {
     try {
         func()
     } catch (e: Throwable) {
-        NautilusUtils.logErrorWithData(e, lazyMessage(e))
+        NautilusErrorManager.logErrorWithData(e, lazyMessage(e))
     }
 }
 
@@ -70,7 +93,7 @@ inline fun <T> tryThrowError(message: String, func: () -> T): T {
     return try {
         func()
     } catch (e: Throwable) {
-        NautilusUtils.logErrorWithData(e, message)
+        NautilusErrorManager.logErrorWithData(e, message)
         throw e
     }
 }
@@ -84,7 +107,7 @@ inline fun <T> tryThrowError(lazyMessage: (Throwable) -> String, func: () -> T):
     return try {
         func()
     } catch (e: Throwable) {
-        NautilusUtils.logErrorWithData(e, lazyMessage(e))
+        NautilusErrorManager.logErrorWithData(e, lazyMessage(e))
         throw e
     }
 }
@@ -98,7 +121,7 @@ inline fun <T : Any> errorIfNull(value: T?, lazyMessage: () -> Any): T {
     if (value == null) {
         val message = lazyMessage().toString()
         val e = IllegalStateException(message)
-        NautilusUtils.logErrorWithData(e, message)
+        NautilusErrorManager.logErrorWithData(e, message)
         throw e
     } else {
         return value

@@ -3,8 +3,8 @@ package com.github.itsempa.nautilus.features.misc.update
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.data.NautilusStorage
-import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.data.core.NautilusStorage
+import me.owdding.ktmodules.Module
 
 @Module
 object ChangelogManager {

@@ -22,40 +22,41 @@ object NautilusTimeUtils {
         } else ""
 
         val parts = enumMapOf<NautilusTimeUnit, Int>()
+
         for (unit in NautilusTimeUnit.entries) {
-            if (maxUnits != -1 && parts.size == maxUnits) break
-            if (unit > biggestUnit) break
-            if (unit < smallestUnit) continue
             val factor = unit.factor
-            val shouldSkip = if (showSmallerUnits) parts.isEmpty() else millis < factor
-            if (shouldSkip) continue
-            val result = (millis / factor).toInt()
-            if (result == 0) {
-                parts[unit] = 0
-                continue
+            if (factor > biggestUnit.factor) continue
+            if (factor < smallestUnit.factor) continue
+
+            val value = (millis / factor).toInt()
+
+            if (value > 0 || (showSmallerUnits && parts.isNotEmpty())) {
+                parts[unit] = value
+                millis %= factor
             }
-            parts[unit] = result
-            millis %= factor
+
+            if (maxUnits != -1 && parts.size >= maxUnits) break
         }
 
         if (absoluteValue < 1.seconds) {
-            if (smallestUnit > NautilusTimeUnit.SECOND) return prefix // dumb
+            if (smallestUnit > NautilusTimeUnit.SECOND) return prefix + "0"
             if (!showDeciseconds) return "${prefix}0${NautilusTimeUnit.SECOND.getName(0, longName)}"
-            val formattedMillis = (millis / 100).toInt()
-            return "${prefix}0.$formattedMillis${NautilusTimeUnit.SECOND.getName(formattedMillis, longName)}"
+            val formattedDs = (millis / 100).toInt()
+            return "${prefix}0.$formattedDs${NautilusTimeUnit.SECOND.getName(formattedDs, longName)}"
         }
 
         val result = buildString {
             for ((unit, value) in parts) {
-                if (isNotEmpty()) append("")
+                if (isNotEmpty()) append(" ")
                 val formatted = value.addSeparators()
                 val text = if (unit == NautilusTimeUnit.SECOND && showDeciseconds) {
-                    val formattedMillis = (millis / 100).toInt()
-                    "$formatted.$formattedMillis"
+                    val formattedDs = (millis / 100).toInt()
+                    "$formatted.$formattedDs"
                 } else formatted
                 append(text + unit.getName(value, longName))
             }
         }
+
         return prefix + result
     }
 }
@@ -68,7 +69,7 @@ private const val FACTOR_WEEKS = FACTOR_DAYS * 7
 private const val FACTOR_MONTH = FACTOR_DAYS * 30
 private const val FACTOR_YEARS = (FACTOR_DAYS * 365.25).toLong()
 
-enum class NautilusTimeUnit(val factor: Long, private val shortName: String, private val longName: String) : Comparable<NautilusTimeUnit> {
+enum class NautilusTimeUnit(val factor: Long, private val shortName: String, private val longName: String) {
     YEAR(FACTOR_YEARS, "y", "Year"),
     MONTH(FACTOR_MONTH, "mo", "Month"),
     WEEK(FACTOR_WEEKS, "w", "Week"),

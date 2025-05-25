@@ -11,8 +11,8 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.SeaCreatureData
 import com.github.itsempa.nautilus.data.SeaCreatureDetectionApi
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusUtils.toSet
+import me.owdding.ktmodules.Module
 
 @Module
 object MobHealthDisplay {
@@ -58,7 +58,7 @@ object MobHealthDisplay {
             for ((seaCreature, health) in healthMap) {
                 if (health == -1) continue
                 val mob = seaCreature.mob ?: continue
-                val color = if (seaCreature.isOwn) "§a" else "§b"
+                val color = if (seaCreature.isOwn) "§a" else "§c"
                 add("$color${seaCreature.name} ${formatHealth(mob)}")
                 if (size >= config.limit) break
             }

@@ -3,16 +3,16 @@ package com.github.itsempa.nautilus.features.render
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.SeaCreatureData
 import com.github.itsempa.nautilus.data.VanquisherApi
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.events.VanquisherEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.getLorenzVec
 import com.github.itsempa.nautilus.utils.NautilusUtils.getHeight
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.seconds
 
 @Module
@@ -50,20 +50,20 @@ object InvincibilityTimer {
             val time = seaCreature.spawnTime + INVINCIBILITY
             if (time.passedSince() > 1.seconds) continue
             val timeLeft = time.timeUntil()
-            event.drawString(pos, "§b${timeLeft.format(showMilliSeconds = true)}")
+            event.drawDynamicText(pos, "§b${timeLeft.format(showMilliSeconds = true)}", scaleMultiplier = 1.3)
             if (!seaCreature.isOwn) continue
-            event.drawString(pos.up(0.5), "§aOWN MOB")
+            event.drawDynamicText(pos.up(0.5), "§aOWN MOB", scaleMultiplier = 1.3)
         }
         for (vanquisher in vanquishers) {
             val time = vanquisher.spawnTime + INVINCIBILITY
             if (time.passedSince() > 1.seconds) continue
             val mob = vanquisher.mob
             val height = mob.baseEntity.height
-            val pos = vanquisher.mob.getLorenzVec().up(height + 1.5)
+            val pos = vanquisher.mob.getLorenzVec().up(height - 1) // TODO: confirm that this looks correct
             val timeLeft = time.timeUntil()
-            event.drawString(pos, "§b${timeLeft.format(showMilliSeconds = true)}")
+            event.drawDynamicText(pos, "§b${timeLeft.format(showMilliSeconds = true)}", scaleMultiplier = 1.3)
             if (!vanquisher.isOwn) continue
-            event.drawString(pos.up(0.5), "§aOWN MOB")
+            event.drawDynamicText(pos.up(0.5), "§aOWN MOB", scaleMultiplier = 1.3)
 
         }
     }

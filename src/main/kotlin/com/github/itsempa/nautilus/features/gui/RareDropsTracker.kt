@@ -14,26 +14,28 @@ import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SizeLimitedSet
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.FeeshApi
-import com.github.itsempa.nautilus.data.NautilusStorage
 import com.github.itsempa.nautilus.data.RareDropStat
 import com.github.itsempa.nautilus.data.categories.FishingCategory
+import com.github.itsempa.nautilus.data.core.NautilusStorage
 import com.github.itsempa.nautilus.data.repo.FishingCategoriesMobs.getMobs
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.RareDropEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.features.render.LootshareRange
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusTimeUtils.customFormat
 import com.github.itsempa.nautilus.utils.enumSetOf
 import com.github.itsempa.nautilus.utils.removeFirstMatches
 import com.google.gson.annotations.Expose
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("UnstableApiUsage")
 @Module
 object RareDropsTracker {
 
@@ -52,11 +54,11 @@ object RareDropsTracker {
             if (doubleHook) seaCreaturesSince += 2 else ++seaCreaturesSince
         }
 
-        fun getAverageCreatures(): Int? =
-            if (totalSeacreaturesCaught == 0) null else count / totalSeacreaturesCaught
+        fun getAverageCreatures(): Double? =
+            if (!hasDropped) null else (totalSeacreaturesCaught.toDouble() / count)
 
         fun getAverageMagicFind(): Double? =
-            if (totalSeacreaturesCaught == 0) null else (totalMagicFind.toDouble() / totalSeacreaturesCaught)
+            if (!hasDropped) null else (totalMagicFind.toDouble() / count)
 
         fun onDrop(magicFind: Int?) {
             totalSeacreaturesCaught += seaCreaturesSince
@@ -134,6 +136,9 @@ object RareDropsTracker {
     private val recentDeaths = mutableListOf<Pair<FishingRareDrop, SimpleTimeMark>>()
     private val recentDroppedItems = mutableListOf<Pair<FishingRareDrop, SimpleTimeMark>>()
 
+    private val debugRecentDeaths = SizeLimitedSet<Pair<FishingRareDrop, SimpleTimeMark>>(10)
+    private val debugDroppedItems = SizeLimitedSet<Pair<FishingRareDrop, SimpleTimeMark>>(10)
+
     private var activeDrops = enumSetOf<FishingRareDrop>()
     private var renderables = emptyList<Renderable>()
 
@@ -143,7 +148,9 @@ object RareDropsTracker {
         val drop = FishingRareDrop.mobsToCheck[data.name] ?: return
         val canActuallyGetDrops = event.isOwn || (event.seenDeath && LootshareRange.isInRange(data.actualLastPos))
         if (!canActuallyGetDrops) return
-        recentDeaths.add(drop to SimpleTimeMark.now())
+        val pair = drop to SimpleTimeMark.now()
+        recentDeaths.add(pair)
+        debugRecentDeaths.add(pair)
         handleMobDrop()
     }
 
@@ -158,7 +165,10 @@ object RareDropsTracker {
     fun onItemAdd(event: ItemAddEvent) {
         if (event.source != ItemAddManager.Source.ITEM_ADD) return
         val drop = FishingRareDrop.mobDeathDropsToCheck[event.internalName] ?: return
-        recentDeaths.add(drop to SimpleTimeMark.now())
+        val pair = drop to SimpleTimeMark.now()
+        recentDroppedItems.add(pair)
+        debugDroppedItems.add(pair)
+
         handleMobDrop()
     }
 
@@ -225,7 +235,7 @@ object RareDropsTracker {
         val message = buildString {
             append("§c$displayMobName §7since $itemName§7: §b${entry.seaCreaturesSince}")
             entry.getAverageCreatures()?.let {
-                append("§e($it)")
+                append(" §e($it avg)")
             }
             if (entry.hasDropped) {
                 append(" §b${entry.lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 2)}")
@@ -266,6 +276,8 @@ object RareDropsTracker {
             "recentDeaths" to recentDeaths,
             "recentDroppedItems" to recentDroppedItems,
             "activeDrops" to activeDrops,
+            "debugRecentDeaths" to debugRecentDeaths,
+            "debugDroppedItems" to debugDroppedItems,
         )
     }
 }

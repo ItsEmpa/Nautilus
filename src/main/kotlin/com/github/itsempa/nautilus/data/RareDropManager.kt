@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SizeLimitedSet
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.RareDropEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.tryOrDefault
+import me.owdding.ktmodules.Module
 
 enum class RareDropType {
     RARE_DROP,
