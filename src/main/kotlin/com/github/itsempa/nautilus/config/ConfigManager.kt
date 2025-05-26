@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.categories.FishingCategory
+import com.github.itsempa.nautilus.data.core.EmptyFieldAdapterFactory
 import com.github.itsempa.nautilus.data.fishingevents.FishingEvent
 import com.github.itsempa.nautilus.features.misc.update.ConfigVersionDisplay
 import com.github.itsempa.nautilus.features.misc.update.NautilusGuiOptionEditorUpdateCheck
@@ -66,6 +67,7 @@ object ConfigManager {
             .registerTypeAdapter(TimePeriod.TYPE_ADAPTER)
             .registerTypeAdapter(FishingCategory.TYPE_ADAPTER)
             .registerTypeAdapter(FishingEvent.TYPE_ADAPTER)
+            .registerTypeAdapterFactory(EmptyFieldAdapterFactory)
     }
 
     // TODO: find a way to get all factories in skyhanni's base gson builder dynamically

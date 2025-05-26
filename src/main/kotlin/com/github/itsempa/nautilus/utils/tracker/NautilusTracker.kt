@@ -16,18 +16,16 @@ import com.github.itsempa.nautilus.data.core.NautilusErrorManager
 import com.github.itsempa.nautilus.data.core.NautilusStorage
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.helpers.McScreen
-import com.google.gson.annotations.Expose
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 
 @Suppress("unused")
 open class NautilusTracker<Data : NautilusTrackerData>(
     val name: String,
-    val internalName: String,
+    private val internalName: String,
     private val createNewSession: () -> Data,
-    private val getStorage: (ProfileStorage) -> Data,
-    private val customSessionStorage: (ProfileStorage) -> Data, // TODO: change this to be a map of tracker display mode to data?
-    private val extraDisplayModes: Map<TrackerDisplayMode, (ProfileStorage) -> Data> = emptyMap(),
+    private val getStorage: (ProfileStorage) -> TrackerStorage<Data>,
+    private val extraDisplayModes: List<TrackerDisplayMode> = emptyList(),
     private val drawDisplay: (Data) -> List<Renderable>,
 ) {
     var inventoryOpen = false
@@ -38,7 +36,6 @@ open class NautilusTracker<Data : NautilusTrackerData>(
     private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var dirty = false
-
 
     companion object {
         // TODO: replace with own config
@@ -59,18 +56,17 @@ open class NautilusTracker<Data : NautilusTrackerData>(
         update()
     }
 
-    fun modify(mode: TrackerDisplayMode, modifyFunction: (Data) -> Unit) {
+    fun modify(mode: TrackerDisplayMode, modifyFunction: Data.() -> Unit) {
         getSharedTracker().modify(mode, modifyFunction)
         update()
     }
 
-
-    private fun tryModify(mode: TrackerDisplayMode, modifyFunction: (Data) -> Unit) {
+    private fun tryModify(mode: TrackerDisplayMode, modifyFunction: Data.() -> Unit) {
         getSharedTracker().tryModify(mode, modifyFunction)
         update()
     }
 
-    fun modifyEachMode(modifyFunction: (Data) -> Unit) {
+    fun modifyEachMode(modifyFunction: Data.() -> Unit) {
         TrackerDisplayMode.entries.forEach {
             tryModify(it, modifyFunction)
         }
@@ -112,11 +108,14 @@ open class NautilusTracker<Data : NautilusTrackerData>(
             buildMap {
                 put(TrackerDisplayMode.TOTAL, storage.getTotal())
                 put(TrackerDisplayMode.SESSION, storage.getCurrentSession())
-                if (storage.info.isCustomSessionActive) {
-                    put(TrackerDisplayMode.CUSTOM_SESSION, storage.getCustomSession())
+                val customSession = storage.getCustomSession()
+                if (customSession != null) {
+                    put(TrackerDisplayMode.CUSTOM_SESSION, customSession.data)
                 }
-                extraDisplayModes.mapValuesTo(this) { it.value(storage) }
-            }
+                extraDisplayModes.associateWithTo(this) {
+                    storage.storage.extraDisplayModes.getOrPut(it, createNewSession)
+                }
+            },
         )
     }
 
@@ -130,13 +129,13 @@ open class NautilusTracker<Data : NautilusTrackerData>(
         if (display.isEmpty()) update()
     }
 
-    private fun ProfileStorage.getCustomSession(): Data = customSessionStorage(this)
+    private val ProfileStorage.storage get(): TrackerStorage<Data> = getStorage(this)
+
+    private fun ProfileStorage.getCustomSession(): CustomSession<Data>? = storage.currentCustomSession
 
     private fun ProfileStorage.getCurrentSession() = currentSessions.getOrPut(this, createNewSession)
 
-    private fun ProfileStorage.getTotal(): Data = getStorage(this)
-
-    private val ProfileStorage.info get() = trackerInfo.getOrPut(internalName, ::TrackerInfo)
+    private fun ProfileStorage.getTotal(): Data = storage.total
 
     inner class SharedTracker(
         private val entries: Map<TrackerDisplayMode, Data>,
@@ -163,11 +162,6 @@ open class NautilusTracker<Data : NautilusTrackerData>(
             "availableModes" to entries.keys,
         )
     }
-
-    data class TrackerInfo(
-        @Expose var customSessionStart: SimpleTimeMark = SimpleTimeMark.farFuture(),
-        @Expose var isCustomSessionActive: Boolean = false,
-    )
 
 
 }
