@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.config.Features
+import com.github.itsempa.nautilus.config.PositionLinkManager
 import com.github.itsempa.nautilus.data.core.NautilusRepoManager
 import com.github.itsempa.nautilus.data.core.SkyHanniVersionCheck
 import com.github.itsempa.nautilus.events.NautilusPreInitFinishedEvent
@@ -41,6 +42,7 @@ object Nautilus {
         SkyHanniVersionCheck.checkSkyHanniLoaded()
         tryError("Something went wrong while initializing the config!") {
             ConfigManager // Load ConfigManager class to initialize config
+            PositionLinkManager.init(feature)
         }
 
         tryError("Something went wrong while initializing modules!") {
@@ -77,6 +79,7 @@ object Nautilus {
     const val VERSION = "@MOD_VER@"
     const val MOD_NAME = "@MOD_NAME@"
     const val COMPILED_SH_VERSION = "@SKYHANNI_VER@"
+    const val PATH = "com.github.itsempa.nautilus"
 
     const val CLASS_PATH = "com.github.itsempa.nautilus"
     const val DISCORD_INVITE = "https://discord.gg/KM3dKjbWqg"

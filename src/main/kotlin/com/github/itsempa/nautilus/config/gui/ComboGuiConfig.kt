@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorBoolean
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorSlider
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigLink
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigOption
-import com.github.itsempa.nautilus.features.gui.ComboGui
 import com.google.gson.annotations.Expose
 
 class ComboGuiConfig {
@@ -30,7 +29,7 @@ class ComboGuiConfig {
     var grandmaWolfLevel: Int = 100
 
     @Expose
-    @ConfigLink(owner = ComboGui::class, field = "enabled")
+    @ConfigLink(owner = ComboGuiConfig::class, field = "enabled")
     val pos = Position(-300, 150)
 
 }

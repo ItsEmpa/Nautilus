@@ -1,8 +1,7 @@
 package com.github.itsempa.nautilus.mixins.transformers.skyhanni;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigLink;
-import com.github.itsempa.nautilus.Nautilus;
+import com.github.itsempa.nautilus.mixins.hooks.NautilusPositionData;
 import com.github.itsempa.nautilus.mixins.hooks.PositionHook;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -12,17 +11,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Position.class)
-public class MixinPosition {
+public class MixinPosition implements NautilusPositionData {
+
+    @Override
+    public boolean isNautilus() {
+        return nautilus$isNautilus;
+    }
+
+    @Override
+    public void setNautilus(boolean nautilus) {
+        nautilus$isNautilus = nautilus;
+    }
 
     @Unique
     private boolean nautilus$isNautilus = false;
-
-    @Inject(method = "setLink", at = @At("HEAD"), remap = false)
-    private void nautilus$setLink(ConfigLink configLink, CallbackInfo ci) {
-        if (configLink.owner().getName().startsWith(Nautilus.PATH)) {
-            this.nautilus$isNautilus = true;
-        }
-    }
 
     @Inject(method = "canJumpToConfigOptions", at = @At(value = "INVOKE", target = "Lat/hannibal2/skyhanni/config/ConfigGuiManager;getEditorInstance()Lat/hannibal2/skyhanni/deps/moulconfig/gui/MoulConfigEditor;"), cancellable = true, remap = false)
     private void nautilus$canJumpToConfigOptions(CallbackInfoReturnable<Boolean> cir) {
