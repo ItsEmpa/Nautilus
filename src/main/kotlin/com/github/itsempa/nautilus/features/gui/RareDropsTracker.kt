@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SizeLimitedSet
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.FeeshApi
@@ -81,7 +82,7 @@ object RareDropsTracker {
     enum class FishingRareDrop(
         val mobName: String,
         internalName: String? = null,
-        val pluralMobName: String? = null,
+        pluralMobName: String? = null,
         displayMobName: String? = null,
         val checkChat: Boolean = true,
         private val itemDisplayName: String? = null,
@@ -108,6 +109,7 @@ object RareDropsTracker {
 
         val internalName = (internalName ?: name).toInternalName()
         val itemName: String get() = itemDisplayName ?: internalName.repoItemName
+        val pluralDisplayMobName: String = pluralMobName ?: "${displayMobName}s"
         val displayMobName = displayMobName ?: mobName
         val entry: RareDropEntry
             get() = storage.getOrPut(internalName, ::RareDropEntry)
@@ -201,7 +203,7 @@ object RareDropsTracker {
         val entry = drop.entry
         val (dropCount, creatureCount, lastDrop) = entry
         val newDropCount = dropCount + 1
-        val pluralized = StringUtils.pluralize(creatureCount, drop.displayMobName, drop.pluralMobName)
+        val pluralized = StringUtils.pluralize(creatureCount, drop.displayMobName, drop.pluralDisplayMobName)
         val message = buildString {
             append(
                 "Dropped §6§l$newDropCount${newDropCount.ordinal()} §r${drop.itemName} " +
@@ -232,27 +234,37 @@ object RareDropsTracker {
     }
 
     private fun FishingRareDrop.getDisplay(): Renderable {
+        val entry = entry
+        val seaCreaturesSince = entry.seaCreaturesSince
+        val averageSeaCreatures = entry.getAverageCreatures()?.roundTo(2)?.addSeparators()
         val message = buildString {
-            append("§c$displayMobName §7since $itemName§7: §b${entry.seaCreaturesSince}")
-            entry.getAverageCreatures()?.let {
+            append("§c$displayMobName §7since $itemName§7: §b${seaCreaturesSince}")
+            averageSeaCreatures?.let {
                 append(" §e($it avg)")
             }
             if (entry.hasDropped) {
                 append(" §b${entry.lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 2)}")
             }
         }
-        val hover: List<String>
-        if (!checkChat) {
-            hover = listOf("§cCan't get magic find from this drop!")
-        } else {
-            val avgMf = entry.getAverageMagicFind()
-            if (avgMf == null) hover = listOf("§cNo magic find data available!")
-            else {
-                val lastMf = entry.lastMagicFind
-                hover = listOf(
-                    "§3Average magic find: §b${avgMf.roundTo(2)}",
-                    "§3Last magic find: §b$lastMf",
-                )
+        val hover = buildList {
+            if (averageSeaCreatures != null) {
+                add("§7Average §c$pluralDisplayMobName §7since last $itemName: §b$averageSeaCreatures")
+            }
+            if (entry.hasDropped) {
+                add("§7Last drop: §b${entry.lastDrop.passedSince().customFormat(showDeciseconds = false)} ago")
+            }
+            if (!checkChat) {
+                add("§cCan't get magic find from this drop!")
+            } else {
+                val avgMf = entry.getAverageMagicFind()
+                if (avgMf == null) add("§cNo magic find data available!")
+                else {
+                    val lastMf = entry.lastMagicFind
+                    addAll(
+                        "§3Average magic find: §b${avgMf.roundTo(2)}",
+                        "§3Last magic find: §b$lastMf",
+                    )
+                }
             }
         }
         return Renderable.hoverTips(message, hover)
