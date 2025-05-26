@@ -24,8 +24,9 @@ object NautilusStorage {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
-        NautilusChat.debug("Joined profile ${event.name}")
-        profile = storage.profileStorage.getOrPut(event.name, ::ProfileStorage)
+        val name = event.name
+        NautilusChat.debug("Joined profile $name")
+        profile = storage.profileStorage.getOrPut(name, ::ProfileStorage).also { it.profileName = name }
         profileName = event.name
     }
 
