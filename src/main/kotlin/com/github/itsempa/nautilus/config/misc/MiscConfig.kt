@@ -16,4 +16,9 @@ class MiscConfig {
     @ConfigOption(name = "Hide Armor Glint", desc = "Hide the enchantment glint on armor pieces.")
     @ConfigEditorBoolean
     var hideArmorGlint: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Third Person Fov", desc = ".")
+    @Accordion
+    val fov: ThirdPersonFovConfig = ThirdPersonFovConfig()
 }
