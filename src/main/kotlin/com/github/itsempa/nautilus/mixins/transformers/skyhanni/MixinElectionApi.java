@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(targets = "at.hannibal2.skyhanni.data.ElectionApi$checkHypixelApi$1")
 public class MixinElectionApi {
 
+    @SuppressWarnings("UnresolvedMixinReference")
     @Inject(method = "invokeSuspend*", at = @At("RETURN"), remap = false)
     private void test(CallbackInfoReturnable<Object> cir) {
         MayorDataUpdateEvent.INSTANCE.post();

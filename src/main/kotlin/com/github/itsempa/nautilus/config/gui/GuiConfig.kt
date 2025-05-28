@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigLink
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigOption
 import at.hannibal2.skyhanni.deps.moulconfig.observer.GetSetter
 import at.hannibal2.skyhanni.deps.moulconfig.observer.Property
+import com.github.itsempa.nautilus.utils.helpers.McClient
 import com.google.gson.annotations.Expose
 import org.lwjgl.input.Keyboard
 
@@ -22,7 +23,9 @@ class GuiConfig {
         desc = "Opens the Position Editor, allows changing the position of Nautilus' overlays."
     )
     @ConfigEditorButton(buttonText = "Edit")
-    private val guiEditor = Runnable { openGuiPositionEditor(true) }
+    private val guiEditor = Runnable {
+        McClient.run { openGuiPositionEditor(true) }
+    }
 
     @Suppress("unused")
     @Transient

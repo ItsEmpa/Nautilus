@@ -242,7 +242,7 @@ object RareDropsTracker {
             averageSeaCreatures?.let {
                 append(" §e($it avg)")
             }
-            if (entry.hasDropped) {
+            if (entry.hasDropped && config.showTime) {
                 append(" §b${entry.lastDrop.passedSince().customFormat(showDeciseconds = false, maxUnits = 2)}")
             }
         }
