@@ -20,12 +20,15 @@ import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.features.render.HotspotHighlight
 import com.github.itsempa.nautilus.utils.NautilusUtils.roundToHalf
 import com.github.itsempa.nautilus.utils.clearAnd
+import com.github.itsempa.nautilus.utils.helpers.McPlayer
 import me.owdding.ktmodules.Module
 import net.minecraft.block.BlockLiquid
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import java.awt.Color
+import java.util.LinkedList
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @Module
 object HotspotApi {
@@ -58,7 +61,8 @@ object HotspotApi {
 
     data class Hotspot(val center: LorenzVec, private val entityId: Int) {
         val startTime: SimpleTimeMark = SimpleTimeMark.now()
-
+        var lastUpdate: SimpleTimeMark = SimpleTimeMark.now()
+            private set
         var radius: Double = Double.NaN
             private set
 
@@ -86,6 +90,7 @@ object HotspotApi {
             val distance = distance(pos)
             if (distance > MAX_RADIUS) return false
             ++particleCount
+            lastUpdate = SimpleTimeMark.now()
 
             radius = distance.roundToHalf()
             if (particleCount > 10 && !hasSentSpawn) {
@@ -97,9 +102,7 @@ object HotspotApi {
             return true
         }
 
-        fun tick() {
-            checkSeen()
-        }
+        fun tick() = checkSeen()
 
         private fun checkSeen() {
             if (hasBeenSeen) return
@@ -125,7 +128,16 @@ object HotspotApi {
 
         override fun toString(): String {
             val buffString = buff?.toString() ?: "Unknown"
-            return "Hotspot(center=$center, radius=$radius, buff=$buffString)"
+            return "Hotspot(" +
+                "center=$center, " +
+                "radius=$radius, " +
+                "buff=$buffString, " +
+                "hasBeenSeen=$hasBeenSeen, " +
+                "particleCount=$particleCount, " +
+                "entityId=$entityId" +
+                "lastUpdate=${lastUpdate.passedSince()}, " +
+                "startTime=${startTime.passedSince()}" +
+                ")"
         }
     }
 
@@ -133,6 +145,8 @@ object HotspotApi {
     val hotspots: Sequence<Hotspot> get() = _hotspots.values.asSequence().filter { it.isDetected() }
     var currentHotspot: Hotspot? = null
         private set
+
+    private val despawnQueue = LinkedList<Pair<SimpleTimeMark, Hotspot>>()
 
     // TODO: make better detection, this is ass
     //  this is slightly better now, but i still dont really like it a lot
@@ -205,6 +219,7 @@ object HotspotApi {
     @HandleEvent(onlyOnIslands = [IslandType.HUB, IslandType.SPIDER_DEN, IslandType.BACKWATER_BAYOU, IslandType.CRIMSON_ISLE])
     fun onEntityLeave(event: EntityLeaveWorldEvent<EntityArmorStand>) {
         val removed = _hotspots.remove(event.entity.entityId) ?: return
+        despawnQueue.addLast(Pair(SimpleTimeMark.now(), removed))
         HotspotEvent.Removed(removed).post()
     }
 
@@ -217,7 +232,6 @@ object HotspotApi {
         val pos = event.location
         val anyAdded = _hotspots.values.any { it.tryAddParticle(pos) }
         if (anyAdded && HotspotHighlight.shouldHideHotspotParticles()) event.cancel()
-
     }
 
     @HandleEvent(onlyOnIslands = [IslandType.HUB, IslandType.SPIDER_DEN, IslandType.BACKWATER_BAYOU, IslandType.CRIMSON_ISLE])
@@ -231,7 +245,20 @@ object HotspotApi {
     }
 
     @HandleEvent(onlyOnIslands = [IslandType.HUB, IslandType.SPIDER_DEN, IslandType.BACKWATER_BAYOU, IslandType.CRIMSON_ISLE])
-    fun onTick() = _hotspots.values.forEach(Hotspot::tick)
+    fun onTick() {
+        _hotspots.values.forEach(Hotspot::tick)
+        pollDespawnQueue()
+    }
+
+    private fun pollDespawnQueue() {
+        val playerPos = McPlayer.pos
+        while (true) {
+            val (time, hotspot) = despawnQueue.peek() ?: return
+            if (time.passedSince() < 1.seconds) return
+            despawnQueue.poll()
+            if (hotspot.distance(playerPos) < 30) HotspotEvent.Ended(hotspot).post()
+        }
+    }
 
     @HandleEvent(onlyOnIslands = [IslandType.HUB, IslandType.SPIDER_DEN, IslandType.BACKWATER_BAYOU, IslandType.CRIMSON_ISLE])
     fun onCatch(event: FishCatchEvent) {
@@ -266,6 +293,7 @@ object HotspotApi {
         _hotspots.clearAnd { (_, hotspot) ->
             HotspotEvent.Removed(hotspot).post()
         }
+        despawnQueue.clear()
         lastNearFishedHotspotTime = SimpleTimeMark.farPast()
     }
 

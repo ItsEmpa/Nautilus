@@ -21,7 +21,7 @@ object HotspotWarning {
     }
 
     @HandleEvent
-    fun onHotspotRemoved(event: HotspotEvent.Removed) {
+    fun onHotspotRemoved(event: HotspotEvent.Ended) {
         val hotspot = event.hotspot
         if (hotspot != lastHotspot) return
         lastHotspot = null
