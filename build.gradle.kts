@@ -123,6 +123,7 @@ kotlin {
         languageSettings {
             languageVersion = "2.0"
             enableLanguageFeature("BreakContinueInInlineLambdas")
+            optIn("kotlin.contracts.ExperimentalContracts")
         }
     }
 }

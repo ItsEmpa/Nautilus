@@ -1,9 +1,6 @@
-@file:OptIn(ExperimentalContracts::class)
-
 package com.github.itsempa.nautilus.utils
 
 import com.github.itsempa.nautilus.data.core.NautilusErrorManager
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
