@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.FeeshApi
+import com.github.itsempa.nautilus.data.categories.FishingCategory
 import com.github.itsempa.nautilus.data.fishingevents.SpookyFestivalEvent
 import com.github.itsempa.nautilus.events.FishingEventUpdate
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
@@ -98,6 +99,7 @@ object SpookyCounter {
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive || !FeeshApi.isFishing || !config.spookyCounter) return
+        if (!FishingCategory.Water.Events.Spooky.checkTreeActive()) return
         config.spookyCounterPos.renderRenderable(renderable, "Spooky Counter")
     }
 
