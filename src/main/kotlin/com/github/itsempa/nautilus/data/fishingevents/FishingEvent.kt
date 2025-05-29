@@ -51,12 +51,12 @@ sealed class FishingEvent(val internalName: String) {
     private fun internalStart() {
         onStart()
         NautilusChat.debug("Started Fishing Event $name (${timePeriod?.duration})")
-        if (shouldPostEvents()) FishingEventUpdate.Start(this)
+        if (shouldPostEvents()) FishingEventUpdate.Start(this).post()
     }
     private fun internalEnd() {
         onEnd()
         NautilusChat.debug("Ended Fishing Event $name")
-        if (shouldPostEvents()) FishingEventUpdate.End(this)
+        if (shouldPostEvents()) FishingEventUpdate.End(this).post()
     }
 
     private fun updateTimePeriodAndState() {
