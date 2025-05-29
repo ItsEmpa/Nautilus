@@ -52,8 +52,8 @@ object ConfigManager {
         if (event.repeatSeconds(60)) save()
     }
 
-    @HandleEvent
-    fun onDisconnect(event: ClientDisconnectEvent) = save()
+    @HandleEvent(ClientDisconnectEvent::class)
+    fun onDisconnect() = save()
 
     private inline fun <reified T> GsonBuilder.registerTypeAdapter(adapter: TypeAdapter<T>, nullSafe: Boolean = true): GsonBuilder {
         val newAdapter = if (nullSafe) adapter.nullSafe() else adapter

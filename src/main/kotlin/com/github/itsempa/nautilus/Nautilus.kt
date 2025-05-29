@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     version = Nautilus.VERSION,
     modLanguageAdapter = "com.github.itsempa.nautilus.utils.KotlinLanguageAdapter",
+    dependencies = "after:skyhanni",
 )
 object Nautilus {
 
