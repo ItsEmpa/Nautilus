@@ -49,15 +49,6 @@ data class SoundConfig(
     @ConfigEditorSlider(minValue = 1f, maxValue = 500f, minStep = 1f)
     var repeatDuration: Int = 50,
 ) {
-    @Suppress("unused")
-    constructor(
-        enabled: Boolean = true,
-        soundName: String = "note.pling",
-        volume: Float = 50f,
-        pitch: Float = 1f,
-        repeat: Int = 1,
-        repeatDuration: Int = 50,
-    ) : this(enabled, soundName.asProperty(), volume.asProperty(), pitch.asProperty(), repeat, repeatDuration)
 
 
     @Transient
@@ -89,6 +80,19 @@ data class SoundConfig(
                     delay(duration)
                 }
             }
+        }
+    }
+
+    companion object {
+        fun of(
+            enabled: Boolean = true,
+            soundName: String = "note.pling",
+            volume: Float = 50f,
+            pitch: Float = 1f,
+            repeat: Int = 1,
+            repeatDuration: Int = 50,
+        ): SoundConfig {
+            return SoundConfig(enabled, soundName.asProperty(), volume.asProperty(), pitch.asProperty(), repeat, repeatDuration)
         }
     }
 }
