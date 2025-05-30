@@ -38,10 +38,10 @@ object BestCombo {
 
     @HandleEvent
     fun onComboFinish(event: ComboEndEvent) {
-        val finishedCombo = event.combo
-        if (!isInBestCombo || finishedCombo > bestCombo) return
         isInBestCombo = false
+        val finishedCombo = event.combo
         val currentBestCombo = bestCombo
+        if (currentBestCombo > finishedCombo) return
         bestCombo = finishedCombo
         if (currentBestCombo == 0) {
             sendMessage("You got a new best combo of §l§6${finishedCombo.addSeparators()}§3!")
@@ -51,7 +51,6 @@ object BestCombo {
                     "with a combo of §l§6${finishedCombo.addSeparators()}§3!",
             )
         }
-
     }
 
     private fun sendMessage(message: String) {

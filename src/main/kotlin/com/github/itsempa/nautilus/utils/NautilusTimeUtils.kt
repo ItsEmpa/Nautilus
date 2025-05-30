@@ -6,6 +6,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 object NautilusTimeUtils {
+    private val EMPTY_SET = emptyEnumSet<NautilusTimeUnit>()
+
     fun Duration.customFormat(
         biggestUnit: NautilusTimeUnit = NautilusTimeUnit.YEAR,
         smallestUnit: NautilusTimeUnit = NautilusTimeUnit.SECOND,
@@ -14,6 +16,7 @@ object NautilusTimeUtils {
         maxUnits: Int = -1,
         showSmallerUnits: Boolean = false,
         showNegativeAsSoon: Boolean = true,
+        ignoredUnits: Set<NautilusTimeUnit> = EMPTY_SET
     ): String {
         var millis = inWholeMilliseconds.absoluteValue
         val prefix = if (isNegative()) {
@@ -24,6 +27,7 @@ object NautilusTimeUtils {
         val parts = enumMapOf<NautilusTimeUnit, Int>()
 
         for (unit in NautilusTimeUnit.entries) {
+            if (unit in ignoredUnits) continue
             val factor = unit.factor
             if (factor > biggestUnit.factor) continue
             if (factor < smallestUnit.factor) continue
