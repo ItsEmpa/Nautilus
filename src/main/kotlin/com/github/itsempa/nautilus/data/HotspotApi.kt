@@ -72,6 +72,7 @@ object HotspotApi {
             private set
 
         private var particleCount: Int = 0
+        private var particleYLevel: Double = Double.NaN
 
         init {
             tick()
@@ -87,8 +88,12 @@ object HotspotApi {
 
         /** Returns true if it "used" the particle. */
         fun tryAddParticle(pos: LorenzVec): Boolean {
+            val y = pos.y
             val distance = distance(pos)
             if (distance > MAX_RADIUS) return false
+
+            if (particleYLevel.isNaN()) particleYLevel = y
+            else if (y != particleYLevel) return false
             ++particleCount
             lastUpdate = SimpleTimeMark.now()
 
