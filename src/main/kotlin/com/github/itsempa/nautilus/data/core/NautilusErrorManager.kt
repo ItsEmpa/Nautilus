@@ -13,11 +13,13 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.helpers.McPlayer
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.minutes
 
 /**
  * Taken from SkyHanni
  */
+@Module
 object NautilusErrorManager {
 
     // random id -> error message
