@@ -22,32 +22,32 @@ data class SoundConfig(
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enable playing the sound.")
     @ConfigEditorBoolean
-    var enabled: Boolean,
+    var enabled: Boolean = false,
 
     @Expose
     @ConfigOption(name = "Sound Name", desc = "Name of the sound to use")
     @ConfigEditorText
-    val soundName: Property<String>,
+    val soundName: Property<String> = "note.pling".asProperty(),
 
     @Expose
     @ConfigOption(name = "Volume", desc = "Volume of sound")
     @ConfigEditorSlider(minValue = 0f, minStep = 0.1f, maxValue = 100f)
-    val volume: Property<Float>,
+    val volume: Property<Float> = 50f.asProperty(),
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "Pitch of the sound")
     @ConfigEditorSlider(minValue = 0f, minStep = 0.1f, maxValue = 2f)
-    val pitch: Property<Float>,
+    val pitch: Property<Float> = 1f.asProperty(),
 
     @Expose
     @ConfigOption(name = "Repeat Sound", desc = "Play the sound this amount of times every time it is played.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
-    var repeat: Int,
+    var repeat: Int = 1,
 
     @Expose
     @ConfigOption(name = "Repeat Duration", desc = "Amount of milliseconds between each sound played, in milliseconds.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 500f, minStep = 1f)
-    var repeatDuration: Int,
+    var repeatDuration: Int = 50,
 ) {
     @Suppress("unused")
     constructor(
