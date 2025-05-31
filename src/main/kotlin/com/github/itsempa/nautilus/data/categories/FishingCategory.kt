@@ -1,17 +1,21 @@
 package com.github.itsempa.nautilus.data.categories
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
 import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
 import com.github.itsempa.nautilus.data.CrystalHollowsArea
 import com.github.itsempa.nautilus.data.HotspotApi
 import com.github.itsempa.nautilus.data.fishingevents.FishingFestivalEvent
 import com.github.itsempa.nautilus.data.fishingevents.JerrysWorkshopEvent
 import com.github.itsempa.nautilus.data.fishingevents.SpookyFestivalEvent
-import com.github.itsempa.nautilus.events.NautilusDebugEvent
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
+import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orTrue
 import com.github.itsempa.nautilus.utils.getSealedObjects
 import me.owdding.ktmodules.Module
@@ -28,12 +32,41 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         private set
     val children: List<FishingCategory> = getNestedClasses(this::class, this)
 
-    fun isMainActive() = this == activeCategory
-    fun isExtraActive() = this in extraCategories
-    fun isActive() = isMainActive() || isExtraActive()
+    var isActive: Boolean = false
+        private set
+
+    /** True only if none of its children are active. */
+    var isMainActive: Boolean = false
+        private set
+
     fun hasParent() = parent != null
 
-    internal fun checkTreeActive(): Boolean = checkActive() && parent?.checkTreeActive().orTrue()
+    private fun updateActive() {
+        isActive = checkTreeActive()
+    }
+
+    private fun updateMainActive() {
+        isMainActive = isActive && children.none { it.isActive }
+    }
+
+    private fun getDebug(): String {
+        val data = listOf(
+            "internalName" to internalName,
+            "isActive" to isActive,
+            "isMainActive" to isMainActive,
+            "extraCategory" to extraCategory,
+            "parent" to parent?.internalName,
+            "children" to children.map { it.internalName },
+        )
+        return buildString {
+            appendLine("== $internalName ==")
+            for ((key, value) in data) {
+                appendLine("  $key: $value")
+            }
+        }
+    }
+
+    private fun checkTreeActive(): Boolean = checkActive() && parent?.checkTreeActive().orTrue()
     internal open fun checkActive(): Boolean = false
 
     fun getPredecessors(): List<FishingCategory> {
@@ -140,21 +173,16 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
     }
 
-    // TODO: create event for when active categories change
     @Module
     companion object {
-        val categories: Map<String, FishingCategory>
-        private val parentCategories: List<FishingCategory>
+        private val categoriesMap: Map<String, FishingCategory>
+        val categories: List<FishingCategory>
+        val parentCategories: List<FishingCategory>
+
         private var lastWater: Boolean? = null
-        var activeCategory: FishingCategory? = null
-            private set
 
-        var extraCategories: Set<FishingCategory> = emptySet()
+        var activeCategories: Set<FishingCategory> = emptySet()
             private set
-
-        // TODO: improve active system for categories
-        val anyActiveCategories: Set<FishingCategory>
-            get() = categories.values.filterTo(mutableSetOf()) { it.checkTreeActive() }
 
         init {
             val list = getSealedObjects<FishingCategory>()
@@ -162,7 +190,8 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
             for (obj in list) {
                 check(map.put(obj.internalName, obj) == null) { "${obj.internalName} has a duplicate internal name" }
             }
-            categories = map
+            categoriesMap = map
+            categories = list
             parentCategories = list.filter { !it.hasParent() }
         }
 
@@ -171,7 +200,7 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
             ::getCategoryByInternalName,
         )
 
-        fun getCategoryByInternalName(name: String): FishingCategory? = categories[name]
+        fun getCategoryByInternalName(name: String): FishingCategory? = categoriesMap[name]
 
         @HandleEvent
         fun onBobber(event: FishingBobberInLiquidEvent) {
@@ -179,46 +208,42 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
         }
 
         @HandleEvent
-        fun onDebug(event: NautilusDebugEvent) {
-            event.title("FishingCategories")
-            event.addIrrelevant(getTree())
+        fun onCommand(event: BrigadierRegisterEvent) {
+            event.register("ntfishingcategories") {
+                this.category = CommandCategory.DEVELOPER_DEBUG
+                this.description = "Shows information about all fishing categories."
+
+                argCallback("name", BrigadierArguments.simpleMap(categoriesMap)) { category ->
+                    val debug = category.getDebug()
+                    ClipboardUtils.copyToClipboard(debug)
+                    NautilusChat.chat("Copied debug information of category '${category.internalName}' to clipboard.")
+                }
+
+                literalCallback("all") {
+                    val debugInfo = categories.joinToString("\n\n\n") { it.getDebug() }
+                    ClipboardUtils.copyToClipboard(debugInfo)
+                    NautilusChat.chat("Copied debug information of all fishing categories to clipboard.")
+                }
+
+                literalCallback("tree") {
+                    val tree = getTree().joinToString("\n")
+                    ClipboardUtils.copyToClipboard(tree)
+                    NautilusChat.chat("Copied the fishing categories tree to clipboard.")
+                }
+            }
         }
 
         @HandleEvent
         fun onSecondPassed() {
-            val result = findCategories()
-            if (result == null) {
-                activeCategory = null
-                extraCategories = emptySet()
-                return
-            }
-            activeCategory = result.first
-            extraCategories = result.second.toSet()
+            val newCategories = findCategories()
+            if (newCategories == activeCategories) return
+            activeCategories = newCategories
         }
 
-        private fun findCategories(): Pair<FishingCategory, List<FishingCategory>>? {
-            var current = parentCategories.find { it.checkActive() } ?: return null
-            val eventCategories = mutableListOf<FishingCategory>()
-
-            while (true) {
-                val activeChildren = current.children.filter { it.checkActive() }
-
-                eventCategories.addAll(activeChildren.filter { it.extraCategory })
-
-                val activeChild = activeChildren.find { !it.extraCategory }
-
-                if (activeChild == null) {
-                    if (eventCategories.isNotEmpty()) {
-                        val filtered = eventCategories.find { it.isPredecessor(current) }
-                        if (filtered != null) {
-                            return filtered to eventCategories.apply { remove(filtered) }
-                        }
-                    }
-                    return current to eventCategories
-                }
-
-                current = activeChild
-            }
+        private fun findCategories(): Set<FishingCategory> {
+            categories.forEach { it.updateActive() }
+            categories.forEach { it.updateMainActive() }
+            return categories.filterTo(mutableSetOf()) { it.isActive }
         }
 
         private fun getNestedClasses(clazz: KClass<*>, parent: FishingCategory): List<FishingCategory> {
@@ -244,11 +269,11 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
             }
 
             fun printCategory(category: FishingCategory, currentPrefix: String, childrenPrefix: String) {
-                val suffix = if (category.isMainActive()) "ACTIVE"
-                else if (category.isExtraActive()) "EXTRA" else ""
-                val tick = if (category.checkActive()) "✔" else "✘"
+                val suffix = if (category.isMainActive) " MAIN"
+                else ""
+                val tick = if (category.isActive) "✔" else "✘"
 
-                result.add("$currentPrefix${category.internalName} - $tick $suffix")
+                result.add("$currentPrefix${category.internalName} - $tick$suffix")
                 val children = category.children
                 for ((index, child) in children.withIndex()) {
                     val (parentPrefix, nextPrefix) = getPrefixes(childrenPrefix, index, children.lastIndex)

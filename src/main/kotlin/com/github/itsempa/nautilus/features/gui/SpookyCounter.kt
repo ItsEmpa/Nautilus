@@ -99,7 +99,7 @@ object SpookyCounter {
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive || !FeeshApi.isFishing || !config.spookyCounter) return
-        if (!FishingCategory.Water.Events.Spooky.checkTreeActive()) return
+        if (!FishingCategory.Water.Events.Spooky.isActive) return
         config.spookyCounterPos.renderRenderable(renderable, "Spooky Counter")
     }
 

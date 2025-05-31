@@ -114,7 +114,7 @@ object RareDropsTracker {
         val entry: RareDropEntry
             get() = storage.getOrPut(internalName, ::RareDropEntry)
 
-        fun isActive(): Boolean = FishingCategory.anyActiveCategories.any { mobName in it.getMobs() }
+        fun isActive(): Boolean = FishingCategory.activeCategories.any { mobName in it.getMobs() }
 
         companion object {
             val mobsToCheck: Map<String, FishingRareDrop>
