@@ -6,7 +6,7 @@ import com.github.itsempa.nautilus.data.repo.json.FishingCategoriesMobsJson
 import com.github.itsempa.nautilus.data.repo.json.FishingCategoryMobsDataJson
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.NautilusRepositoryReloadEvent
-import com.github.itsempa.nautilus.modules.Module
+import me.owdding.ktmodules.Module
 
 @Module
 object FishingCategoriesMobs {

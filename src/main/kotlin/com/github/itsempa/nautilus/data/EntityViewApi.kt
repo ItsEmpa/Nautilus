@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.github.itsempa.nautilus.mixins.transformers.AccessorRenderManager
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.helpers.McClient
 import com.github.itsempa.nautilus.utils.removeIf
 import com.github.itsempa.nautilus.utils.tryOrDefault
+import me.owdding.ktmodules.Module
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -122,7 +122,7 @@ object EntityViewApi {
     }
 
     private fun cleanupUnusedQueries() {
-        val theWorld = McClient.world ?: return
+        val theWorld = McClient.world
         val loaded: Set<UUID> = theWorld.loadedEntityList.mapTo(mutableSetOf()) { it.uniqueID }
 
         queries.removeIf { (uuid, query) ->

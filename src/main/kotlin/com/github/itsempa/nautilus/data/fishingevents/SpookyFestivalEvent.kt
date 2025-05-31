@@ -2,11 +2,11 @@ package com.github.itsempa.nautilus.data.fishingevents
 
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusUtils.skyblockDays
 import com.github.itsempa.nautilus.utils.NautilusUtils.skyblockYears
 import com.github.itsempa.nautilus.utils.TimePeriod
 import com.github.itsempa.nautilus.utils.TimePeriod.Companion.getCurrentOrNext
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration
 
 @Module

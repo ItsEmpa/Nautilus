@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package com.github.itsempa.nautilus.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -11,14 +9,13 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
+import me.owdding.ktmodules.Module
 
 @Module
 object NautilusCommands {
 
-    // Priority is set to the highest so that these commands always appear at the top
-    @HandleEvent(priority = HandleEvent.HIGHEST)
+    @HandleEvent
     fun onCommandRegister(event: BrigadierRegisterEvent) {
         event.register("nautilus") {
             this.aliases = listOf("nt", "nautilusconfig", "ntconfig")
@@ -66,7 +63,7 @@ object NautilusCommands {
     }
 
     private fun openConfigGui(search: String? = null) {
-        val editor = ConfigManager.getEditor()
+        val editor = ConfigManager.editor
 
         search?.let { editor.search(search) }
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)

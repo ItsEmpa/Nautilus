@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.data.NautilusStorage
+import com.github.itsempa.nautilus.data.core.NautilusStorage
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.combo.ComboEndEvent
 import com.github.itsempa.nautilus.events.combo.ComboUpdateEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
+import me.owdding.ktmodules.Module
 
 @Module
 object BestCombo {
@@ -38,20 +38,19 @@ object BestCombo {
 
     @HandleEvent
     fun onComboFinish(event: ComboEndEvent) {
-        if (!isInBestCombo) return
-        isInBestCombo = true
+        isInBestCombo = false
+        val finishedCombo = event.combo
         val currentBestCombo = bestCombo
-        val combo = event.combo
-        bestCombo = combo
+        if (currentBestCombo > finishedCombo) return
+        bestCombo = finishedCombo
         if (currentBestCombo == 0) {
-            sendMessage("You got a new best combo of §l§6${combo.addSeparators()}§3!")
+            sendMessage("You got a new best combo of §l§6${finishedCombo.addSeparators()}§3!")
         } else {
             sendMessage(
                 "You beat your previous best combo of ${currentBestCombo.addSeparators()} " +
-                    "with a combo of §l§6${combo.addSeparators()}§3!",
+                    "with a combo of §l§6${finishedCombo.addSeparators()}§3!",
             )
         }
-
     }
 
     private fun sendMessage(message: String) {

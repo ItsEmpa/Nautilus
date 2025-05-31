@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.modules.Module
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration.Companion.seconds
 
 @Module

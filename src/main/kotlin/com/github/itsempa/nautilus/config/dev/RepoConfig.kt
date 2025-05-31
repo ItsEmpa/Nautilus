@@ -3,7 +3,7 @@ package com.github.itsempa.nautilus.config.dev
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorButton
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorText
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigOption
-import com.github.itsempa.nautilus.data.NautilusRepoManager
+import com.github.itsempa.nautilus.data.core.NautilusRepoManager
 import com.google.gson.annotations.Expose
 
 class RepoConfig {

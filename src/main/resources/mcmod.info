@@ -5,14 +5,13 @@
     "description": "Nautilus is a mod made to improve fishing in Hypixel Skyblock.",
     "version": "${version}",
     "mcversion": "1.8.9",
-    "url": "",
-    "updateUrl": "",
+    "url": "https://github.com/ItsEmpa/Nautilus",
     "authorList": [
       "Empa"
     ],
     "credits": "",
     "logoFile": "",
     "screenshots": [],
-    "dependencies": ["SkyHanni"]
+    "dependencies": ["skyhanni"]
   }
 ]

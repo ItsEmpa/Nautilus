@@ -12,10 +12,11 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import com.github.itsempa.nautilus.events.KillEvent
 import com.github.itsempa.nautilus.events.combo.ComboEndEvent
 import com.github.itsempa.nautilus.events.combo.ComboUpdateEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.fullEnumMapOf
 import com.github.itsempa.nautilus.utils.replaceAll
+import me.owdding.ktmodules.Module
 import java.util.regex.Matcher
+import kotlin.time.Duration.Companion.seconds
 
 @Module
 object ComboData {
@@ -71,8 +72,7 @@ object ComboData {
         }
         comboEndPattern.matchMatcher(message) {
             val combo = group("combo").formatInt()
-            ComboEndEvent(combo).post()
-            this@ComboData.reset()
+            postEnd(combo, true)
         }
     }
 
@@ -87,19 +87,28 @@ object ComboData {
 
     @HandleEvent
     fun onWorldChange() {
-        if (combo != 0) {
-            ComboEndEvent(combo).post()
-            reset()
-        }
+        if (combo != 0) postEnd(combo, false)
     }
 
-    private fun reset() {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onSecondPassed() {
+        if (lastUpdateTime.passedSince() < 10.seconds) return
+        if (combo == 0 || combo > 5) return
+        postEnd(combo, false)
+    }
+
+    private fun reset(fromChat: Boolean) {
         lastUpdateTime = SimpleTimeMark.now()
         currentColor = 'f'
         combo = 0
         lastComboMessage = 0
         currentBuffs.replaceAll(0)
-        post(true)
+        post(fromChat)
+    }
+
+    private fun postEnd(combo: Int, fromChat: Boolean) {
+        ComboEndEvent(combo).post()
+        reset(fromChat)
     }
 
     private fun post(fromChat: Boolean) = ComboUpdateEvent(combo, currentColor, currentBuffs, fromChat).post()

@@ -9,9 +9,14 @@ import com.google.gson.annotations.Expose
 class RareDropsTrackerConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable showing how many sea creatures it has been since you acquired certin rare drops.")
+    @ConfigOption(name = "Enabled", desc = "Enable showing how many sea creatures it has been since you acquired certain rare drops.")
     @ConfigEditorBoolean
     var enabled: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Show Time", desc = "Show the time since you last dropped said drop.")
+    @ConfigEditorBoolean
+    var showTime: Boolean = true
 
     @Expose
     @ConfigOption(name = "Send Chat Message", desc = "Send a chat message whenever you get the items.")

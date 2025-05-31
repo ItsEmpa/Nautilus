@@ -1,19 +1,21 @@
 package com.github.itsempa.nautilus.data.fishingevents
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
+import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.FishingEventUpdate
 import com.github.itsempa.nautilus.events.MayorDataUpdateEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orFalse
 import com.github.itsempa.nautilus.utils.TimePeriod
 import com.github.itsempa.nautilus.utils.TimePeriod.Companion.getCurrentOrNext
 import com.github.itsempa.nautilus.utils.getSealedObjects
 import com.github.itsempa.nautilus.utils.minBy
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration
 
 sealed class FishingEvent(val internalName: String) {
@@ -49,12 +51,12 @@ sealed class FishingEvent(val internalName: String) {
     private fun internalStart() {
         onStart()
         NautilusChat.debug("Started Fishing Event $name (${timePeriod?.duration})")
-        if (shouldPostEvents()) FishingEventUpdate.Start(this)
+        if (shouldPostEvents()) FishingEventUpdate.Start(this).post()
     }
     private fun internalEnd() {
         onEnd()
         NautilusChat.debug("Ended Fishing Event $name")
-        if (shouldPostEvents()) FishingEventUpdate.End(this)
+        if (shouldPostEvents()) FishingEventUpdate.End(this).post()
     }
 
     private fun updateTimePeriodAndState() {
@@ -99,6 +101,17 @@ sealed class FishingEvent(val internalName: String) {
         fun onSecondPassed() = events.forEach(FishingEvent::onSecondPassed)
 
         @HandleEvent
+        fun onCommand(event: BrigadierRegisterEvent) {
+            event.register("ntfishingevent") {
+                this.description = "Forcefully updates all fishing events."
+                this.category = CommandCategory.DEVELOPER_DEBUG
+                literalCallback("forceupdate") {
+                    events.forEach(FishingEvent::updateTimePeriodAndState)
+                }
+            }
+        }
+
+        @HandleEvent
         fun onDebug(event: NautilusDebugEvent) {
             event.title("FishingEvents")
             event.addIrrelevant(
@@ -107,6 +120,7 @@ sealed class FishingEvent(val internalName: String) {
                         appendLine(it.internalName)
                         appendLine(" - timePeriod: ${it.timePeriod?.formatString()}")
                         appendLine(" - nextUpdate: in ${it.nextUpdate.timeUntil()} ")
+                        appendLine(" - isActive: ${it.isActive}")
                         appendLine()
                     }
                 }

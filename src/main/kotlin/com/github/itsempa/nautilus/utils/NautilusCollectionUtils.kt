@@ -1,31 +1,7 @@
 package com.github.itsempa.nautilus.utils
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import java.util.EnumMap
-import java.util.EnumSet
 import kotlin.time.Duration
-
-inline fun <reified E : Enum<E>> enumSetOf(vararg elements: E): EnumSet<E> = EnumSet.copyOf(elements.toList())
-
-inline fun <reified E : Enum<E>> enumSetOf(): EnumSet<E> = EnumSet.noneOf(E::class.java)
-
-fun <E : Enum<E>> Set<E>.toEnumSet(): EnumSet<E> = EnumSet.copyOf(this)
-
-inline fun <reified K : Enum<K>, V> enumMapOf(): EnumMap<K, V> = EnumMap<K, V>(K::class.java)
-
-fun <K : Enum<K>, V> Map<K, V>.toEnumMap(): EnumMap<K, V> = EnumMap(this)
-
-inline fun <reified K : Enum<K>, V> fullEnumMapOf(defaultValue: V): EnumMap<K, V> {
-    return buildMap {
-        for (enum in enumValues<K>()) put(enum, defaultValue)
-    }.toEnumMap()
-}
-
-inline fun <reified K : Enum<K>, V> fullEnumMapOf(defaultValue: () -> V): EnumMap<K, V> {
-    return buildMap {
-        for (enum in enumValues<K>()) put(enum, defaultValue())
-    }.toEnumMap()
-}
 
 fun <T> MutableList<T>.removeFirstMatches(condition: (T) -> Boolean): T? {
     val indexOf = indexOfFirst(condition)
@@ -38,6 +14,18 @@ fun <T> MutableList<T>.removeRange(range: IntRange) {
     val first = range.first.coerceAtLeast(0)
     for (i in last downTo first) removeAt(i)
 }
+
+fun <T> MutableCollection<T>.clearAnd(predicate: (T) -> Unit) {
+    val it = iterator()
+    while (it.hasNext()) {
+        predicate(it.next())
+        it.remove()
+    }
+}
+
+fun <T> Iterable<T>.anyIntersects(other: Iterable<T>): Boolean = any { it in other }
+
+fun <K, V> MutableMap<K, V>.clearAnd(predicate: (Map.Entry<K, V>) -> Unit) = entries.clearAnd(predicate)
 
 fun <K, V> MutableMap<K, V>.replaceAll(value: V) = entries.forEach { it.setValue(value) }
 

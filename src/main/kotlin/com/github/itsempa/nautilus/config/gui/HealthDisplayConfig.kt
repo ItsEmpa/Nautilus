@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorBoolean
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorSlider
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorText
+import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigLink
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigOption
 import com.github.itsempa.nautilus.utils.NautilusUtils.asProperty
 import com.google.gson.annotations.Expose
@@ -25,5 +26,11 @@ class HealthDisplayConfig {
     var limit = 5
 
     @Expose
-    val pos = Position(200, 200)
+    @ConfigOption(name = "Red Percentage", desc = "Percentage of health at which a mob's health should be shown in red.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 25f, minStep = 1f)
+    var redPercentage: Float = 5f
+
+    @Expose
+    @ConfigLink(owner = HealthDisplayConfig::class, field = "enabled")
+    val pos = Position(200, 200, centerX = true)
 }

@@ -32,6 +32,9 @@ data class SeaCreatureData(
     var aabb: AxisAlignedBB?
         private set
 
+    var lastUpdate: SimpleTimeMark = SimpleTimeMark.now()
+        private set
+
     /** This tracks the real last position of the sea creature. Don't display this to the user */
     internal var actualLastPos: LorenzVec
         private set
@@ -49,6 +52,8 @@ data class SeaCreatureData(
     }
 
     inline val name: String get() = seaCreature.name
+
+    inline val displayName: String get() = seaCreature.displayName
 
     inline val isRare: Boolean get() = seaCreature.rare
 
@@ -95,6 +100,7 @@ data class SeaCreatureData(
 
     @Suppress("HandleEventInspection")
     fun update(renderWorld: SkyHanniRenderWorldEvent) {
+        lastUpdate = SimpleTimeMark.now()
         val mob = mob ?: return
         actualLastPos = mob.getLorenzVec()
         if (!updateCanBeSeen()) return

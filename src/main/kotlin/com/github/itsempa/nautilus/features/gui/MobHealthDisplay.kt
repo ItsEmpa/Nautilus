@@ -1,6 +1,7 @@
 package com.github.itsempa.nautilus.features.gui
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -10,8 +11,8 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.SeaCreatureData
 import com.github.itsempa.nautilus.data.SeaCreatureDetectionApi
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusUtils.toSet
+import me.owdding.ktmodules.Module
 
 @Module
 object MobHealthDisplay {
@@ -37,6 +38,18 @@ object MobHealthDisplay {
         }
     }
 
+    private fun formatHealth(mob: Mob): String {
+        val health = mob.health
+        val maxHealth = mob.maxHealth
+        val percentage = (health / maxHealth * 100)
+        val color = when (percentage) {
+            in 0f..config.redPercentage -> "§c"
+            in config.redPercentage..50f -> "§e"
+            else -> "§a"
+        }
+        return "$color${health.shortFormat()}§f/§a${maxHealth.shortFormat()}§c❤"
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
@@ -45,8 +58,8 @@ object MobHealthDisplay {
             for ((seaCreature, health) in healthMap) {
                 if (health == -1) continue
                 val mob = seaCreature.mob ?: continue
-                val color = if (seaCreature.isOwn) "§a" else "§b"
-                add("$color${seaCreature.name} §a${mob.health.shortFormat()}§f/§a${mob.maxHealth.shortFormat()}§c❤")
+                val color = if (seaCreature.isOwn) "§a" else "§c"
+                add("$color${seaCreature.name} ${formatHealth(mob)}")
                 if (size >= config.limit) break
             }
         }

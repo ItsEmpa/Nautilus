@@ -22,7 +22,7 @@ class BaseBrigadierBuilder(override val name: String) : CommandData, BrigadierBu
 ) {
     var description: String = ""
     override var aliases: List<String> = emptyList()
-    override var category: CommandCategory = CommandCategory.MAIN
+    override var category: CommandCategory = CommandCategory.USERS_ACTIVE
 
     override val descriptor: String
         get() = description

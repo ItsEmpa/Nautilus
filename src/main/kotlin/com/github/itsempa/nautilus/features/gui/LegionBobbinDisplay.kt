@@ -12,16 +12,18 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
-import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusItemUtils.uuid
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orZero
 import com.github.itsempa.nautilus.utils.helpers.McPlayer
+import com.github.itsempa.nautilus.utils.safe.SafeUtils
+import me.owdding.ktmodules.Module
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.projectile.EntityFishHook
 import java.util.UUID
+import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.seconds
 
 @Module
@@ -32,10 +34,12 @@ object LegionBobbinDisplay {
     private const val BOBBERS_DISTANCE = 30.0
     private const val BOBBERS_LIMIT = 10
     private const val BOBBIN_MULT = 0.16
+    private const val MAX_BOBBIN_LVL = 5
 
     private const val LEGION_DISTANCE = 30.0
     private const val LEGION_LIMIT = 20
     private const val LEGION_MULT = 0.07
+    private const val MAX_LEGION_LVL = 5
 
     private var nearbyBobbers: Int = 0
     private var nearbyPlayers: Int = 0
@@ -51,6 +55,8 @@ object LegionBobbinDisplay {
     )
 
     private val armorDataCache = TimeLimitedCache<UUID, ArmorData>(5.seconds)
+
+    private var display: List<Renderable>? = null
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
@@ -72,8 +78,8 @@ object LegionBobbinDisplay {
                 }
             }
         }
-        nearbyBobbers = bobbers.coerceAtMost(BOBBERS_LIMIT)
-        nearbyPlayers = players.coerceAtMost(LEGION_LIMIT)
+        modifyValue(::nearbyBobbers, bobbers.coerceAtMost(BOBBERS_LIMIT))
+        modifyValue(::nearbyPlayers, players.coerceAtMost(LEGION_LIMIT))
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -94,28 +100,103 @@ object LegionBobbinDisplay {
             newLegionBuff += data.legion * LEGION_MULT
             newBobbinBuff += data.bobbin * BOBBIN_MULT
         }
-        armorLegionBuff = newLegionBuff
-        armorBobbinBuff = newBobbinBuff
+        modifyValue(::armorLegionBuff, newLegionBuff)
+        modifyValue(::armorBobbinBuff, newBobbinBuff)
+    }
+
+    // Modifies the passed property with the new value, and if the value is different it resets the display
+    private fun <T> modifyValue(property: KMutableProperty0<T>, newValue: T) {
+        if (property.get() == newValue) return
+        property.set(newValue)
+        display = null
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        val renderables = buildList {
+        val renderables = display ?: createRenderable().also { display = it }
+        config.position.renderRenderables(renderables, posLabel = "Legion Bobbin Display")
+    }
+
+    private fun createRenderable(): List<Renderable> {
+        if (!config.alwaysShowMax) return createRealRenderable()
+
+        val legionBuff = MAX_LEGION_LVL * LEGION_MULT * nearbyPlayers
+        val bobbinBuff = MAX_BOBBIN_LVL * BOBBIN_MULT * nearbyBobbers
+
+
+        val (legionTitle, legionText) = formatInfo(
+            wearingLegion, legionBuff > bobbinBuff, nearbyPlayers, legionBuff, "§d", "Legion",
+        )
+
+        val (bobbinTitle, bobbinText) = formatInfo(
+            wearingBobbin, bobbinBuff > legionBuff, nearbyBobbers, bobbinBuff, "§3", "Bobbin",
+        )
+
+        return listOf(
+            HorizontalContainerRenderable(listOf(
+                SafeUtils.stringRenderable(legionTitle),
+                SafeUtils.stringRenderable(legionText),
+            )),
+            HorizontalContainerRenderable(listOf(
+                SafeUtils.stringRenderable(bobbinTitle),
+                SafeUtils.stringRenderable(bobbinText),
+            )),
+        )
+
+    }
+
+    private fun createRealRenderable(): List<Renderable> {
+        return buildList {
             if (!config.hideWithoutEnchant || wearingLegion) add(
-                HorizontalContainerRenderable(listOf(
-                    RenderableString("§dLegion: "),
-                    RenderableString("§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)"),
-                )),
+                HorizontalContainerRenderable(
+                    listOf(
+                        SafeUtils.stringRenderable("§dLegion: "),
+                        SafeUtils.stringRenderable("§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)"),
+                    ),
+                ),
             )
             if (!config.hideWithoutEnchant || wearingBobbin) add(
-                HorizontalContainerRenderable(listOf(
-                    RenderableString("§3Bobbin: "),
-                    RenderableString("§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)"),
-                )),
+                HorizontalContainerRenderable(
+                    listOf(
+                        SafeUtils.stringRenderable("§3Bobbin: "),
+                        SafeUtils.stringRenderable("§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)"),
+                    ),
+                ),
             )
         }
-        config.position.renderRenderables(renderables, posLabel = "Legion Bobbin Display")
+    }
+
+    private fun formatInfo(
+        isActive: Boolean,
+        isBest: Boolean,
+        nearby: Int,
+        buff: Double,
+        color: String,
+        title: String,
+    ): Pair<String, String> {
+
+        val boldCode = if (isActive) "§l" else ""
+        val suffix = if (isBest) " §6$boldCode✦" else ""
+
+        val legionTitle = buildString {
+            append(color)
+            append(boldCode)
+            append("$title: ")
+        }
+
+        val legionFormat = buildString {
+            append("§b")
+            append(boldCode)
+            append(nearby)
+            append(" ")
+            append("§7")
+            append(boldCode)
+            append("(${buff.roundTo(2)}%)")
+            append(suffix)
+        }
+
+        return legionTitle to legionFormat
     }
 
     private fun isEnabled() = config.enabled

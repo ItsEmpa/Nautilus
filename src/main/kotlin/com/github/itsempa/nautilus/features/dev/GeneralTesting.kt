@@ -5,10 +5,11 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import com.github.itsempa.nautilus.commands.brigadier.arguments.ItemNameArgumentType
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.KillEvent
-import com.github.itsempa.nautilus.modules.Module
+import com.github.itsempa.nautilus.modules.DevModule
 import com.github.itsempa.nautilus.utils.NautilusChat
+import com.github.itsempa.nautilus.utils.NautilusTimeUtils.customFormat
 
-@Module(devOnly = true)
+@DevModule
 object GeneralTesting {
 
     @HandleEvent

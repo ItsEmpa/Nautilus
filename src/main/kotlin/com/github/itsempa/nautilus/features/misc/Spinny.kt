@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
+import me.owdding.ktmodules.Module
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 

@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusUtils.skyblockDays
 import com.github.itsempa.nautilus.utils.NautilusUtils.skyblockMonths
 import com.github.itsempa.nautilus.utils.TimePeriod
 import com.github.itsempa.nautilus.utils.TimePeriod.Companion.getCurrentOrNext
+import me.owdding.ktmodules.Module
 import kotlin.time.Duration
 
 @Module

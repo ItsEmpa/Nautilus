@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SizeLimitedCache
 import com.github.itsempa.nautilus.events.KillEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusItemUtils.getBookOfStats
 import com.github.itsempa.nautilus.utils.NautilusItemUtils.uuid
+import me.owdding.ktmodules.Module
 import java.util.UUID
 
 @Module

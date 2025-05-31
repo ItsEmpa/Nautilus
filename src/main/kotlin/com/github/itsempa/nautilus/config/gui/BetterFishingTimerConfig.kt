@@ -44,6 +44,6 @@ class BetterFishingTimerConfig {
 
     @Expose
     @ConfigLink(owner = BetterFishingTimerConfig::class, field = "enabled")
-    val position = Position(200, -100)
+    val position = Position(200, -100, centerX = true)
 
 }

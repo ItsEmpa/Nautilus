@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
-import com.github.itsempa.nautilus.modules.Module
 import com.github.itsempa.nautilus.utils.NautilusChat
+import me.owdding.ktmodules.Module
 
 @Module
 object FishingPetProfit {

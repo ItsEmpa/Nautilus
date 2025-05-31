@@ -20,6 +20,7 @@ sealed class SeaCreatureEvent(val seaCreature: SeaCreatureData) : SkyHanniEvent(
     /** Gets called when a Sea Creature is re-detected after despawning. */
     class ReDetect(seaCreature: SeaCreatureData) : SeaCreatureEvent(seaCreature)
 
+    inline val name: String get() = seaCreature.name
     inline val isOwn: Boolean get() = seaCreature.isOwn
     inline val isRare: Boolean get() = seaCreature.isRare
 }
