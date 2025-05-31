@@ -2,15 +2,20 @@ package com.github.itsempa.nautilus.features.dev
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.features.fishing.FishingApi.isLavaRod
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import com.github.itsempa.nautilus.commands.brigadier.arguments.ItemNameArgumentType
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.KillEvent
 import com.github.itsempa.nautilus.modules.DevModule
 import com.github.itsempa.nautilus.utils.NautilusChat
-import com.github.itsempa.nautilus.utils.NautilusTimeUtils.customFormat
 
 @DevModule
 object GeneralTesting {
+
+    private fun isValid(internalName: NeuInternalName): Boolean {
+        return internalName.isLavaRod()
+    }
 
     @HandleEvent
     fun onBrigadier(event: BrigadierRegisterEvent) {
@@ -18,7 +23,7 @@ object GeneralTesting {
             aliases = listOf("ntbd")
             category = CommandCategory.DEVELOPER_TEST
 
-            argCallback("item", ItemNameArgumentType.itemName()) { item ->
+            argCallback("item", ItemNameArgumentType.itemName(::isValid)) { item ->
                 NautilusChat.debug("Item: $item")
             }
         }
