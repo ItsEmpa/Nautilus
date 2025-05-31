@@ -8,11 +8,16 @@ import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import java.util.concurrent.CompletableFuture
 
-// TODO: add support for internal name tab completion
+private typealias ParsingFail = BrigadierUtils.ItemParsingFail
+
+// TODO:
+//  add support for internal name tab completion
+//  add argument type that uses greedy string
 sealed class ItemNameArgumentType : ArgumentType<NeuInternalName> {
 
     private val unknownValueException = DynamicCommandExceptionType { input ->
@@ -23,13 +28,16 @@ sealed class ItemNameArgumentType : ArgumentType<NeuInternalName> {
         LiteralMessage("Disallowed item '$input'.")
     }
 
+    private val emptyValueException = SimpleCommandExceptionType { "Empty item name provided." }
+
     override fun parse(reader: StringReader): NeuInternalName {
         val input = reader.readOptionalDoubleQuotedString()
         val result = BrigadierUtils.parseItem(input, isValidItem = ::isValidItem)
         return when (result) {
             is NeuInternalName -> result
-            BrigadierUtils.ItemParsingFail.DISALLOWED_ITEM -> throw disallowedValueException.createWithContext(reader, input)
-            BrigadierUtils.ItemParsingFail.UNKNOWN_ITEM -> throw unknownValueException.createWithContext(reader, input)
+            ParsingFail.DISALLOWED_ITEM -> throw disallowedValueException.createWithContext(reader, input)
+            ParsingFail.UNKNOWN_ITEM -> throw unknownValueException.createWithContext(reader, input)
+            ParsingFail.EMPTY -> throw emptyValueException.createWithContext(reader)
             else -> throw IllegalArgumentException("Unexpected item parsing result: $result")
         }
     }
