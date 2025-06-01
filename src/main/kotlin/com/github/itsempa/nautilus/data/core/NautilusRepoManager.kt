@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.core.loader.GsonManager
@@ -158,7 +159,7 @@ object NautilusRepoManager {
             try {
                 InputStreamReader(URL(getCommitApiUrl()).openStream())
                     .use { inReader ->
-                        val commits: JsonObject = gson.fromJson(inReader, JsonObject::class.java)
+                        val commits: JsonObject = gson.fromJson<JsonObject>(inReader)
                         latestRepoCommit = commits["sha"].asString
                         val formattedDate = commits["commit"].asJsonObject["committer"].asJsonObject["date"].asString
                         latestRepoCommitTime = Instant.parse(formattedDate).toEpochMilli().asTimeMark()
@@ -303,7 +304,7 @@ object NautilusRepoManager {
                     StandardCharsets.UTF_8,
                 ),
             ).use { reader ->
-                gson.fromJson(reader, JsonObject::class.java)
+                gson.fromJson<JsonObject>(reader)
             }
         }
     }
