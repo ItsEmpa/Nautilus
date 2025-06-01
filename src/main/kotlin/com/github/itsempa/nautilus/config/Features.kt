@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.deps.moulconfig.annotations.Category
 import at.hannibal2.skyhanni.deps.moulconfig.common.MyResourceLocation
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.chat.ChatConfig
+import com.github.itsempa.nautilus.config.core.loader.NautilusConfigMigrator
 import com.github.itsempa.nautilus.config.dev.DevConfig
 import com.github.itsempa.nautilus.config.gui.GuiConfig
 import com.github.itsempa.nautilus.config.inventory.InventoryConfig
@@ -61,4 +62,8 @@ class Features : Config() {
 
     @Expose
     val storage: Storage = Storage()
+
+    @Expose
+    @Suppress("unused")
+    var lastVersion: Int = NautilusConfigMigrator.VERSION
 }

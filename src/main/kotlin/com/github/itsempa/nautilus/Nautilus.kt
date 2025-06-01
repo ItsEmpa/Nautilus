@@ -1,6 +1,9 @@
 package com.github.itsempa.nautilus
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.config.Features
@@ -26,6 +29,7 @@ import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.io.File
 
 @Module
 @Mod(
@@ -41,11 +45,6 @@ object Nautilus {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
         SkyHanniVersionCheck.checkSkyHanniLoaded()
-        tryError("Something went wrong while initializing the config!") {
-            ConfigManager // Load ConfigManager class to initialize config
-            PositionLinkManager.init(feature)
-        }
-
         tryError("Something went wrong while initializing modules!") {
             NautilusModules.init(::loadModule)
         }
@@ -54,11 +53,24 @@ object Nautilus {
                 NautilusDevModules.init(::loadModule)
             }
         }
+        tryError("Something went wrong while initializing the config!") {
+            ConfigManager // Load ConfigManager class to initialize config
+            PositionLinkManager.init(feature)
+        }
+
         // TODO: figure out why this errors on startup
         NautilusRepoManager.initRepo()
 
         NautilusPreInitFinishedEvent.post()
     }
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (event.repeatSeconds(60)) ConfigManager.save()
+    }
+
+    @HandleEvent(ClientDisconnectEvent::class)
+    fun onDisconnect() = ConfigManager.save()
 
     private fun loadModule(obj: Any) {
         if (obj in modules) return
@@ -88,6 +100,7 @@ object Nautilus {
 
     val SEM_VER = SemVersion.fromString(VERSION)
 
+    val directory = File("config/$MOD_ID")
     private val modules: MutableList<Any> = mutableListOf()
 
     @JvmStatic

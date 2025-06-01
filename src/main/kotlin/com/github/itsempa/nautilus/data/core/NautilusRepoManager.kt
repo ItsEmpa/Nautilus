@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.github.itsempa.nautilus.Nautilus
-import com.github.itsempa.nautilus.config.ConfigManager
+import com.github.itsempa.nautilus.config.core.loader.GsonManager
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusRepositoryReloadEvent
 import com.github.itsempa.nautilus.utils.NautilusChat
@@ -42,10 +42,10 @@ object NautilusRepoManager {
         constructor(errorMessage: String, cause: Throwable) : super(errorMessage, cause)
     }
 
-    val gson get() = ConfigManager.gson
+    val gson get() = GsonManager.gson
 
-    private val repoLocation = File(ConfigManager.directory, "repo")
-    private val tempDownloadDir = File(ConfigManager.directory, "temp")
+    private val repoLocation = File(Nautilus.directory, "repo")
+    private val tempDownloadDir = File(Nautilus.directory, "temp")
 
     private val config get() = Nautilus.feature.dev
 
@@ -282,7 +282,7 @@ object NautilusRepoManager {
         }
     }
 
-    private fun getCurrentCommitFile(): File = File(ConfigManager.directory, "currentCommit.json")
+    private fun getCurrentCommitFile(): File = File(Nautilus.directory, "currentCommit.json")
 
     private fun readCurrentCommit(): Pair<String, SimpleTimeMark?>? {
         val currentCommitJSON = getJsonFromFile(getCurrentCommitFile()) ?: return null
