@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import com.github.itsempa.nautilus.Nautilus
+import com.github.itsempa.nautilus.config.core.loader.NautilusConfigFixEvent
 import com.github.itsempa.nautilus.config.storage.ProfileStorage
 import com.github.itsempa.nautilus.config.storage.Storage
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
@@ -25,7 +26,7 @@ object NautilusStorage {
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         NautilusChat.debug("Joined profile ${event.name}")
-        profile = storage.profileStorage.getOrPut(event.name, ::ProfileStorage)
+        profile = storage.profiles.getOrPut(event.name, ::ProfileStorage)
         profileName = event.name
     }
 
@@ -48,6 +49,11 @@ object NautilusStorage {
             "profileName" to profileName,
             "profileStorage" to profile,
         )
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: NautilusConfigFixEvent) {
+        event.move(1, "storage.profileStorage", "storage.profiles")
     }
 
 }

@@ -10,9 +10,9 @@ import com.google.gson.JsonPrimitive
 
 object NautilusConfigMigrator {
 
-    val logger = NautilusLogger("ConfigMigration")
+    private val logger = NautilusLogger("ConfigMigration")
 
-    const val VERSION = 0
+    const val VERSION = 1
 
     fun fixConfig(config: JsonObject): JsonObject {
         val lastVersion = (config["lastVersion"] as? JsonPrimitive)?.asIntOrNull ?: -1
@@ -28,7 +28,7 @@ object NautilusConfigMigrator {
             val storage = acc["storage"]?.asJsonObject
             val dynamicPrefix = mapOf(
                 "#profile" to (
-                    storage?.get("profileStorage")?.asJsonObject?.entrySet()?.map { "storage.profileStorage.${it.key}" }.orEmpty()
+                    storage?.get("profiles")?.asJsonObject?.entrySet()?.map { "storage.profiles.${it.key}" }.orEmpty()
                     ),
             )
             val migration = NautilusConfigFixEvent(
@@ -36,7 +36,7 @@ object NautilusConfigMigrator {
                 JsonObject().also {
                     it.add("lastVersion", JsonPrimitive(newVersion))
                 },
-                prev, 0, dynamicPrefix,
+                prev, 0, dynamicPrefix, logger,
             ).also { it.post() }
             logger.log("Transformations scheduled: ${migration.new}")
             val mergesPerformed = merge(migration.old, migration.new)
@@ -71,12 +71,13 @@ data class NautilusConfigFixEvent(
     val oldVersion: Int,
     var movesPerformed: Int,
     val dynamicPrefix: Map<String, List<String>>,
+    private val logger: NautilusLogger,
 ) : SkyHanniEvent() {
     init {
         dynamicPrefix.entries
             .filter { it.value.isEmpty() }
             .forEach {
-                NautilusConfigMigrator.logger.log("Dynamic prefix ${it.key} does not resolve to anything.")
+                logger.log("Dynamic prefix ${it.key} does not resolve to anything.")
             }
     }
 
@@ -86,21 +87,21 @@ data class NautilusConfigFixEvent(
 
     fun add(since: Int, path: String, value: () -> JsonElement) {
         if (since <= oldVersion) {
-            NautilusConfigMigrator.logger.log("Skipping add of $value to $path ($since <= $oldVersion)")
+            logger.log("Skipping add of $value to $path ($since <= $oldVersion)")
             return
         }
         if (since > NautilusConfigMigrator.VERSION) {
             error("Illegally new version $since > ${NautilusConfigMigrator.VERSION}")
         }
         if (since > oldVersion + 1) {
-            NautilusConfigMigrator.logger.log("Skipping add of $value to $path (will be done in another pass)")
+            logger.log("Skipping add of $value to $path (will be done in another pass)")
             return
         }
         val np = path.split(".")
         if (np.first().startsWith("#")) {
             val realPrefixes = dynamicPrefix[np.first()]
             if (realPrefixes == null) {
-                NautilusConfigMigrator.logger.log("Could not resolve dynamic prefix $path")
+                logger.log("Could not resolve dynamic prefix $path")
                 return
             }
             for (realPrefix in realPrefixes) {
@@ -110,26 +111,26 @@ data class NautilusConfigFixEvent(
         }
         val newParentElement = new.at(np.dropLast(1), true)
         if (newParentElement !is JsonObject) {
-            NautilusConfigMigrator.logger.log(
+            logger.log(
                 "Skipping add of $value to $path, since another element already inhabits that path",
             )
             return
         }
         newParentElement.add(np.last(), value())
-        NautilusConfigMigrator.logger.log("Added element to $path")
+        logger.log("Added element to $path")
         return
     }
 
     fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
         if (since <= oldVersion) {
-            NautilusConfigMigrator.logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
+            logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
             return
         }
         if (since > NautilusConfigMigrator.VERSION) {
             error("Illegally new version $since > ${NautilusConfigMigrator.VERSION}")
         }
         if (since > oldVersion + 1) {
-            NautilusConfigMigrator.logger.log("Skipping move from $oldPath to $newPath (will be done in another pass)")
+            logger.log("Skipping move from $oldPath to $newPath (will be done in another pass)")
             return
         }
         val op = oldPath.split(".")
@@ -138,7 +139,7 @@ data class NautilusConfigFixEvent(
             require(np.first() == op.first())
             val realPrefixes = dynamicPrefix[op.first()]
             if (realPrefixes == null) {
-                NautilusConfigMigrator.logger.log("Could not resolve dynamic prefix $oldPath")
+                logger.log("Could not resolve dynamic prefix $oldPath")
                 return
             }
             for (realPrefix in realPrefixes) {
@@ -152,12 +153,12 @@ data class NautilusConfigFixEvent(
         }
         val oldElem = old.at(op, false)
         if (oldElem == null) {
-            NautilusConfigMigrator.logger.log("Skipping move from $oldPath to $newPath ($oldPath not present)")
+            logger.log("Skipping move from $oldPath to $newPath ($oldPath not present)")
             return
         }
         val newParentElement = new.at(np.dropLast(1), true)
         if (newParentElement !is JsonObject) {
-            NautilusConfigMigrator.logger.log(
+            logger.log(
                 "Catastrophic: element at path $old could not be relocated to $new, " +
                     "since another element already inhabits that path",
             )
@@ -165,7 +166,7 @@ data class NautilusConfigFixEvent(
         }
         movesPerformed++
         newParentElement.add(np.last(), transform(oldElem.shDeepCopy()))
-        NautilusConfigMigrator.logger.log("Moved element from $oldPath to $newPath")
+        logger.log("Moved element from $oldPath to $newPath")
     }
 
     companion object {
