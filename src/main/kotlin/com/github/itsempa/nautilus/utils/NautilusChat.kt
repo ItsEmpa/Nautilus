@@ -155,8 +155,7 @@ object NautilusChat {
     private fun getUniqueMessageIdForString(string: String): Int =
         uniqueMessageIdStorage.getOrPut(string, ::getUniqueMessageId)
 
-    // TODO: find a reason to use number?
-    private var lastUniqueMessageId = 223242
+    private var lastUniqueMessageId = 680545
 
     fun getUniqueMessageId() = lastUniqueMessageId++
 

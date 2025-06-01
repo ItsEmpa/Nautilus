@@ -23,19 +23,4 @@ public class MixinEntityFishHook {
         return LavaBobberHook.fixBobberLava(instance, aabb);
     }
 
-    // TODO: figure out if its possible to use mixin extras
-    /*
-    @WrapOperation(
-        method = "onUpdate",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/World;isAABBInMaterial(Lnet/minecraft/util/AxisAlignedBB;Lnet/minecraft/block/material/Material;)Z"
-        )
-    )
-
-    public boolean fixBobberLava(World instance, AxisAlignedBB aabb, Material material, Operation<Boolean> original) {
-        if (!LavaBobberHook.isEnabled()) return original.call(instance, aabb, material);
-        return LavaBobberHook.fixBobberLava(instance, aabb);
-    }*/
-
 }

@@ -2,13 +2,12 @@ package com.github.itsempa.nautilus.features.misc.update
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.utils.NautilusChat
-import com.github.itsempa.nautilus.utils.helpers.McClient
+import com.github.itsempa.nautilus.utils.helpers.McPlayer
 import me.owdding.ktmodules.Module
 import moe.nea.libautoupdate.GithubReleaseUpdateSource
 import moe.nea.libautoupdate.PotentialUpdate
@@ -56,10 +55,10 @@ object UpdateManager {
 
     // TODO: change this
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (checked) return
         if (!config.notifyUpdates) return
-        McClient.self.thePlayer ?: return
+        if (!McPlayer.exists) return
         checked = true
         checkUpdate()
     }

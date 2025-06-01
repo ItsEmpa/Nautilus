@@ -58,7 +58,6 @@ object Nautilus {
             PositionLinkManager.init(feature)
         }
 
-        // TODO: figure out why this errors on startup
         NautilusRepoManager.initRepo()
 
         NautilusPreInitFinishedEvent.post()
