@@ -1,4 +1,4 @@
-package com.github.itsempa.nautilus.config
+package com.github.itsempa.nautilus.config.core
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigLink
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import com.github.itsempa.nautilus.Nautilus
+import com.github.itsempa.nautilus.config.Features
 import com.github.itsempa.nautilus.data.core.NautilusErrorManager
 import com.github.itsempa.nautilus.mixins.hooks.NautilusPositionData.Companion.isNautilus
 import com.github.itsempa.nautilus.utils.tryError

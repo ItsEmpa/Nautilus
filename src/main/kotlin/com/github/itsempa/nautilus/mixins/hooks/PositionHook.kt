@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.deps.moulconfig.gui.GuiScreenElementWrapper
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import com.github.itsempa.nautilus.config.ConfigManager
+import com.github.itsempa.nautilus.config.core.ConfigManager
 import com.github.itsempa.nautilus.mixins.hooks.NautilusPositionData.Companion.isNautilus
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 

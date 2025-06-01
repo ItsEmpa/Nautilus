@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.deps.moulconfig.gui.GuiScreenElementWrapper
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
-import com.github.itsempa.nautilus.config.ConfigManager
+import com.github.itsempa.nautilus.config.core.ConfigManager
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.utils.NautilusChat
 import me.owdding.ktmodules.Module

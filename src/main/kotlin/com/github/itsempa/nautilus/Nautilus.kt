@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.config.Features
-import com.github.itsempa.nautilus.config.PositionLinkManager
+import com.github.itsempa.nautilus.config.core.ConfigManager
+import com.github.itsempa.nautilus.config.core.PositionLinkManager
 import com.github.itsempa.nautilus.data.core.NautilusRepoManager
 import com.github.itsempa.nautilus.data.core.SkyHanniVersionCheck
 import com.github.itsempa.nautilus.events.NautilusPreInitFinishedEvent

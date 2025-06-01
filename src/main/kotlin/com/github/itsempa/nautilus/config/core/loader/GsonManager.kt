@@ -19,6 +19,8 @@ object GsonManager {
     val gson: Gson = gsonBuilder().create()
     val lenientGson: Gson = lenientGsonBuilder().create()
 
+
+
     private inline fun <reified T> GsonBuilder.registerTypeAdapter(adapter: TypeAdapter<T>, nullSafe: Boolean = true): GsonBuilder {
         val newAdapter = if (nullSafe) adapter.nullSafe() else adapter
         return registerTypeAdapter(T::class.java, newAdapter)

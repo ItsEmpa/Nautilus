@@ -12,12 +12,12 @@ object NautilusConfigMigrator {
 
     val logger = NautilusLogger("ConfigMigration")
 
-    const val VERSION = -1
+    const val VERSION = 0
 
     fun fixConfig(config: JsonObject): JsonObject {
         val lastVersion = (config["lastVersion"] as? JsonPrimitive)?.asIntOrNull ?: -1
         if (lastVersion > VERSION) {
-            logger.log("Attempted to downgrate config version")
+            logger.log("Attempted to downgrade config version")
             config.add("lastVersion", JsonPrimitive(VERSION))
             return config
         }

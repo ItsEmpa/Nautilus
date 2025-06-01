@@ -1,7 +1,8 @@
-package com.github.itsempa.nautilus.config
+package com.github.itsempa.nautilus.config.core
 
 import at.hannibal2.skyhanni.deps.moulconfig.managed.ManagedConfig
 import com.github.itsempa.nautilus.Nautilus
+import com.github.itsempa.nautilus.config.Features
 import com.github.itsempa.nautilus.config.core.loader.ConfigMapper
 import com.github.itsempa.nautilus.features.misc.update.ConfigVersionDisplay
 import com.github.itsempa.nautilus.features.misc.update.NautilusGuiOptionEditorUpdateCheck
@@ -13,7 +14,7 @@ object ConfigManager {
         customProcessor(ConfigVersionDisplay::class.java) { processor, _ ->
             NautilusGuiOptionEditorUpdateCheck(processor)
         }
-        mapper = ConfigMapper()
+        mapper = ConfigMapper
         throwOnFailure()
     }
 

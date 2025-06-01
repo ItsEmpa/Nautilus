@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierArguments
-import com.github.itsempa.nautilus.config.NullableStringTypeAdapter
+import com.github.itsempa.nautilus.config.core.loader.NullableStringTypeAdapter
 import com.github.itsempa.nautilus.data.CrystalHollowsArea
 import com.github.itsempa.nautilus.data.HotspotApi
 import com.github.itsempa.nautilus.data.fishingevents.FishingFestivalEvent

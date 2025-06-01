@@ -1,6 +1,7 @@
 package com.github.itsempa.nautilus.config.core.loader
 
 import at.hannibal2.skyhanni.deps.moulconfig.managed.DataMapper
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.Features
@@ -8,19 +9,19 @@ import com.github.itsempa.nautilus.utils.helpers.McClient
 import com.github.itsempa.nautilus.utils.tryOrDefault
 import com.google.gson.JsonObject
 
-class ConfigMapper : DataMapper<Features> {
-    val gson = GsonManager.lenientGson
-    private val clazz = Features::class.java
+object ConfigMapper : DataMapper<Features> {
+    private val gson = GsonManager.lenientGson
 
     override fun serialize(value: Features): String = gson.toJson(value)
 
-    override fun createDefault(): Features = clazz.newInstance()
+    override fun createDefault(): Features = Features()
 
     override fun deserialize(string: String): Features {
         return tryOrDefault(::createDefault) {
-            val jsonObject = gson.fromJson(string, JsonObject::class.java)
+            val jsonObject = gson.fromJson<JsonObject>(string)
             val newJson = NautilusConfigMigrator.fixConfig(jsonObject)
-            val run = { gson.fromJson(newJson, clazz) }
+
+            val run = { gson.fromJson<Features>(newJson) }
             if (PlatformUtils.isDevEnvironment) {
                 try {
                     return run()
@@ -29,7 +30,7 @@ class ConfigMapper : DataMapper<Features> {
                     McClient.shutdown("Nautilus Config is corrupt inside development environment.")
                 }
             } else run()
-            return gson.fromJson(string, clazz)
+            return gson.fromJson<Features>(string)
         }
     }
 }

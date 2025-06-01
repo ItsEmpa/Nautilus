@@ -1,10 +1,10 @@
-package com.github.itsempa.nautilus.config
+package com.github.itsempa.nautilus.config.core.loader
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 
-class NullableStringTypeAdapter<T>(
+class NullableStringTypeAdapter<T : Any>(
     val serializer: T.() -> String,
     val deserializer: String.() -> T?
 ) : TypeAdapter<T>() {
@@ -16,4 +16,3 @@ class NullableStringTypeAdapter<T>(
     override fun read(reader: JsonReader): T? = deserializer(reader.nextString())
 
 }
-
