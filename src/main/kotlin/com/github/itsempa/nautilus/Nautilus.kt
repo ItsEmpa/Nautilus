@@ -38,6 +38,7 @@ import java.io.File
     clientSideOnly = true,
     version = Nautilus.VERSION,
     modLanguageAdapter = "com.github.itsempa.nautilus.utils.KotlinLanguageAdapter",
+    guiFactory = "com.github.itsempa.nautilus.config.core.ConfigGuiForgeInterop",
     dependencies = "after:skyhanni",
 )
 object Nautilus {
