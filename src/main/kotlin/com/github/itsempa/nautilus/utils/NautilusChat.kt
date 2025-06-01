@@ -13,12 +13,15 @@ import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
 import com.github.itsempa.nautilus.Nautilus
+import com.github.itsempa.nautilus.data.core.NautilusLogger
 import com.github.itsempa.nautilus.utils.helpers.McClient
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 
 @Suppress("unused")
 object NautilusChat {
+    private val logger = NautilusLogger("chat")
+
     private const val DEBUG_PREFIX_NO_COLOR = "[${Nautilus.MOD_NAME} Debug] "
     private const val DEBUG_PREFIX = "$DEBUG_PREFIX_NO_COLOR§7"
     private const val CHAT_PREFIX = "[${Nautilus.MOD_NAME}] "
@@ -33,7 +36,7 @@ object NautilusChat {
     ) {
         if (Nautilus.feature.about.debug) {
             internalChat(DEBUG_PREFIX + message, replaceSameMessage)
-            Nautilus.consoleLog(DEBUG_PREFIX_NO_COLOR + message)
+            logger.log(DEBUG_PREFIX_NO_COLOR + message)
         }
     }
 
