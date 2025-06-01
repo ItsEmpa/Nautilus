@@ -18,7 +18,7 @@ class MiscConfig {
     var hideArmorGlint: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Third Person Fov", desc = ".")
+    @ConfigOption(name = "Third Person Tweaks", desc = ".")
     @Accordion
-    val fov: ThirdPersonFovConfig = ThirdPersonFovConfig()
+    val thirdPerson: ThirdPersonConfig = ThirdPersonConfig()
 }
