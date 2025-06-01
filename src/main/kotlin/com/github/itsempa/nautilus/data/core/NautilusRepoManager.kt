@@ -6,11 +6,13 @@ import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.config.ConfigManager
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.NautilusRepositoryReloadEvent
 import com.github.itsempa.nautilus.utils.NautilusChat
+import com.github.itsempa.nautilus.utils.helpers.McClient
 import com.github.itsempa.nautilus.utils.tryCatch
 import com.github.itsempa.nautilus.utils.tryOrNull
 import com.google.gson.Gson
@@ -43,6 +45,7 @@ object NautilusRepoManager {
     val gson get() = ConfigManager.gson
 
     private val repoLocation = File(ConfigManager.directory, "repo")
+    private val tempDownloadDir = File(ConfigManager.directory, "temp")
 
     private val config get() = Nautilus.feature.dev
 
@@ -53,8 +56,14 @@ object NautilusRepoManager {
     fun initRepo() {
         shouldManuallyReload = true
         Nautilus.launchIOCoroutine {
-            fetchRepository(command = false)
-            reloadRepository()
+            fun update() {
+                fetchRepository(command = false)
+                reloadRepository()
+            }
+
+            // For some reason dev environment HATES the repo?
+            if (PlatformUtils.isDevEnvironment) McClient.runOnWorld(::update)
+            else update()
         }
     }
 
@@ -210,18 +219,14 @@ object NautilusRepoManager {
 
             lastRepoUpdate = SimpleTimeMark.now()
 
-            repoLocation.mkdirs()
-            val itemsZip = File(repoLocation, "nt-repo-main.zip")
+            tempDownloadDir.mkdirs()
+            val itemsZip = File(tempDownloadDir, "nt-repo-main.zip")
             itemsZip.createNewFile()
-
             val url = URL(getDownloadUrl(latestRepoCommit))
             val urlConnection = url.openConnection().apply {
                 connectTimeout = 15000
                 readTimeout = 30000
             }
-
-            RepoUtils.recursiveDelete(repoLocation)
-            repoLocation.mkdirs()
 
             try {
                 urlConnection.getInputStream().use { stream ->
@@ -230,6 +235,19 @@ object NautilusRepoManager {
                         itemsZip,
                     )
                 }
+
+                RepoUtils.recursiveDelete(repoLocation)
+                repoLocation.mkdirs()
+
+                unzipIgnoreFirstFolder(
+                    itemsZip.absolutePath,
+                    repoLocation.absolutePath,
+                )
+                if (currentDownloadedCommit == null || currentDownloadedCommit != latestRepoCommit) {
+                    writeCurrentCommit(latestRepoCommit, latestRepoCommitTime)
+                }
+                commitTime = latestRepoCommitTime
+                RepoUtils.recursiveDelete(tempDownloadDir)
             } catch (e: IOException) {
                 NautilusErrorManager.logErrorWithData(
                     e,
@@ -238,18 +256,9 @@ object NautilusRepoManager {
                     "command" to command,
                 )
                 repoDownloadFailed = true
+                RepoUtils.recursiveDelete(tempDownloadDir)
                 return
             }
-
-            unzipIgnoreFirstFolder(
-                itemsZip.absolutePath,
-                repoLocation.absolutePath,
-            )
-            if (currentDownloadedCommit == null || currentDownloadedCommit != latestRepoCommit) {
-                writeCurrentCommit(latestRepoCommit, latestRepoCommitTime)
-            }
-            commitTime = latestRepoCommitTime
-
         } catch (e: Exception) {
             NautilusErrorManager.logErrorWithData(
                 e,
