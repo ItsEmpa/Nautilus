@@ -21,9 +21,8 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.FeeshApi
 import com.github.itsempa.nautilus.data.RareDropStat
-import com.github.itsempa.nautilus.data.categories.FishingCategory
 import com.github.itsempa.nautilus.data.core.NautilusStorage
-import com.github.itsempa.nautilus.data.repo.FishingCategoriesMobs.getMobs
+import com.github.itsempa.nautilus.data.repo.FishingCategoriesMobs
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.RareDropEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
@@ -114,7 +113,7 @@ object RareDropsTracker {
         val entry: RareDropEntry
             get() = storage.getOrPut(internalName, ::RareDropEntry)
 
-        fun isActive(): Boolean = FishingCategory.activeCategories.any { mobName in it.getMobs() }
+        fun isActive(): Boolean = FishingCategoriesMobs.getCategoryOfMob(mobName)?.isActive ?: false
 
         companion object {
             val mobsToCheck: Map<String, FishingRareDrop>
