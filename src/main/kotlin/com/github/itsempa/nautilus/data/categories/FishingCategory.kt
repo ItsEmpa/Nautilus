@@ -15,6 +15,7 @@ import com.github.itsempa.nautilus.data.fishingevents.FishingFestivalEvent
 import com.github.itsempa.nautilus.data.fishingevents.JerrysWorkshopEvent
 import com.github.itsempa.nautilus.data.fishingevents.SpookyFestivalEvent
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
+import com.github.itsempa.nautilus.events.FishingCategoryUpdateEvent
 import com.github.itsempa.nautilus.utils.NautilusChat
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orTrue
 import com.github.itsempa.nautilus.utils.getSealedObjects
@@ -235,9 +236,10 @@ sealed class FishingCategory(val internalName: String, val extraCategory: Boolea
 
         @HandleEvent
         fun onSecondPassed() {
-            val newCategories = findCategories()
-            if (newCategories == activeCategories) return
-            activeCategories = newCategories
+            val oldCategories = activeCategories
+            activeCategories = findCategories()
+            if (oldCategories == activeCategories) return
+            FishingCategoryUpdateEvent(activeCategories, oldCategories).post()
         }
 
         private fun findCategories(): Set<FishingCategory> {

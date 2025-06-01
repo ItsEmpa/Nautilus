@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -23,6 +22,7 @@ import com.github.itsempa.nautilus.data.FeeshApi
 import com.github.itsempa.nautilus.data.RareDropStat
 import com.github.itsempa.nautilus.data.core.NautilusStorage
 import com.github.itsempa.nautilus.data.repo.FishingCategoriesMobs
+import com.github.itsempa.nautilus.events.FishingCategoryUpdateEvent
 import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.RareDropEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
@@ -187,12 +187,13 @@ object RareDropsTracker {
         }
     }
 
+    @HandleEvent(FishingCategoryUpdateEvent::class)
+    fun onFishingCategoryUpdate() {
+        activeDrops = FishingRareDrop.entries.filterTo(enumSetOf()) { it.isActive() }
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (event.repeatSeconds(5)) {
-            activeDrops = FishingRareDrop.entries.filterTo(enumSetOf()) { it.isActive() }
-        }
+    fun onSecondPassed() {
         if (config.enabled) updateDisplay()
         if (recentDroppedItems.isNotEmpty()) recentDroppedItems.removeIf { it.second.passedSince() > MAX_TIME }
         if (recentDeaths.isNotEmpty()) recentDeaths.removeIf { it.second.passedSince() > MAX_TIME }
