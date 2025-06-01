@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.github.itsempa.nautilus.events.FishCatchEvent
 import com.github.itsempa.nautilus.events.HotspotEvent
@@ -27,6 +28,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import java.awt.Color
 import java.util.LinkedList
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -71,38 +73,42 @@ object HotspotApi {
         var hasBeenSeen: Boolean = false
             private set
 
-        private var particleCount: Int = 0
-        private var particleYLevel: Double = Double.NaN
+        private val radiusCount: MutableMap<Double, Int> = mutableMapOf()
 
         init {
             tick()
         }
 
-        private var hasSentSpawn = false
+        private var isConfirmed = false
         private var hasSentBuff = false
 
         fun distance(pos: LorenzVec): Double = center.distanceIgnoreY(pos)
         fun isInside(pos: LorenzVec): Boolean = distance(pos) <= radius
 
-        fun isDetected() = hasSentSpawn
+        fun isDetected() = isConfirmed
 
         /** Returns true if it "used" the particle. */
         fun tryAddParticle(pos: LorenzVec): Boolean {
-            val y = pos.y
             val distance = distance(pos)
             if (distance > MAX_RADIUS) return false
 
-            if (particleYLevel.isNaN()) particleYLevel = y
-            else if (y != particleYLevel) return false
-            ++particleCount
-            lastUpdate = SimpleTimeMark.now()
+            val newRadius = distance.roundToHalf()
 
-            radius = distance.roundToHalf()
-            if (particleCount > 10 && !hasSentSpawn) {
-                hasSentSpawn = true
-                HotspotEvent.Detected(this).post()
-                postBuff()
-            }
+            if (!isConfirmed) {
+                // This is done to prevent particles from other sources from flickering the radius.
+                val newCount = radiusCount.addOrPut(newRadius, 1)
+                radius = newRadius
+                if (newCount > 15) {
+                    isConfirmed = true
+
+                    HotspotEvent.Detected(this).post()
+                    postBuff()
+
+                    radiusCount.clear()
+                }
+            } else if (abs(newRadius - radius) > 1.0) return false
+
+            lastUpdate = SimpleTimeMark.now()
 
             return true
         }
@@ -119,7 +125,7 @@ object HotspotApi {
         }
 
         private fun postBuff() {
-            if (!hasSentSpawn || hasSentBuff) return
+            if (!isConfirmed || hasSentBuff) return
             if (buff == null) return
             hasSentBuff = true
             HotspotEvent.BuffFound(this).post()
@@ -138,7 +144,6 @@ object HotspotApi {
                 "radius=$radius, " +
                 "buff=$buffString, " +
                 "hasBeenSeen=$hasBeenSeen, " +
-                "particleCount=$particleCount, " +
                 "entityId=$entityId" +
                 "lastUpdate=${lastUpdate.passedSince()}, " +
                 "startTime=${startTime.passedSince()}" +
