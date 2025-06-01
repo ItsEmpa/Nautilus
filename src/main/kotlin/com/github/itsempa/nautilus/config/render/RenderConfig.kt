@@ -1,5 +1,6 @@
 package com.github.itsempa.nautilus.config.render
 
+import at.hannibal2.skyhanni.deps.moulconfig.annotations.Accordion
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorBoolean
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigEditorText
 import at.hannibal2.skyhanni.deps.moulconfig.annotations.ConfigOption
@@ -7,6 +8,11 @@ import com.github.itsempa.nautilus.utils.NautilusUtils.asProperty
 import com.google.gson.annotations.Expose
 
 class RenderConfig {
+
+    @Expose
+    @ConfigOption(name = "Hotspot Highlight", desc = ".")
+    @Accordion
+    val hotspotHighlight: HotspotHighlightConfig = HotspotHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Invincibility Timer", desc = "Show a timer on top of sea creatures and Vanquishers.")
@@ -31,16 +37,6 @@ class RenderConfig {
     @ConfigOption(name = "Fix Lava Bobbers", desc = "Makes bobbers not sink in lava.")
     @ConfigEditorBoolean
     var fixLavaBobbers = true
-
-    @Expose
-    @ConfigOption(name = "Hotspot Highlight", desc = "Highlight hotspots.")
-    @ConfigEditorBoolean
-    var hotspotHighlight: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Hide Hotspot Particles", desc = "Hides the particles created by hotspots.")
-    @ConfigEditorBoolean
-    var hideHotspotParticles: Boolean = true
 
 
 }
