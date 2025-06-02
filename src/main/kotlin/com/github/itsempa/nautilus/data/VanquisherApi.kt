@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -20,6 +19,7 @@ import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.VanquisherEvent
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.hasDied
 import com.github.itsempa.nautilus.utils.NautilusEntityUtils.spawnTime
+import com.github.itsempa.nautilus.utils.clearAnd
 import me.owdding.ktmodules.Module
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Items
@@ -33,7 +33,14 @@ object VanquisherApi {
         val isOwn: Boolean,
         val mob: Mob,
         val spawnTime: SimpleTimeMark,
-    )
+    ) {
+        private var hasSentDespawn: Boolean = false
+        fun postDespawn() {
+            if (hasSentDespawn) return
+            hasSentDespawn = true
+            VanquisherEvent.DeSpawn(this).post()
+        }
+    }
 
     private val spawnPattern = "§aA §r§cVanquisher §r§ais spawning nearby!".toPattern()
 
@@ -48,7 +55,7 @@ object VanquisherApi {
     private var lastVanqSoundTime = SimpleTimeMark.farPast()
 
     private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes) { mob, data, _ ->
-        if (mob != null && data != null) VanquisherEvent.DeSpawn(data).post()
+        if (mob != null && data != null) data.postDespawn()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
@@ -108,13 +115,15 @@ object VanquisherApi {
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         val mob = event.mob
         val data = vanquishers.remove(mob) ?: return
+        data.postDespawn()
         if (mob.hasDied) VanquisherEvent.Death(data).post()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onSecondPassed() {
         if ((lastPossibleVanqSpawnEntity != null || lastVanqSpawnEntityPos != null || lastVanqSoundPos != null) &&
-            lastOwnVanqTime.passedSince() > 5.seconds) {
+            lastOwnVanqTime.passedSince() > 5.seconds
+        ) {
             lastPossibleVanqSpawnEntity = null
             lastVanqSpawnEntityPos = null
             lastVanqSoundPos = null
@@ -127,8 +136,8 @@ object VanquisherApi {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
-        vanquishers.clear()
+    fun onWorldChange() {
+        vanquishers.clearAnd { it.value.postDespawn() }
         lastPossibleVanqSpawnEntity = null
         lastVanqSpawnEntityPos = null
         lastVanqSoundPos = null

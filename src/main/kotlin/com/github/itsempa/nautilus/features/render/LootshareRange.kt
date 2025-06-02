@@ -1,7 +1,6 @@
 package com.github.itsempa.nautilus.features.render
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -44,7 +43,7 @@ object LootshareRange {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         updateNames()
         config.lootshareMobs.onToggle {
             updateNames()
