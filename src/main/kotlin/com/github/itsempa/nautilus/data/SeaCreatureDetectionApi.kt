@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.SeaCreature
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
@@ -64,6 +65,7 @@ object SeaCreatureDetectionApi {
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+        if (!isActive()) return // TODO: remove this workaround
         val mob = event.mob
         val data = entityIdToData[mob.entityId]
         if (data != null) {
@@ -258,6 +260,9 @@ object SeaCreatureDetectionApi {
             callback { reset() }
         }
     }
+
+    // TODO: remove workaround
+    private fun isActive(): Boolean = !DungeonApi.inDungeon()
 
     @HandleEvent
     fun onDebug(event: NautilusDebugEvent) {
