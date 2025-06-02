@@ -22,15 +22,14 @@ object ConfigMapper : DataMapper<Features> {
             val newJson = NautilusConfigMigrator.fixConfig(jsonObject)
 
             val run = { gson.fromJson<Features>(newJson) }
-            if (PlatformUtils.isDevEnvironment) {
+            return if (PlatformUtils.isDevEnvironment) {
                 try {
-                    return run()
+                    run()
                 } catch (e: Throwable) {
                     Nautilus.consoleLog(e.stackTraceToString())
                     McClient.shutdown("Nautilus Config is corrupt inside development environment.")
                 }
             } else run()
-            return gson.fromJson<Features>(string)
         }
     }
 }

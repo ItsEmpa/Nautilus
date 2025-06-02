@@ -32,10 +32,12 @@ object McClient {
         else DelayedRun.runNextTick(action)
     }
 
-    fun shutdown(reason: String? = null) {
+    fun shutdown(reason: String? = null): Nothing {
         val reasonLine = reason?.let { " Reason: ($it)" }.orEmpty()
-        System.err.println("${Nautilus.MOD_NAME}-${Nautilus.VERSION} forced the game to shutdown.$reasonLine")
+        val message = "${Nautilus.MOD_NAME}-${Nautilus.VERSION} forced the game to shutdown.$reasonLine"
+        System.err.println(message)
         FMLCommonHandler.instance().handleExit(-1)
+        throw RuntimeException(message) // This is here so that shutdown can return "Nothing"
     }
 
 }
