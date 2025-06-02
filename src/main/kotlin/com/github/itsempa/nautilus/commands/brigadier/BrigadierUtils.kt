@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import com.github.itsempa.nautilus.utils.NautilusUtils.hasWhitespace
 import com.mojang.brigadier.StringReader
+import com.mojang.brigadier.arguments.ArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.suggestion.Suggestions
@@ -13,6 +15,15 @@ import java.util.concurrent.CompletableFuture
 object BrigadierUtils {
 
     const val DOUBLE_QUOTE = '"'
+    private const val SINGLE_QUOTE = '\''
+
+    // Add greedy arguments here
+    fun <T> ArgumentType<T>.isGreedy(): Boolean {
+        return when (this) {
+            is StringArgumentType -> this.type == StringArgumentType.StringType.GREEDY_PHRASE
+            else -> false
+        }
+    }
 
     fun Collection<String>.toSuggestionProvider(shouldEscape: Boolean = true) = SuggestionProvider<Any?> { _, builder ->
         if (shouldEscape) builder.addOptionalEscaped(this)
@@ -20,13 +31,28 @@ object BrigadierUtils {
         builder.buildFuture()
     }
 
+    private fun isCharAllowed(c: Char): Boolean = StringReader.isAllowedInUnquotedString(c) || c == SINGLE_QUOTE
+
     /** The same as [StringReader.readString], except it doesn't accept escaping with `'`. */
     fun StringReader.readOptionalDoubleQuotedString(): String {
         if (!canRead()) return ""
         return if (peek() == DOUBLE_QUOTE) {
             skip()
             readStringUntil(DOUBLE_QUOTE)
-        } else readUnquotedString()
+        } else {
+            val start = cursor
+            while (canRead() && isCharAllowed(peek())) {
+                skip()
+            }
+            return string.substring(start, cursor)
+        }
+    }
+
+    /** Returns the remaining text in the [StringReader] and sets the cursor at the end */
+    fun StringReader.readGreedyString(): String {
+        val text = remaining
+        cursor = totalLength
+        return text
     }
 
     /** The same as [StringReader.readQuotedString], except it doesn't accept escaping with `'`. */
@@ -125,15 +151,32 @@ object BrigadierUtils {
         input: String,
         builder: SuggestionsBuilder,
         limit: Int = 200,
-        isValidItem: (NeuInternalName) -> Boolean = { true },
+        showWhenEmpty: Boolean = false,
+        isValidItem: (NeuInternalName) -> Boolean,
     ): CompletableFuture<Suggestions> {
-        val first = input.firstOrNull() ?: return builder.buildFuture()
-        val unEscaped = if (first == DOUBLE_QUOTE) input.drop(1) else input
-        if (unEscaped.isBlank()) return builder.buildFuture()
+        if (input.isEmpty() && !showWhenEmpty) return builder.buildFuture()
+        val unEscaped = if (input.firstOrNull() == DOUBLE_QUOTE) input.drop(1) else input
+        if (unEscaped.isBlank() && !showWhenEmpty) return builder.buildFuture()
 
         val lowercaseStart = unEscaped.replace("_", " ")
         val items = NeuItems.findItemNameStartingWithWithoutNPCs(lowercaseStart, isValidItem).take(limit)
 
+        return builder.addOptionalEscaped(items).buildFuture()
+    }
+
+    fun parseInternalNameTabComplete(
+        input: String,
+        builder: SuggestionsBuilder,
+        limit: Int = 200,
+        showWhenEmpty: Boolean = false,
+        isValidItem: (NeuInternalName) -> Boolean,
+    ): CompletableFuture<Suggestions> {
+        if (input.isEmpty() && !showWhenEmpty) return builder.buildFuture()
+        val unEscaped = if (input.firstOrNull() == DOUBLE_QUOTE) input.drop(1) else input
+        if (unEscaped.isBlank() && !showWhenEmpty) return builder.buildFuture()
+
+        val start = unEscaped.replace(" ", "_").uppercase()
+        val items = NeuItems.findInternalNameStartingWithWithoutNPCs(start, isValidItem).take(limit)
         return builder.addOptionalEscaped(items).buildFuture()
     }
 }

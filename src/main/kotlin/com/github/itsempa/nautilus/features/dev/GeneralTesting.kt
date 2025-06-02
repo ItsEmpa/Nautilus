@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isLavaRod
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import com.github.itsempa.nautilus.commands.brigadier.arguments.ItemNameArgumentType
+import com.github.itsempa.nautilus.commands.brigadier.arguments.InternalNameArgumentType
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.events.KillEvent
 import com.github.itsempa.nautilus.modules.DevModule
@@ -23,7 +23,7 @@ object GeneralTesting {
             aliases = listOf("ntbd")
             category = CommandCategory.DEVELOPER_TEST
 
-            argCallback("item", ItemNameArgumentType.itemName(::isValid)) { item ->
+            argCallback("item", InternalNameArgumentType.itemName(::isValid)) { item ->
                 NautilusChat.debug("Item: $item")
             }
         }
