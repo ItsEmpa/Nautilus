@@ -39,7 +39,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
 ) {
 
     private fun checkGreedy() =
-        require(!hasGreedyArg) { "Cannot add a callback to a builder that has a greedy argument." }
+        require(!hasGreedyArg) { "Cannot add an argument/literal to a builder that has a greedy argument." }
 
     fun callback(block: ArgContext.() -> Unit) {
         this.builder.executes {

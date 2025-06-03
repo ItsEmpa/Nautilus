@@ -2,6 +2,7 @@ package com.github.itsempa.nautilus.commands.brigadier.arguments
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierUtils
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierUtils.readGreedyString
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierUtils.readOptionalDoubleQuotedString
 import com.mojang.brigadier.LiteralMessage
 import com.mojang.brigadier.StringReader
@@ -16,7 +17,9 @@ import java.util.concurrent.CompletableFuture
 private typealias ParsingFail = BrigadierUtils.ItemParsingFail
 
 // TODO: Maybe add greedy argument support
-sealed class InternalNameArgumentType : ArgumentType<NeuInternalName> {
+sealed class InternalNameArgumentType(
+    val isGreedy: Boolean = false,
+) : ArgumentType<NeuInternalName> {
 
     protected open val showWhenEmpty: Boolean = false
 
@@ -30,7 +33,10 @@ sealed class InternalNameArgumentType : ArgumentType<NeuInternalName> {
 
     private val emptyValueException = SimpleCommandExceptionType { "Empty item name provided." }
 
-    protected fun parseString(input: String, reader: StringReader): NeuInternalName {
+    override fun parse(reader: StringReader): NeuInternalName {
+        val input = if (isGreedy) reader.readGreedyString()
+        else reader.readOptionalDoubleQuotedString()
+
         val result = BrigadierUtils.parseItem(input, isValidItem = ::isValidItem)
         return when (result) {
             is NeuInternalName -> result
@@ -43,33 +49,25 @@ sealed class InternalNameArgumentType : ArgumentType<NeuInternalName> {
 
     protected open fun isValidItem(item: NeuInternalName): Boolean = true
 
-    private open class ItemName : InternalNameArgumentType() {
-        override fun parse(reader: StringReader): NeuInternalName {
-            val input = reader.readOptionalDoubleQuotedString()
-            return parseString(input, reader)
-        }
-
+    private open class ItemName(isGreedy: Boolean) : InternalNameArgumentType(isGreedy) {
         override fun <S : Any?> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
             return BrigadierUtils.parseItemNameTabComplete(
                 builder.remainingLowerCase,
                 builder,
                 showWhenEmpty = showWhenEmpty,
+                isGreedy = isGreedy,
                 isValidItem = ::isValidItem,
             )
         }
     }
 
-    private open class InternalName : InternalNameArgumentType() {
-        override fun parse(reader: StringReader): NeuInternalName {
-            val input = reader.readOptionalDoubleQuotedString()
-            return parseString(input, reader)
-        }
-
+    private open class InternalName(isGreedy: Boolean) : InternalNameArgumentType(isGreedy) {
         override fun <S : Any?> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
             return BrigadierUtils.parseInternalNameTabComplete(
                 builder.remaining,
                 builder,
                 showWhenEmpty = showWhenEmpty,
+                isGreedy = isGreedy,
                 isValidItem = ::isValidItem,
             )
         }
@@ -77,54 +75,48 @@ sealed class InternalNameArgumentType : ArgumentType<NeuInternalName> {
 
     @Suppress("unused")
     companion object {
-        fun itemName(): InternalNameArgumentType = ItemName()
+        fun itemName(isGreedy: Boolean = false): InternalNameArgumentType = ItemName(isGreedy)
 
-        fun itemName(isValid: (NeuInternalName) -> Boolean): InternalNameArgumentType {
-            return object : ItemName() {
+        fun itemName(
+            showWhenEmpty: Boolean = false,
+            isGreedy: Boolean = false,
+            isValid: (NeuInternalName) -> Boolean,
+        ): InternalNameArgumentType {
+            return object : ItemName(isGreedy) {
+                override val showWhenEmpty: Boolean = showWhenEmpty
+                override fun isValidItem(item: NeuInternalName): Boolean = isValid(item)
+            }
+        }
+
+        fun itemName(
+            allowed: Collection<NeuInternalName>,
+            showWhenEmpty: Boolean = false,
+            isGreedy: Boolean = false,
+        ): InternalNameArgumentType {
+            val set = allowed.toSet()
+            return itemName(showWhenEmpty, isGreedy) { it in set }
+        }
+
+        fun internalName(isGreedy: Boolean = false): InternalNameArgumentType = InternalName(isGreedy)
+
+        fun internalName(
+            showWhenEmpty: Boolean = false,
+            isGreedy: Boolean = false,
+            isValid: (NeuInternalName) -> Boolean,
+        ): InternalNameArgumentType {
+            return object : InternalName(isGreedy) {
                 private val isValid: (NeuInternalName) -> Boolean = isValid
                 override fun isValidItem(item: NeuInternalName): Boolean = this.isValid(item)
             }
         }
 
-        fun itemName(showWhenEmpty: Boolean, isValid: (NeuInternalName) -> Boolean): InternalNameArgumentType {
-            return object : ItemName() {
-                override val showWhenEmpty: Boolean = showWhenEmpty
-                private val isValid: (NeuInternalName) -> Boolean = isValid
-                override fun isValidItem(item: NeuInternalName): Boolean = this.isValid(item)
-            }
-        }
-
-        fun itemName(allowed: Collection<NeuInternalName>, showWhenEmpty: Boolean = false): InternalNameArgumentType {
-            return object : ItemName() {
-                override val showWhenEmpty: Boolean = showWhenEmpty
-                private val set = allowed.toSet()
-                override fun isValidItem(item: NeuInternalName): Boolean = item in set
-            }
-        }
-
-        fun internalName(): InternalNameArgumentType = InternalName()
-
-        fun internalName(isValid: (NeuInternalName) -> Boolean): InternalNameArgumentType {
-            return object : InternalName() {
-                private val isValid: (NeuInternalName) -> Boolean = isValid
-                override fun isValidItem(item: NeuInternalName): Boolean = this.isValid(item)
-            }
-        }
-
-        fun internalName(showWhenEmpty: Boolean, isValid: (NeuInternalName) -> Boolean): InternalNameArgumentType {
-            return object : InternalName() {
-                override val showWhenEmpty: Boolean = showWhenEmpty
-                private val isValid: (NeuInternalName) -> Boolean = isValid
-                override fun isValidItem(item: NeuInternalName): Boolean = this.isValid(item)
-            }
-        }
-
-        fun internalName(allowed: Collection<NeuInternalName>, showWhenEmpty: Boolean = false): InternalNameArgumentType {
-            return object : InternalName() {
-                override val showWhenEmpty: Boolean = showWhenEmpty
-                private val set = allowed.toSet()
-                override fun isValidItem(item: NeuInternalName): Boolean = item in set
-            }
+        fun internalName(
+            allowed: Collection<NeuInternalName>,
+            showWhenEmpty: Boolean = false,
+            isGreedy: Boolean = false,
+        ): InternalNameArgumentType {
+            val set = allowed.toSet()
+            return internalName(showWhenEmpty, isGreedy) { it in set }
         }
     }
 }

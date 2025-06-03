@@ -2,6 +2,7 @@ package com.github.itsempa.nautilus.commands.brigadier
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
+import com.github.itsempa.nautilus.commands.brigadier.arguments.InternalNameArgumentType
 import com.github.itsempa.nautilus.utils.NautilusUtils.hasWhitespace
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
@@ -21,6 +22,7 @@ object BrigadierUtils {
     fun <T> ArgumentType<T>.isGreedy(): Boolean {
         return when (this) {
             is StringArgumentType -> this.type == StringArgumentType.StringType.GREEDY_PHRASE
+            is InternalNameArgumentType -> this.isGreedy
             else -> false
         }
     }
@@ -152,6 +154,7 @@ object BrigadierUtils {
         builder: SuggestionsBuilder,
         limit: Int = 200,
         showWhenEmpty: Boolean = false,
+        isGreedy: Boolean = false,
         isValidItem: (NeuInternalName) -> Boolean,
     ): CompletableFuture<Suggestions> {
         if (input.isEmpty() && !showWhenEmpty) return builder.buildFuture()
@@ -161,7 +164,8 @@ object BrigadierUtils {
         val lowercaseStart = unEscaped.replace("_", " ")
         val items = NeuItems.findItemNameStartingWithWithoutNPCs(lowercaseStart, isValidItem).take(limit)
 
-        return builder.addOptionalEscaped(items).buildFuture()
+        if (isGreedy) builder.addUnescaped(items) else builder.addOptionalEscaped(items)
+        return builder.buildFuture()
     }
 
     fun parseInternalNameTabComplete(
@@ -169,6 +173,7 @@ object BrigadierUtils {
         builder: SuggestionsBuilder,
         limit: Int = 200,
         showWhenEmpty: Boolean = false,
+        isGreedy: Boolean = false,
         isValidItem: (NeuInternalName) -> Boolean,
     ): CompletableFuture<Suggestions> {
         if (input.isEmpty() && !showWhenEmpty) return builder.buildFuture()
@@ -177,6 +182,8 @@ object BrigadierUtils {
 
         val start = unEscaped.replace(" ", "_").uppercase()
         val items = NeuItems.findInternalNameStartingWithWithoutNPCs(start, isValidItem).take(limit)
-        return builder.addOptionalEscaped(items).buildFuture()
+
+        if (isGreedy) builder.addUnescaped(items) else builder.addOptionalEscaped(items)
+        return builder.buildFuture()
     }
 }

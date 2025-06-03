@@ -17,6 +17,17 @@ import kotlin.time.Duration.Companion.minutes
 // TODO: separate some functions into other util objects
 object NautilusUtils {
 
+    /** If the collection is a set, it returns the collection itself or an optimized instance of it. If not, it creates a new set. */
+    fun <T> Collection<T>.ensureSet(): Set<T> {
+        return when (size) {
+            0 -> emptySet()
+            1 -> setOf(if (this is List) this[0] else iterator().next())
+            else -> {
+                this as? Set ?: toSet()
+            }
+        }
+    }
+
     fun AxisAlignedBB.getHeight() = abs(maxY - minY)
     fun AxisAlignedBB.getWidth() = max(abs(maxX - minX), abs(maxZ - minZ))
 
