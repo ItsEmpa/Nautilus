@@ -2,7 +2,7 @@ package com.github.itsempa.nautilus.commands.brigadier
 
 import com.github.itsempa.nautilus.data.core.NautilusErrorManager
 import com.github.itsempa.nautilus.utils.NautilusChat
-import com.github.itsempa.nautilus.utils.tryOrDefault
+import com.github.itsempa.nautilus.utils.tryOrNull
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.exceptions.CommandSyntaxException
@@ -13,7 +13,7 @@ import net.minecraft.util.BlockPos
 
 class BrigadierCommand(
     root: BaseBrigadierBuilder,
-    private val dispatcher: CommandDispatcher<Any?>
+    private val dispatcher: CommandDispatcher<Any?>,
 ) : CommandBase() {
     private val aliases: List<String> = root.aliases
     private val node: CommandNode<Any?>
@@ -45,10 +45,10 @@ class BrigadierCommand(
     override fun addTabCompletionOptions(
         sender: ICommandSender,
         args: Array<String>,
-        pos: BlockPos
-    ): List<String> {
+        pos: BlockPos,
+    ): List<String>? {
         val input = if (args.isEmpty()) node.name else "${node.name} ${args.joinToString(" ")}"
-        return tryOrDefault(emptyList()) {
+        return tryOrNull {
             dispatcher.getCompletionSuggestions(dispatcher.parse(input, sender)).get().list.map { it.text }
         }
     }
