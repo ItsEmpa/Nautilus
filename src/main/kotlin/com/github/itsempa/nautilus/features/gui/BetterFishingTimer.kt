@@ -15,6 +15,7 @@ import com.github.itsempa.nautilus.events.NautilusDebugEvent
 import com.github.itsempa.nautilus.events.SeaCreatureEvent
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orFarPast
 import me.owdding.ktmodules.Module
+import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -84,6 +85,8 @@ object BetterFishingTimer {
         config.position.renderString(display, posLabel = "Better Fishing Timer")
     }
 
+    private fun KMutableProperty0<Int>.decrease() = set((get() - 1).coerceAtLeast(0))
+
     private fun SeaCreatureData.handleSpawn() {
         if (isOwn) ++ownMobs else ++otherMobs
         val oldest = oldestSeaCreature
@@ -95,13 +98,17 @@ object BetterFishingTimer {
     }
 
     private fun SeaCreatureData.handleDeSpawn() {
-        if (isOwn) --ownMobs else --otherMobs
+        val property = if (isOwn) ::ownMobs else ::otherMobs
+        property.decrease()
         if (this == oldestSeaCreature) calculateOldest()
         update()
     }
 
     private fun update() {
-        if (totalMobs == 0 && display != null) return reset()
+        if (totalMobs == 0) {
+            if (display != null) reset()
+            return
+        }
         if (!isEnabled()) return
         val timeSince = oldestTime.passedSince()
 
@@ -132,7 +139,7 @@ object BetterFishingTimer {
                 lastWarning.passedSince() < warningDelay -> AlertReason.NO_ALERT
                 timeAlert && timeSince >= timeAlertSeconds.seconds -> AlertReason.TIME
                 warnPersonalCap && currentCap.hasPersonalCap && ownMobs >= currentCap.personalCap -> AlertReason.PERSONAL_CAP
-                warnGlobalCap && ownMobs >= GLOBAL_CAP -> AlertReason.GLOBAL_CAP
+                warnGlobalCap && totalMobs >= GLOBAL_CAP -> AlertReason.GLOBAL_CAP
                 else -> AlertReason.NO_ALERT
             }
         }
