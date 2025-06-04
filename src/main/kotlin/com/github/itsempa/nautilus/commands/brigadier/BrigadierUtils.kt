@@ -65,6 +65,11 @@ object BrigadierUtils {
         return readStringUntil(DOUBLE_QUOTE)
     }
 
+    fun String.escapeDoubleQuote(): String {
+        if (firstOrNull() != DOUBLE_QUOTE) return this
+        return substring(1, lastIndex - 1)
+    }
+
     enum class ItemParsingFail {
         UNKNOWN_ITEM,
         DISALLOWED_ITEM,
@@ -138,11 +143,15 @@ object BrigadierUtils {
     ): SuggestionsBuilder {
         if (collection.isEmpty()) return this
         val input = remainingLowerCase
-        val lastWhitespace = input.lastIndexOf(' ')
+        val isEscaped = input.firstOrNull() == DOUBLE_QUOTE
+        val escaped = if (isEscaped) input.drop(1) else input
+        val lastWhitespace = escaped.lastIndexOf(' ')
         for (string in collection) {
-            if (lastWhitespace == -1) suggest(string)
-            else {
-                val suggestion = string.substring(lastWhitespace + 1)
+            if (lastWhitespace == -1) {
+                if (input == string) continue
+                suggest(string)
+            } else {
+                val suggestion = string.substring(lastWhitespace + 1) + if (isEscaped) DOUBLE_QUOTE else ""
                 if (suggestion.isNotBlank()) suggest(suggestion)
             }
         }

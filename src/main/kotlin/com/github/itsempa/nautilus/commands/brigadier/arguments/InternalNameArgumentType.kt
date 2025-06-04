@@ -2,6 +2,7 @@ package com.github.itsempa.nautilus.commands.brigadier.arguments
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierUtils
+import com.github.itsempa.nautilus.commands.brigadier.BrigadierUtils.escapeDoubleQuote
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierUtils.readGreedyString
 import com.github.itsempa.nautilus.commands.brigadier.BrigadierUtils.readOptionalDoubleQuotedString
 import com.mojang.brigadier.LiteralMessage
@@ -34,7 +35,7 @@ sealed class InternalNameArgumentType(
     private val emptyValueException = SimpleCommandExceptionType { "Empty item name provided." }
 
     override fun parse(reader: StringReader): NeuInternalName {
-        val input = if (isGreedy) reader.readGreedyString()
+        val input = if (isGreedy) reader.readGreedyString().escapeDoubleQuote()
         else reader.readOptionalDoubleQuotedString()
 
         val result = BrigadierUtils.parseItem(input, isValidItem = ::isValidItem)
@@ -105,8 +106,8 @@ sealed class InternalNameArgumentType(
             isValid: (NeuInternalName) -> Boolean,
         ): InternalNameArgumentType {
             return object : InternalName(isGreedy) {
-                private val isValid: (NeuInternalName) -> Boolean = isValid
-                override fun isValidItem(item: NeuInternalName): Boolean = this.isValid(item)
+                override val showWhenEmpty: Boolean = showWhenEmpty
+                override fun isValidItem(item: NeuInternalName): Boolean = isValid(item)
             }
         }
 

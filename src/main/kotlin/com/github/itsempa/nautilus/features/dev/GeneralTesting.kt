@@ -2,7 +2,6 @@ package com.github.itsempa.nautilus.features.dev
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.features.fishing.FishingApi.isLavaRod
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -15,11 +14,6 @@ import com.github.itsempa.nautilus.utils.NautilusChat
 
 @DevModule
 object GeneralTesting {
-
-
-    private fun isValid(internalName: NeuInternalName): Boolean {
-        return internalName.isLavaRod()
-    }
 
     @HandleEvent
     fun onBrigadier(event: BrigadierRegisterEvent) {
@@ -35,10 +29,25 @@ object GeneralTesting {
                 "POLISHED_TOPAZ_ROD"
             ).toInternalNames()
 
-            val lavaRodArgument = InternalNameArgumentType.itemName(lavaRods, showWhenEmpty = true, isGreedy = true)
+            literal("greedy") {
+                val greedyArg = InternalNameArgumentType.itemName(lavaRods, showWhenEmpty = true, isGreedy = true)
+                argCallback("greedy", greedyArg) { greedyItem ->
+                    ChatUtils.chat("Greedy item selected: ${greedyItem.repoItemName}")
+                }
+            }
 
-            argCallback("lavaRod", lavaRodArgument) { lavaRod ->
-                ChatUtils.chat("Lava rod selected: ${lavaRod.repoItemName}")
+            literal("item") {
+                val itemArgument = InternalNameArgumentType.itemName(lavaRods, showWhenEmpty = true)
+                argCallback("item", itemArgument) { item ->
+                    ChatUtils.chat("Item selected: ${item.repoItemName}")
+                }
+            }
+
+            literal("internal") {
+                val internalNameArgument = InternalNameArgumentType.internalName(lavaRods, showWhenEmpty = true)
+                argCallback("internal", internalNameArgument) { internalName ->
+                    ChatUtils.chat("Internal name selected: ${internalName.asString()}")
+                }
             }
         }
     }
