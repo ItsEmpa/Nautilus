@@ -12,12 +12,15 @@ object FishingCategoriesMobs {
 
     var categoriesMobData: Map<FishingCategory, List<String>> = emptyMap()
         private set
-    private var mobToCategory = mutableMapOf<String, FishingCategory>()
+    private var mobToCategory: Map<String, FishingCategory> = emptyMap()
 
     @HandleEvent
     fun onRepoLoad(event: NautilusRepositoryReloadEvent) {
         val data = event.getConstant<FishingCategoriesMobsJson>("FishingCategoriesMobs")
         categoriesMobData = data.categories.mapValues { it.value.mobs }
+        mobToCategory = categoriesMobData.flatMap { (category, mobs) ->
+            mobs.map { mob -> mob to category }
+        }.toMap()
     }
 
     fun getCategoryOfMob(mob: String): FishingCategory? = mobToCategory[mob]
