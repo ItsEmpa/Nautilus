@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.deps.moulconfig.gui.KeyboardEvent
 import at.hannibal2.skyhanni.deps.moulconfig.gui.MouseEvent
 import at.hannibal2.skyhanni.deps.moulconfig.processor.ProcessedOption
 import com.github.itsempa.nautilus.Nautilus
-import net.minecraft.util.EnumChatFormatting.GREEN
-import net.minecraft.util.EnumChatFormatting.RED
 import org.lwjgl.input.Mouse
 
 class NautilusGuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
@@ -23,7 +21,9 @@ class NautilusGuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEdi
         val adjustedWidth = width - 20
         val nextVersion = UpdateManager.getNextVersion()
 
-        button.text = when (UpdateManager.updateState) {
+        val updateState = UpdateManager.updateState
+
+        button.text = when (updateState) {
             UpdateState.AVAILABLE -> "Download update"
             UpdateState.QUEUED -> "Downloading..."
             UpdateState.DOWNLOADED -> "Downloaded"
@@ -32,8 +32,8 @@ class NautilusGuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEdi
         button.width = button.getWidth(context)
         button.render(context, getButtonPosition(adjustedWidth), 10)
 
-        if (UpdateManager.updateState == UpdateState.DOWNLOADED) {
-            val updateText = "${GREEN}The update will be installed after your next restart."
+        if (updateState == UpdateState.DOWNLOADED) {
+            val updateText = "§aThe update will be installed after your next restart."
             context.drawStringCenteredScaledMaxWidth(
                 updateText,
                 fr,
@@ -50,9 +50,11 @@ class NautilusGuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEdi
         context.scale(2F, 2F, 1F)
         val currentVersion = Nautilus.VERSION
         val sameVersion = currentVersion.equals(nextVersion, true)
+
+        val prefix = if (updateState == UpdateState.NONE) "§a" else "§c"
         context.drawStringCenteredScaledMaxWidth(
-            "${if (UpdateManager.updateState == UpdateState.NONE) GREEN else RED}$currentVersion" +
-                if (nextVersion != null && !sameVersion) "➜ ${GREEN}${nextVersion}" else "",
+            "$prefix$currentVersion" +
+                if (nextVersion != null && !sameVersion) "➜ §a$nextVersion" else "",
             fr,
             widthRemaining / 4F,
             10F,
@@ -76,7 +78,8 @@ class NautilusGuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEdi
             (mouseY - 10 - y) in (0..button.height)
         ) {
             when (UpdateManager.updateState) {
-                UpdateState.AVAILABLE, UpdateState.NONE -> UpdateManager.checkUpdate()
+                UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
+                UpdateState.NONE -> UpdateManager.checkUpdate()
                 else -> { /* Empty */ }
             }
             return true
