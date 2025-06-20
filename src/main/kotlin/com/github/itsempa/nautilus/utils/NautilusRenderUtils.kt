@@ -2,8 +2,8 @@ package com.github.itsempa.nautilus.utils
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
-import at.hannibal2.skyhanni.utils.RenderUtils.getViewerPos
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.getViewerPos
 import com.github.itsempa.nautilus.utils.helpers.McClient
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
