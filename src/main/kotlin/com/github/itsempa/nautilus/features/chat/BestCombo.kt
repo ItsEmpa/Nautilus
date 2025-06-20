@@ -29,7 +29,7 @@ object BestCombo {
 
     @HandleEvent
     fun onComboUpdate(event: ComboUpdateEvent) {
-        if (event.combo > bestCombo && !isInBestCombo) {
+        if (event.combo >= bestCombo && !isInBestCombo) {
             isInBestCombo = true
             val currentBestCombo = bestCombo
             if (currentBestCombo != 0) sendMessage("You beat your previous best combo of §l§6${currentBestCombo.addSeparators()}§3!")
@@ -41,7 +41,7 @@ object BestCombo {
         isInBestCombo = false
         val finishedCombo = event.combo
         val currentBestCombo = bestCombo
-        if (currentBestCombo > finishedCombo) return
+        if (currentBestCombo >= finishedCombo) return
         bestCombo = finishedCombo
         if (currentBestCombo == 0) {
             sendMessage("You got a new best combo of §l§6${finishedCombo.addSeparators()}§3!")
