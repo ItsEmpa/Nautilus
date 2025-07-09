@@ -2,8 +2,8 @@ package com.github.itsempa.nautilus.features.chat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
