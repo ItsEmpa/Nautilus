@@ -17,7 +17,7 @@ class NautilusGuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEdi
         val fr = context.minecraft.defaultFontRenderer
 
         context.pushMatrix()
-        context.translate(x.toFloat() + 10, y.toFloat(), 1F)
+        context.translate(x.toFloat() + 10, y.toFloat())
         val adjustedWidth = width - 20
         val nextVersion = UpdateManager.getNextVersion()
 
@@ -47,7 +47,7 @@ class NautilusGuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEdi
 
         val widthRemaining = adjustedWidth - button.width - 10
 
-        context.scale(2F, 2F, 1F)
+        context.scale(2F, 2F)
         val currentVersion = Nautilus.VERSION
         val sameVersion = currentVersion.equals(nextVersion, true)
 

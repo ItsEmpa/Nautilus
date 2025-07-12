@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.FeeshApi
 import com.github.itsempa.nautilus.data.categories.FishingCategory
@@ -131,7 +132,7 @@ object SpookyCounter {
                 HorizontalContainerRenderable(
                     buildList {
                         for ((mob, amount) in catchAmount) {
-                            add(Renderable.itemStack(mob.item, 1.0))
+                            add(ItemStackRenderable(mob.item, 1.0))
                             add(SafeUtils.stringRenderable("§e$amount", 1.0))
                             add(Renderable.placeholder(5, 0))
                         }
