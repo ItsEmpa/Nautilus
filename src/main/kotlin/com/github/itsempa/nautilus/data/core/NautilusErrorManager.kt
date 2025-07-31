@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.utils.NautilusChat

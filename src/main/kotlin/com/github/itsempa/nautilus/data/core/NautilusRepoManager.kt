@@ -2,7 +2,6 @@ package com.github.itsempa.nautilus.data.core
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -237,7 +236,7 @@ object NautilusRepoManager {
                     )
                 }
 
-                RepoUtils.recursiveDelete(repoLocation)
+                repoLocation.deleteRecursively()
                 repoLocation.mkdirs()
 
                 unzipIgnoreFirstFolder(
@@ -248,7 +247,7 @@ object NautilusRepoManager {
                     writeCurrentCommit(latestRepoCommit, latestRepoCommitTime)
                 }
                 commitTime = latestRepoCommitTime
-                RepoUtils.recursiveDelete(tempDownloadDir)
+                tempDownloadDir.deleteRecursively()
             } catch (e: IOException) {
                 NautilusErrorManager.logErrorWithData(
                     e,
@@ -257,7 +256,7 @@ object NautilusRepoManager {
                     "command" to command,
                 )
                 repoDownloadFailed = true
-                RepoUtils.recursiveDelete(tempDownloadDir)
+                tempDownloadDir.deleteRecursively()
                 return
             }
         } catch (e: Exception) {

@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.utils.NautilusItemUtils.uuid
 import com.github.itsempa.nautilus.utils.NautilusNullableUtils.orZero
@@ -134,11 +134,11 @@ object LegionBobbinDisplay {
         )
 
         return listOf(
-            HorizontalContainerRenderable(listOf(
+            Renderable.horizontal(listOf(
                 SafeUtils.stringRenderable(legionTitle),
                 SafeUtils.stringRenderable(legionText),
             )),
-            HorizontalContainerRenderable(listOf(
+            Renderable.horizontal(listOf(
                 SafeUtils.stringRenderable(bobbinTitle),
                 SafeUtils.stringRenderable(bobbinText),
             )),
@@ -149,7 +149,7 @@ object LegionBobbinDisplay {
     private fun createRealRenderable(): List<Renderable> {
         return buildList {
             if (!config.hideWithoutEnchant || wearingLegion) add(
-                HorizontalContainerRenderable(
+                Renderable.horizontal(
                     listOf(
                         SafeUtils.stringRenderable("§dLegion: "),
                         SafeUtils.stringRenderable("§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)"),
@@ -157,7 +157,7 @@ object LegionBobbinDisplay {
                 ),
             )
             if (!config.hideWithoutEnchant || wearingBobbin) add(
-                HorizontalContainerRenderable(
+                Renderable.horizontal(
                     listOf(
                         SafeUtils.stringRenderable("§3Bobbin: "),
                         SafeUtils.stringRenderable("§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)"),

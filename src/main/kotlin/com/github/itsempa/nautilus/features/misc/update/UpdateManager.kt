@@ -2,8 +2,8 @@ package com.github.itsempa.nautilus.features.misc.update
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.events.BrigadierRegisterEvent
 import com.github.itsempa.nautilus.utils.NautilusChat
@@ -46,7 +46,7 @@ object UpdateManager {
         context.cleanup()
         UpdateUtils.patchConnection {
             if (it is HttpsURLConnection) {
-                ApiUtils.patchHttpsRequest(it)
+                ApiInternalUtils.patchHttpsRequest(it)
             }
         }
     }

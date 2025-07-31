@@ -12,9 +12,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.FeeshApi
 import com.github.itsempa.nautilus.data.categories.FishingCategory
@@ -62,6 +63,7 @@ object SpookyCounter {
         val item: ItemStack by lazy(itemSupplier)
         private val chatName: String = toFormattedName()
         override fun toString(): String = chatName
+
         companion object {
             fun fromChatName(name: String): SpookyMob? = entries.find { it.chatName == name }
         }
@@ -126,14 +128,14 @@ object SpookyCounter {
     }
 
     private fun updateDisplay() {
-        renderable = VerticalContainerRenderable(
+        renderable = Renderable.vertical(
             listOf(
                 SafeUtils.stringRenderable("§5§lSpooky Festival Counter"),
-                HorizontalContainerRenderable(
+                Renderable.horizontal(
                     buildList {
                         for ((mob, amount) in catchAmount) {
-                            add(ItemStackRenderable(mob.item, 1.0))
-                            add(SafeUtils.stringRenderable("§e$amount", 1.0))
+                            add(Renderable.item(mob.item, 1.0))
+                            add(SafeUtils.stringRenderable("§e$amount"))
                             add(Renderable.placeholder(5, 0))
                         }
                     },

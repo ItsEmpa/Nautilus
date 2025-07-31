@@ -8,6 +8,7 @@ import com.github.itsempa.nautilus.Nautilus
 import com.github.itsempa.nautilus.data.SeaCreatureDetectionApi.seaCreature
 import me.owdding.ktmodules.Module
 import net.minecraft.entity.Entity
+import java.awt.Color
 
 @Module
 object SeaCreatureOwnerHighlight {
@@ -20,10 +21,10 @@ object SeaCreatureOwnerHighlight {
         event.queueEntitiesToOutline(::outlineEntity)
     }
 
-    private fun outlineEntity(entity: Entity): Int? {
+    private fun outlineEntity(entity: Entity): Color? {
         val seaCreature = entity.mob?.seaCreature ?: return null
         val color = if (seaCreature.isOwn) LorenzColor.LIGHT_PURPLE else LorenzColor.BLUE
-        return color.toColor().rgb
+        return color.toColor()
     }
 
     fun isEnabled(): Boolean = config
